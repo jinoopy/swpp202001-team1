@@ -14,11 +14,7 @@
 
 using namespace llvm;
 using namespace std;
-namespace {
 
-class RegisterGraph {
-
-};
 
 //Finds all instructions that can be 'alive' in some point.
 //i.e. finds all Arguments & Instructions which refer to 'values'.
@@ -27,12 +23,19 @@ vector<Value*>  SearchAllArgInst(Module&);
 
 //Recursively(post-order) searches through all instructions
 //mark liveness of each values in each instruction
-template<int N>
 map<Instruction*, vector<bool>> LiveInterval(Module&, vector<Value*>&);
+//helper function for LiveInterval; does the recursive search
+void LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&);
 
 //for all bool[] array, if two values are marked 'true' together,
 //there exists a line between two values.
 RegisterGraph RegisterClique(Module&, vector<vector<bool>>&);
+
+namespace {
+
+class RegisterGraph {
+
+};
 
 class LivenessAnalysis : PassInfoMixin<LivenessAnalysis>{
 
