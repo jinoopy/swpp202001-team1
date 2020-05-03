@@ -25,9 +25,9 @@ vector<Value*>  SearchAllArgInst(Module&);
 //mark liveness of each values in each instruction
 map<Instruction*, vector<bool>> LiveInterval(Module&, vector<Value*>&);
 //helper function for LiveInterval; does the recursive search
-void LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&);
+bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
 
-//for all bool[] array, if two values are marked 'true' together,
+//for all bool vector, if two values are marked 'true' together,
 //there exists a line between two values.
 RegisterGraph RegisterClique(Module&, vector<vector<bool>>&);
 
