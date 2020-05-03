@@ -1,6 +1,8 @@
 #include "LivenessAnalysis.h"
 
-RegisterGraph LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
+namespace {
+
+PreservedAnalyses LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
     
     vector<Value*> values = SearchAllArgInst(M);
 
@@ -14,7 +16,7 @@ RegisterGraph LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
         for(BasicBlock& BB : F) {
             for(Instruction& I : BB) {
                 I.print(outs());
-                outs() << "Alive variables: ";
+                outs() << " Alive: ";
                 for(int i = 0; i < values.size(); i++) {
                     if(live[&I][i]) {
                         outs() << values[i]->getName() << " ";
@@ -24,7 +26,7 @@ RegisterGraph LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
             }
         }
     }
-
+    /*
     vector<vector<bool>> live_values;
     for(auto it = live.begin(); it != live.end(); ++it) {
         live_values.push_back(it->second);
@@ -32,7 +34,8 @@ RegisterGraph LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
 
     RegisterGraph graph = RegisterClique(M, live_values);
 
-    return graph;
+    return PreservedAnalyses();
+    */
 }
 
 #define isStore(I) (dyn_cast<StoreInst>(&I)!=nullptr)
@@ -53,7 +56,7 @@ vector<Value*> SearchAllArgInst(Module& M) {
     return values;
 }
 
-#define isArgument(V) (dyn_cast<Argument>(&V)!=nullptr)
+#define isArgument(V) (dyn_cast<Argument>(V)!=nullptr)
 map<Instruction*, vector<bool>> LiveInterval(Module& M, vector<Value*>& values) {
 
     map<Instruction*, vector<bool>> live;
@@ -71,23 +74,21 @@ map<Instruction*, vector<bool>> LiveInterval(Module& M, vector<Value*>& values) 
 
     //Search Liveness Interval for all values
     int i = 0;
-    for(Value* Vptr : values) {
-        Value& V = *Vptr;
+    for(Value* V : values) {
 
         //'F': Function which 'V' is located.
         Function& F = *(isArgument(V) ?
-                        dyn_cast<Argument>(V).getParent():
-                        dyn_cast<Instruction>(V).getParent()->getParent());
+                        dyn_cast<Argument>(V)->getParent():
+                        dyn_cast<Instruction>(V)->getParent()->getParent());
         //Get the DominatorTree for 'F'.
-        FunctionAnalysisManager FAM = FunctionAnalysisManager(true);
-        DominatorTree& DT = FAM.getResult<DominatorTreeAnalysis>(F);
+        DominatorTree DT(F);
         
         //'start': Where to start the search.
         Instruction& start = (isArgument(V) ?
                             *(F.getEntryBlock().begin()):
-                            dyn_cast<Instruction>(V));
+                            *(dyn_cast<Instruction>(V)));
         
-        LivenessSearch(start, V, i, live, DT);
+        LivenessSearch(start, *V, i, live, DT);
         i++;
     }
 
@@ -97,7 +98,7 @@ map<Instruction*, vector<bool>> LiveInterval(Module& M, vector<Value*>& values) 
 
 bool LivenessSearch(Instruction& curr, Value& find, int index, map<Instruction*, vector<bool>>& live, DominatorTree& DT) {
     
-    BasicBlock& BB = *(curr.getParent);
+    BasicBlock& BB = *(curr.getParent());
 
     bool isAlive = false;
 
@@ -133,5 +134,12 @@ bool LivenessSearch(Instruction& curr, Value& find, int index, map<Instruction*,
     }
 
     return isAlive;
+
+}
+
+RegisterGraph RegisterClique(Module&, vector<vector<bool>>&) {
+    //FIXME
+    return RegisterGraph();
+}
 
 }
