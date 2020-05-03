@@ -6,6 +6,25 @@ RegisterGraph LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
 
     map<Instruction*, vector<bool>> live = LiveInterval(M, values);
 
+    //Debug Test
+    for(Function& F : M) {
+        for(Argument& Arg : F.args()) {
+            values.push_back(&Arg);
+        }
+        for(BasicBlock& BB : F) {
+            for(Instruction& I : BB) {
+                I.print(outs());
+                outs() << "Alive variables: ";
+                for(int i = 0; i < values.size(); i++) {
+                    if(live[&I][i]) {
+                        outs() << values[i]->getName() << " ";
+                    }
+                }
+                outs() << "\n";
+            }
+        }
+    }
+
     vector<vector<bool>> live_values;
     for(auto it = live.begin(); it != live.end(); ++it) {
         live_values.push_back(it->second);
