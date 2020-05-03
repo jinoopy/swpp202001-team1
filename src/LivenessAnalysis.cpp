@@ -2,7 +2,7 @@
 
 namespace {
 
-PreservedAnalyses LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
+RegisterGraph LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
     
     vector<Value*> values = SearchAllArgInst(M);
 
@@ -16,26 +16,26 @@ PreservedAnalyses LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
         for(BasicBlock& BB : F) {
             for(Instruction& I : BB) {
                 I.print(outs());
-                outs() << " Alive: ";
+                outs() << " (Alive: ";
                 for(int i = 0; i < values.size(); i++) {
                     if(live[&I][i]) {
                         outs() << values[i]->getName() << " ";
                     }
                 }
-                outs() << "\n";
+                outs() << ")\n";
             }
         }
     }
-    /*
+    
     vector<vector<bool>> live_values;
     for(auto it = live.begin(); it != live.end(); ++it) {
         live_values.push_back(it->second);
     }
 
     RegisterGraph graph = RegisterClique(M, live_values);
-
-    return PreservedAnalyses();
-    */
+    
+    return graph;
+    
 }
 
 #define isStore(I) (dyn_cast<StoreInst>(&I)!=nullptr)

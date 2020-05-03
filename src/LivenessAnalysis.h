@@ -3,6 +3,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Instruction.h"
+#include "llvm/IR/PassManager.h"
 
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Passes/PassPlugin.h"
@@ -16,10 +17,11 @@ using namespace llvm;
 using namespace std;
 
 
-namespace {
 class RegisterGraph {
 
 };
+
+namespace {
 
 //Finds all instructions that can be alive in some point.
 //i.e. finds all Arguments & Instructions that contain valid values.
@@ -29,6 +31,7 @@ vector<Value*>  SearchAllArgInst(Module&);
 //Recursively(post-order) searches through all instructions
 //mark liveness of each values in each instruction
 map<Instruction*, vector<bool>> LiveInterval(Module&, vector<Value*>&);
+
 //helper function for LiveInterval(); does the recursive search
 bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
 
@@ -37,9 +40,11 @@ bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&,
 RegisterGraph RegisterClique(Module&, vector<vector<bool>>&);
 
 class LivenessAnalysis : public AnalysisInfoMixin<LivenessAnalysis>{
-
+  friend AnalysisInfoMixin<LivenessAnalysis>;
+  static AnalysisKey Key;
 public:
-  PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
+  using Result = RegisterGraph;
+  RegisterGraph run(Module &M, ModuleAnalysisManager &MAM);
 };
 
 }
