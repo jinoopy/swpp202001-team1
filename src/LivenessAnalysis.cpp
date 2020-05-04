@@ -1,5 +1,8 @@
 #include "LivenessAnalysis.h"
 
+using namespace llvm;
+using namespace std;
+
 namespace {
 
 //---------------------------------------------------------------
@@ -10,6 +13,8 @@ RegisterGraph::RegisterGraph(Module& M) {
     
     vector<Value*> values = SearchAllArgInst(M);
 
+    //TODO
+    //map<Instruction*, vector<bool>> live;
     live = LiveInterval(M, values);
     
     /*

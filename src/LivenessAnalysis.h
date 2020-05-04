@@ -22,7 +22,7 @@ namespace {
 class RegisterGraph {
 public:
   //TODO
-  //Should move into Constructor Local Variable
+  //Should move into Constructor local variable
   map<Instruction*, vector<bool>> live;
 
   //Construct RegisterGraph with Module
@@ -51,7 +51,8 @@ public:
 };
 
 }
-
+/*
+TODO This causes error
 extern "C" ::llvm::PassPluginLibraryInfo
 llvmGetPassPluginInfo() {
   return {
@@ -70,3 +71,4 @@ llvmGetPassPluginInfo() {
     }
   };
 }
+*/
