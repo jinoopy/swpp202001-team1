@@ -16,28 +16,31 @@
 using namespace llvm;
 using namespace std;
 
-
-class RegisterGraph {
-
-};
-
 namespace {
 
-//Finds all instructions that can be alive in some point.
-//i.e. finds all Arguments & Instructions that contain valid values.
-//GVs and non-value Inst.(store, br, ...) are not considered.
-vector<Value*>  SearchAllArgInst(Module&);
+//RegisterGraph: stores the colored register graph information
+class RegisterGraph {
+public:
+  //TODO
+  //Should move into Constructor Local Variable
+  map<Instruction*, vector<bool>> live;
 
-//Recursively(post-order) searches through all instructions
-//mark liveness of each values in each instruction
-map<Instruction*, vector<bool>> LiveInterval(Module&, vector<Value*>&);
+  //Construct RegisterGraph with Module
+  RegisterGraph(Module&);
 
-//helper function for LiveInterval(); does the recursive search
-bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
+  //Finds all instructions that can be alive in some point.
+  //i.e. finds all Arguments & Instructions that contain valid values.
+  //GVs and non-value Inst.(store, br, ...) are not considered.
+  vector<Value*>  SearchAllArgInst(Module&);
 
-//for all bool vector, if two values are marked 'true' together,
-//there exists a line between two values.
-RegisterGraph RegisterClique(Module&, vector<vector<bool>>&);
+  //Recursively(post-order) searches through all instructions
+  //mark liveness of each values in each instruction
+  map<Instruction*, vector<bool>> LiveInterval(Module&, vector<Value*>&);
+
+  //helper function for LiveInterval(); does the recursive search
+  bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
+
+};
 
 class LivenessAnalysis : public AnalysisInfoMixin<LivenessAnalysis>{
   friend AnalysisInfoMixin<LivenessAnalysis>;

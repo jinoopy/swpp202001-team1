@@ -2,44 +2,30 @@
 
 namespace {
 
-RegisterGraph LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
+//---------------------------------------------------------------
+//class RegisterGraph
+//---------------------------------------------------------------
+
+RegisterGraph::RegisterGraph(Module& M) {
     
     vector<Value*> values = SearchAllArgInst(M);
 
-    map<Instruction*, vector<bool>> live = LiveInterval(M, values);
-
-    //Debug Test
-    for(Function& F : M) {
-        for(Argument& Arg : F.args()) {
-            values.push_back(&Arg);
-        }
-        for(BasicBlock& BB : F) {
-            for(Instruction& I : BB) {
-                I.print(outs());
-                outs() << " (Alive: ";
-                for(int i = 0; i < values.size(); i++) {
-                    if(live[&I][i]) {
-                        outs() << values[i]->getName() << " ";
-                    }
-                }
-                outs() << ")\n";
-            }
-        }
-    }
+    live = LiveInterval(M, values);
     
+    /*
     vector<vector<bool>> live_values;
     for(auto it = live.begin(); it != live.end(); ++it) {
         live_values.push_back(it->second);
     }
 
-    RegisterGraph graph = RegisterClique(M, live_values);
-    
-    return graph;
-    
+    //TODO
+    //RegisterClique(M, live_values);
+    //ColorGraph();
+    */
 }
 
 #define isStore(I) (dyn_cast<StoreInst>(&I)!=nullptr)
-vector<Value*> SearchAllArgInst(Module& M) {
+vector<Value*> RegisterGraph::SearchAllArgInst(Module& M) {
     vector<Value*> values;
     for(Function& F : M) {
         for(Argument& Arg : F.args()) {
@@ -57,7 +43,7 @@ vector<Value*> SearchAllArgInst(Module& M) {
 }
 
 #define isArgument(V) (dyn_cast<Argument>(V)!=nullptr)
-map<Instruction*, vector<bool>> LiveInterval(Module& M, vector<Value*>& values) {
+map<Instruction*, vector<bool>> RegisterGraph::LiveInterval(Module& M, vector<Value*>& values) {
 
     map<Instruction*, vector<bool>> live;
 
@@ -96,7 +82,7 @@ map<Instruction*, vector<bool>> LiveInterval(Module& M, vector<Value*>& values) 
 
 }
 
-bool LivenessSearch(Instruction& curr, Value& find, int index, map<Instruction*, vector<bool>>& live, DominatorTree& DT) {
+bool RegisterGraph::LivenessSearch(Instruction& curr, Value& find, int index, map<Instruction*, vector<bool>>& live, DominatorTree& DT) {
     
     BasicBlock& BB = *(curr.getParent());
 
@@ -137,9 +123,12 @@ bool LivenessSearch(Instruction& curr, Value& find, int index, map<Instruction*,
 
 }
 
-RegisterGraph RegisterClique(Module&, vector<vector<bool>>&) {
-    //FIXME
-    return RegisterGraph();
+//---------------------------------------------------------------
+//class LivenessAnalysis
+//---------------------------------------------------------------
+
+RegisterGraph LivenessAnalysis::run(Module &M, ModuleAnalysisManager &MAM) {
+    return RegisterGraph(M);
 }
 
 }
