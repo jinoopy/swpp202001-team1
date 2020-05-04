@@ -1,9 +1,12 @@
-#include "llvm/IR/PassManager.h"
+#ifndef LIVENESS_ANALYSIS_H
+#define LIVENESS_ANALYSIS_H
 
 #include "llvm/IR/Function.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/PassManager.h"
+
+#include "llvm/Analysis/PostDominators.h"
 
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Passes/PassPlugin.h"
@@ -16,14 +19,14 @@
 using namespace llvm;
 using namespace std;
 
-namespace {
+namespace backend {
 
 //RegisterGraph: stores the colored register graph information
 class RegisterGraph {
 public:
   //TODO
   //Should move into Constructor local variable
-  map<Instruction*, vector<bool>> live;
+  vector<vector<bool>> live_values;
 
   //Construct RegisterGraph with Module
   RegisterGraph(Module&);
@@ -35,7 +38,7 @@ public:
 
   //Recursively(post-order) searches through all instructions
   //mark liveness of each values in each instruction
-  map<Instruction*, vector<bool>> LiveInterval(Module&, vector<Value*>&);
+  vector<vector<bool>> LiveInterval(Module&, vector<Value*>&);
 
   //helper function for LiveInterval(); does the recursive search
   bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
@@ -72,3 +75,5 @@ llvmGetPassPluginInfo() {
   };
 }
 */
+
+#endif
