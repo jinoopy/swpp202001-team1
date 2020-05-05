@@ -29,21 +29,22 @@ class RegisterGraph
 {
 
 public:
+
   //Constructors
 
   RegisterGraph(Module &);
 
-  //Interface
+  //Interfaces
 
   auto& getValues() const {return values;}
 
   auto& getAdjList() const {return adjList;}
 
-  int getNumColors() {return NUM_COLORS;};
-  
-  auto& getValueToColor() const {return valueToColor;};
+  int getNumColors() {return NUM_COLORS;}
 
-  auto& getColorToValue() const {return colorToValue;};
+  auto& getValueToColor() const {return valueToColor;}
+
+  auto& getColorToValue() const {return colorToValue;}
 
 private:
   
@@ -82,7 +83,7 @@ private:
   bool LivenessSearch(Instruction &, Value &, int, map<Instruction *, vector<bool>> &, DominatorTree &);
 
   //2. Construct live graph and assign different colors to
-  //   values alive together
+  //   values which are live together
 
   //Adjacency list of Argumetns & value-containing Instructions
   //two insts. are adjacent iff live inerval overlap.
@@ -90,6 +91,7 @@ private:
 
   //Colors values so adjacent value have no same color
   //initializes NUM_COLORS, valueToColor
+  //TODO add must(function call)&can(phi nodes) coalesce features
   void ColorGraph();
   //helper function for ColorGraph()
   //finds PEO via Lexicographic BFS algorithm
