@@ -23,10 +23,39 @@ using namespace std;
 
 namespace backend {
 
-//RegisterGraph: stores the colored register graph information
+//RegisterGraph: stores the colored register graph information and provides interface
 class RegisterGraph {
+
+public:
+
+  //Public Variables
+
+  //values: result of SearchAllArgInst()
+  vector<Value *> values;
+  
+  //adjList: result of LiveInterval() + RegisterAdjList() 
+  map<Value*, set<Value*>> adjList;
+
+  //NUM_COLORS, valueToColor: result of ColorGraph();
+  //NUM_COLORS: total colors used ( 0 < c < NUM_COLORS)
+  //valueToColor: Value=>color mapping
+  unsigned int NUM_COLORS;
+  map<Value*, unsigned int> valueToColor;
+
+  //colorToValue: result of InverseColorMap()
+  //color->Value mapping
+  vector<vector<Value*>> colorToValue;
+
+  //Constructors
+
+  RegisterGraph(Module&);
+
+  //Interface
+
 private:
+
   //Functions for constructor RegisterGraph(Module&)
+
   //1. Construct liveness interval
 
   //Finds all instructions that can be alive in some point.
@@ -49,33 +78,17 @@ private:
   void RegisterAdjList( vector<vector<bool>>&);
 
   //Colors values so adjacent value have no same color
-  //initializes NUM_COLORS, colors
+  //initializes NUM_COLORS, valueToColor
   void ColorGraph();
   //helper function for ColorGraph()
   //finds PEO via Lexicographic BFS algorithm
   vector<Value*> PerfectEliminationOrdering();
   //helper function for ColorGraph()
   //colors the graph greedily(adjList always represents a chordal graph)
-  void greedyColoring(vector<Value*>);
-
-public:
-
-  //values: result of SearchAllArgInst()
-  vector<Value *> values;
+  void greedyColoring(vector<Value*>&);
   
-  //adjList: result of LiveInterval() + RegisterAdjList() 
-  map<Value*, set<Value*>> adjList;
-
-  //NUM_COLORS, colors: result of ColorGraph();
-  //NUM_COLORS: total colors used ( 0 < c < NUM_COLORS)
-  //colors: Value=>color mapping
-  unsigned int NUM_COLORS;
-  map<Value*, unsigned int> colors;
-
-  //Construct RegisterGraph with Module
-  RegisterGraph(Module&);
-
-  //Interface
+  //Makes colorToValue so easily retrieve all values with same color
+  void InverseColorMap();
 
 };
 

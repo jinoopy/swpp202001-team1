@@ -185,7 +185,7 @@ void RegisterGraph::ColorGraph() {
     vector<Value*> PEO = PerfectEliminationOrdering();
 
     //colors the graph greedily with PEO;
-    greedyColoring(PEO);
+    GreedyColoring(PEO);
 
 }
 
@@ -241,7 +241,7 @@ vector<Value*> RegisterGraph::PerfectEliminationOrdering() {
 
 }
 
-void RegisterGraph::greedyColoring(vector<Value*> PEO) {
+void RegisterGraph::GreedyColoring(vector<Value*>& PEO) {
 
     NUM_COLORS = 0;
 
@@ -251,7 +251,7 @@ void RegisterGraph::greedyColoring(vector<Value*> PEO) {
         //mark all colors which vertex before *it has used
         bool colorUsed[NUM_COLORS];
         for(auto jt = PEO.begin(); jt != it; ++jt) {
-            colorUsed[colors[*jt]] = true;
+            colorUsed[valueToColor[*jt]] = true;
         }
 
         //c: color for the vertex *it
@@ -264,10 +264,26 @@ void RegisterGraph::greedyColoring(vector<Value*> PEO) {
             }
         }
         
-        colors[*it] = c;
+        valueToColor[*it] = c;
         
         //if new color used, increment the number of colors used.
         if(c == NUM_COLORS) NUM_COLORS++;
+    }
+
+}
+
+void RegisterGraph::InverseColorMap() {
+
+    for(int i = 0; i < NUM_COLORS; i++) {
+        colorToValue.push_back(vector<Value*>());
+    }
+
+    for(auto it = valueToColor.begin(); it != valueToColor.end(); ++it) {
+        colorToValue[it->second].push_back(it->first);
+    }
+
+    for(int i = 0; i < NUM_COLORS; i++) {
+        assert(!colorToValue[i].empty() && "every list of colorToValue should not be empty");
     }
 
 }
