@@ -37,8 +37,8 @@ private:
   //Recursively(post-order) searches through all instructions
   //mark liveness of each values in each instruction
   vector<vector<bool>> LiveInterval(Module&);
-
-  //helper function for LiveInterval(); does the recursive search
+  //helper function for LiveInterval()
+  //does the recursive search for dominators and branches
   bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
 
   //2. Construct live graph and assign different colors to
@@ -51,10 +51,10 @@ private:
   //Colors values so adjacent value have no same color
   //initializes NUM_COLORS, colors
   void ColorGraph();
-
   //helper function for ColorGraph()
   //finds PEO via Lexicographic BFS algorithm
   vector<Value*> PerfectEliminationOrdering();
+  //helper function for ColorGraph()
   //colors the graph greedily(adjList always represents a chordal graph)
   void greedyColoring(vector<Value*>);
 

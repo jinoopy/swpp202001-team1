@@ -191,6 +191,10 @@ void RegisterGraph::ColorGraph() {
 
 vector<Value*> RegisterGraph::PerfectEliminationOrdering() {
 
+    //FIXME: This is a typical disjoint set(union-find) with order problem;
+    //I do not know how to apply the feature.
+    //Time complexity can reduced from O(EV2) to O(EV).
+
     //Initially, Sigma contains a single set of all value in values.
     vector<set<Value*>> Sigma = { set<Value*>(values.begin(), values.end()) };
     vector<Value*> PEO;
@@ -230,8 +234,41 @@ vector<Value*> RegisterGraph::PerfectEliminationOrdering() {
         }
     }
 
+    assert(PEO.size() == values.size() && "PEO should be the same size as values");
+
     reverse(PEO.begin(), PEO.end());
     return PEO;
+
+}
+
+void RegisterGraph::greedyColoring(vector<Value*> PEO) {
+
+    NUM_COLORS = 0;
+
+    //fetch values by Perfect Elimination Order
+    for(auto it = PEO.begin(); it != PEO.end(); ++it) {
+
+        //mark all colors which vertex before *it has used
+        bool colorUsed[NUM_COLORS];
+        for(auto jt = PEO.begin(); jt != it; ++jt) {
+            colorUsed[colors[*jt]] = true;
+        }
+
+        //c: color for the vertex *it
+        //if every neighbour nodes use all colors, c = NUM_COLORS
+        //else, it becomes the first non-used color
+        int c;
+        for(c = 0; c < NUM_COLORS; c++) {
+            if(!colorUsed[c]) {
+                break;
+            }
+        }
+        
+        colors[*it] = c;
+        
+        //if new color used, increment the number of colors used.
+        if(c == NUM_COLORS) NUM_COLORS++;
+    }
 
 }
 
