@@ -24,9 +24,10 @@ namespace backend {
 //RegisterGraph: stores the colored register graph information
 class RegisterGraph {
 public:
-  //TODO
-  //Should move into Constructor local variable
-  vector<vector<bool>> live_values;
+
+  //Adjacency list of value-containing Instructions
+  //two insts. are adjacent iff live inerval overlap.
+  map<Instruction*, vector<Instruction*>> adjList;
 
   //Construct RegisterGraph with Module
   RegisterGraph(Module&);
@@ -42,6 +43,8 @@ public:
 
   //helper function for LiveInterval(); does the recursive search
   bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
+
+  map<Instruction*, vector<Instruction*>> RegisterAdjList(vector<Value*>&, vector<vector<bool>>&);
 
 };
 

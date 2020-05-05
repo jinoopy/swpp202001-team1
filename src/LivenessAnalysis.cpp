@@ -14,19 +14,14 @@ RegisterGraph::RegisterGraph(Module &M)
 {
 
     vector<Value *> values = SearchAllArgInst(M);
-    //TODO
-    //vector<vector<bool>> live_values;
-    live_values = LiveInterval(M, values);
+    
+    vector<vector<bool>> liveInterval;
+    liveInterval = LiveInterval(M, values);
+    
+    adjList = RegisterAdjList(values, liveInterval);
 
-    /*
-    for(auto it = live.begin(); it != live.end(); ++it) {
-        live_values.push_back(it->second);
-    }
 
-    //TODO
-    //RegisterClique(M, live_values);
     //ColorGraph();
-    */
 }
 
 #define isStore(I) (dyn_cast<StoreInst>(&I) != nullptr)
@@ -160,6 +155,10 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
     }
 
     return isAlive;
+}
+
+map<Instruction*, vector<Instruction*>> RegisterAdjList(vector<Value*>& values, vector<vector<bool>>& liveInterval) {
+    //TODO
 }
 
 //---------------------------------------------------------------
