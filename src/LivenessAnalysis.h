@@ -36,15 +36,17 @@ public:
 
   //Interfaces
 
-  auto& getValues() const {return values;}
+  auto& getValues() {return values;}
 
-  auto& getAdjList() const {return adjList;}
+  auto& getAdjList() {return adjList;}
+  auto& getAdjList(Value* v) {return adjList[v];}
 
   int getNumColors() {return NUM_COLORS;}
 
-  auto& getValueToColor() const {return valueToColor;}
+  auto& getValueToColor() {return valueToColor;}
+  unsigned int getValueToColor(Value* v) {return valueToColor[v];}
 
-  auto& getColorToValue() const {return colorToValue;}
+  auto& getColorToValue() {return colorToValue;}
 
 private:
   

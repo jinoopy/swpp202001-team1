@@ -38,9 +38,26 @@ protected:
 
 };
 
-TEST_F(RegisterGraphTest, LiveIntervalTest1) {
+TEST_F(RegisterGraphTest, NoCondColorGraphTest1) {
     parseAssembly("test-ir/input1.ll");
     RegisterGraph RG(*M);
+
+    for(auto v : RG.getValues()) {
+        for(auto w : RG.getAdjList(v)) {
+            EXPECT_NE(RG.getValueToColor(v), RG.getValueToColor(w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
+        }
+    }
+}
+
+TEST_F(RegisterGraphTest, NoCondColorGraphTest2) {
+    parseAssembly("test-ir/input2.ll");
+    RegisterGraph RG(*M);
+
+    for(auto v : RG.getValues()) {
+        for(auto w : RG.getAdjList(v)) {
+            EXPECT_NE(RG.getValueToColor(v), RG.getValueToColor(w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
+        }
+    }
 }
 
 int main(int argc, char **argv) {
