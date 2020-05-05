@@ -31,11 +31,11 @@ if [[ "$1" == "build" || "$1" == "all" ]]; then
 
   $CXX $ISYSROOT $CXXFLAGS $LDFLAGS $LIBS LivenessAnalysis.cpp LivenessAnalysisTest.cpp -lpthread -lm \
        $SRCROOT/utils/unittest/googletest/src/gtest-all.cc \
-       -o LAPr1Test
+       -o run
 fi
 
 if [[ "$1" == "run" || "$1" == "all" ]]; then
   echo "----- run -----"
   set +e
-  ./LAPr1Test
+  ./run
 fi
