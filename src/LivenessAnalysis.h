@@ -15,6 +15,8 @@
 
 #include <map>
 #include <vector>
+#include <set>
+#include <algorithm>
 
 using namespace llvm;
 using namespace std;
@@ -23,28 +25,57 @@ namespace backend {
 
 //RegisterGraph: stores the colored register graph information
 class RegisterGraph {
-public:
-
-  //Adjacency list of value-containing Instructions
-  //two insts. are adjacent iff live inerval overlap.
-  map<Instruction*, vector<Instruction*>> adjList;
-
-  //Construct RegisterGraph with Module
-  RegisterGraph(Module&);
+private:
+  //Functions for constructor RegisterGraph(Module&)
+  //1. Construct liveness interval
 
   //Finds all instructions that can be alive in some point.
   //i.e. finds all Arguments & Instructions that contain valid values.
   //GVs and non-value Inst.(store, br, ...) are not considered.
-  vector<Value*>  SearchAllArgInst(Module&);
+  void SearchAllArgInst(Module&);
 
   //Recursively(post-order) searches through all instructions
   //mark liveness of each values in each instruction
-  vector<vector<bool>> LiveInterval(Module&, vector<Value*>&);
+  vector<vector<bool>> LiveInterval(Module&);
 
   //helper function for LiveInterval(); does the recursive search
   bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
 
-  map<Instruction*, vector<Instruction*>> RegisterAdjList(vector<Value*>&, vector<vector<bool>>&);
+  //2. Construct live graph and assign different colors to
+  //   values alive together
+
+  //Adjacency list of Argumetns & value-containing Instructions
+  //two insts. are adjacent iff live inerval overlap.
+  void RegisterAdjList( vector<vector<bool>>&);
+
+  //Colors values so adjacent value have no same color
+  //initializes NUM_COLORS, colors
+  void ColorGraph();
+
+  //helper function for ColorGraph()
+  //finds PEO via Lexicographic BFS algorithm
+  vector<Value*> PerfectEliminationOrdering();
+  //colors the graph greedily(adjList always represents a chordal graph)
+  void greedyColoring(vector<Value*>);
+
+public:
+
+  //values: result of SearchAllArgInst()
+  vector<Value *> values;
+  
+  //adjList: result of LiveInterval() + RegisterAdjList() 
+  map<Value*, set<Value*>> adjList;
+
+  //NUM_COLORS, colors: result of ColorGraph();
+  //NUM_COLORS: total colors used ( 0 < c < NUM_COLORS)
+  //colors: Value=>color mapping
+  unsigned int NUM_COLORS;
+  map<Value*, unsigned int> colors;
+
+  //Construct RegisterGraph with Module
+  RegisterGraph(Module&);
+
+  //Interface
 
 };
 

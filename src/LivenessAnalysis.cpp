@@ -12,22 +12,22 @@ namespace backend
 
 RegisterGraph::RegisterGraph(Module &M)
 {
-
-    vector<Value *> values = SearchAllArgInst(M);
+    //find all value-results
+    SearchAllArgInst(M);
     
+    //Find live interval for all values
     vector<vector<bool>> liveInterval;
-    liveInterval = LiveInterval(M, values);
+    liveInterval = LiveInterval(M);
     
-    adjList = RegisterAdjList(values, liveInterval);
+    //Initialize adjList
+    RegisterAdjList(liveInterval);
 
-
-    //ColorGraph();
+    ColorGraph();
 }
 
 #define isStore(I) (dyn_cast<StoreInst>(&I) != nullptr)
-vector<Value *> RegisterGraph::SearchAllArgInst(Module &M)
+void RegisterGraph::SearchAllArgInst(Module &M)
 {
-    vector<Value *> values;
     for (Function &F : M)
     {
         for (Argument &Arg : F.args())
@@ -45,11 +45,10 @@ vector<Value *> RegisterGraph::SearchAllArgInst(Module &M)
             }
         }
     }
-    return values;
 }
 
 #define isArgument(V) (dyn_cast<Argument>(V) != nullptr)
-vector<vector<bool>> RegisterGraph::LiveInterval(Module &M, vector<Value *> &values)
+vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
 {
 
     map<Instruction *, vector<bool>> live;
@@ -157,8 +156,83 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
     return isAlive;
 }
 
-map<Instruction*, vector<Instruction*>> RegisterAdjList(vector<Value*>& values, vector<vector<bool>>& liveInterval) {
-    //TODO
+void RegisterGraph::RegisterAdjList(vector<vector<bool>>& liveInterval) {
+
+    for(Value* value : values) {
+        adjList[value] = set<Value*>();
+    }
+
+    for(vector<bool>& vec : liveInterval) {
+        assert(vec.size() == values.size()
+                && "values & liveInterval match");
+
+        //if two registers are alive together in one instruction,
+        for(int i = 0; i <vec.size(); ++i) {
+            for(int j = i + 1; j < vec.size(); ++j) {
+                if(vec[i] && vec[j]) {
+                    //add to each other's adjacency list
+                    adjList[values[i]].insert(values[j]);
+                    adjList[values[j]].insert(values[i]);
+                }
+            }
+        }
+    }
+}
+
+void RegisterGraph::ColorGraph() {
+
+    //calculates PEO for values + adjList
+    vector<Value*> PEO = PerfectEliminationOrdering();
+
+    //colors the graph greedily with PEO;
+    greedyColoring(PEO);
+
+}
+
+vector<Value*> RegisterGraph::PerfectEliminationOrdering() {
+
+    //Initially, Sigma contains a single set of all value in values.
+    vector<set<Value*>> Sigma = { set<Value*>(values.begin(), values.end()) };
+    vector<Value*> PEO;
+
+    while(Sigma.size()>0) {
+        //retrieve one value v from Sigma[0] and delete it.
+        Value* v = *(Sigma[0].begin());
+        Sigma[0].erase( Sigma[0].begin() );
+        //if Sigma[0] is empty, remove it.
+        if(Sigma[0].empty()) {
+            Sigma.erase(Sigma.begin());
+        }
+        //push the popped value to result PEO vector.
+        PEO.push_back(v);
+
+        //for all members in Sigma, insert empty set
+        for(auto it = Sigma.begin(); it != Sigma.end(); ++it) {
+            Sigma.insert(it, set<Value*>());
+        }
+        //for all nodes connected to v,
+        for(Value* w : adjList[v]) {
+            //search if w is still in Sigma.
+            for(auto it = Sigma.begin(); it != Sigma.end(); ++it) {
+                auto wLoc = it->find(w);
+                //if w exists in *it,
+                if(wLoc != it->end()){
+                    //move w to the set infront.
+                    (it-1)->insert(w);
+                    it->erase(wLoc);
+                }
+            }
+        }
+        for(auto it = Sigma.begin(); it != Sigma.end(); ++it) {
+            if(it->empty()) {
+                Sigma.erase(it);
+            }
+        }
+    }
+
+    reverse(PEO.begin(), PEO.end());
+    return PEO;
+
 }
 
 //---------------------------------------------------------------
