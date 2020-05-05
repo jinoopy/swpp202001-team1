@@ -21,38 +21,49 @@
 using namespace llvm;
 using namespace std;
 
-namespace backend {
+namespace backend
+{
 
 //RegisterGraph: stores the colored register graph information and provides interface
-class RegisterGraph {
+class RegisterGraph
+{
 
 public:
+  //Constructors
 
-  //Public Variables
+  RegisterGraph(Module &);
+
+  //Interface
+
+  auto& getValues() const {return values;}
+
+  auto& getAdjList() const {return adjList;}
+
+  int getNumColors() {return NUM_COLORS;};
+  
+  auto& getValueToColor() const {return valueToColor;};
+
+  auto& getColorToValue() const {return colorToValue;};
+
+private:
+  
+  //Private Variables
 
   //values: result of SearchAllArgInst()
   vector<Value *> values;
-  
-  //adjList: result of LiveInterval() + RegisterAdjList() 
-  map<Value*, set<Value*>> adjList;
+
+  //adjList: result of LiveInterval() + RegisterAdjList()
+  map<Value *, set<Value *>> adjList;
 
   //NUM_COLORS, valueToColor: result of ColorGraph();
   //NUM_COLORS: total colors used ( 0 < c < NUM_COLORS)
   //valueToColor: Value=>color mapping
   unsigned int NUM_COLORS;
-  map<Value*, unsigned int> valueToColor;
+  map<Value *, unsigned int> valueToColor;
 
   //colorToValue: result of InverseColorMap()
   //color->Value mapping
-  vector<vector<Value*>> colorToValue;
-
-  //Constructors
-
-  RegisterGraph(Module&);
-
-  //Interface
-
-private:
+  vector<vector<Value *>> colorToValue;
 
   //Functions for constructor RegisterGraph(Module&)
 
@@ -61,46 +72,47 @@ private:
   //Finds all instructions that can be alive in some point.
   //i.e. finds all Arguments & Instructions that contain valid values.
   //GVs and non-value Inst.(store, br, ...) are not considered.
-  void SearchAllArgInst(Module&);
+  void SearchAllArgInst(Module &);
 
   //Recursively(post-order) searches through all instructions
   //mark liveness of each values in each instruction
-  vector<vector<bool>> LiveInterval(Module&);
+  vector<vector<bool>> LiveInterval(Module &);
   //helper function for LiveInterval()
   //does the recursive search for dominators and branches
-  bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
+  bool LivenessSearch(Instruction &, Value &, int, map<Instruction *, vector<bool>> &, DominatorTree &);
 
   //2. Construct live graph and assign different colors to
   //   values alive together
 
   //Adjacency list of Argumetns & value-containing Instructions
   //two insts. are adjacent iff live inerval overlap.
-  void RegisterAdjList( vector<vector<bool>>&);
+  void RegisterAdjList(vector<vector<bool>> &);
 
   //Colors values so adjacent value have no same color
   //initializes NUM_COLORS, valueToColor
   void ColorGraph();
   //helper function for ColorGraph()
   //finds PEO via Lexicographic BFS algorithm
-  vector<Value*> PerfectEliminationOrdering();
+  vector<Value *> PerfectEliminationOrdering();
   //helper function for ColorGraph()
   //colors the graph greedily(adjList always represents a chordal graph)
-  void greedyColoring(vector<Value*>&);
-  
+  void GreedyColoring(vector<Value *> &);
+
   //Makes colorToValue so easily retrieve all values with same color
   void InverseColorMap();
-
 };
 
-class LivenessAnalysis : public AnalysisInfoMixin<LivenessAnalysis>{
+class LivenessAnalysis : public AnalysisInfoMixin<LivenessAnalysis>
+{
   friend AnalysisInfoMixin<LivenessAnalysis>;
   static AnalysisKey Key;
+
 public:
   using Result = RegisterGraph;
   RegisterGraph run(Module &M, ModuleAnalysisManager &MAM);
 };
 
-}
+} // namespace backend
 /*
 TODO This causes error
 extern "C" ::llvm::PassPluginLibraryInfo
