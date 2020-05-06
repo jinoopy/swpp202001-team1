@@ -12,12 +12,6 @@ namespace backend
 
 RegisterGraph::RegisterGraph(Module &M)
 {
-    vector<pair<Value*, Value*>> emptyList;
-    RegisterGraph(M, emptyList);
-}
-
-RegisterGraph::RegisterGraph(Module &M, vector<pair<Value*, Value*>>& coallocate)
-{
     this->M = &M;
 
     //find all value-results
@@ -30,7 +24,7 @@ RegisterGraph::RegisterGraph(Module &M, vector<pair<Value*, Value*>>& coallocate
     //Initialize adjList
     RegisterAdjList(liveInterval);
 
-    ColorGraph(coallocate);
+    ColorGraph();
 }
 
 #define isStore(I) (dyn_cast<StoreInst>(&I) != nullptr)
@@ -194,7 +188,7 @@ void RegisterGraph::RegisterAdjList(vector<vector<bool>> &liveInterval)
     }
 }
 
-void RegisterGraph::ColorGraph(vector<pair<Value *, Value *>> &coallocate)
+void RegisterGraph::ColorGraph()
 {
 
     for(Function& F : *M) {
@@ -205,48 +199,10 @@ void RegisterGraph::ColorGraph(vector<pair<Value *, Value *>> &coallocate)
         //colors the graph greedily with PEO;
         reverse(PEO.begin(), PEO.end());
         unsigned int colorCount;
-        map<Value *, unsigned int> colorF = GreedyColoring(PEO, colorCount);
+        valueToColor[&F] = GreedyColoring(PEO, colorCount);
         
-        //coallocate interfunctional registers
-        
-        for(auto p : coallocate) {
-            bool shouldCoalloc = false;
-            unsigned int c1, c2;
-            Value* temp;
-            //if p.first is in F and p.second is colored differently,
-            if(find(valueF.begin(), valueF.end(), p.first) != valueF.end()
-                && valueToColor.find(p.second) != valueToColor.end()
-                && colorF[p.first] != valueToColor[p.second] )
-            {
-                temp = p.first;
-                shouldCoalloc = true;
-                c1 = colorF[p.first];
-                c2 = valueToColor[p.second];
-            }
-            //vice versa
-            else if(find(valueF.begin(), valueF.end(), p.second) != valueF.end()
-                && valueToColor.find(p.first) != valueToColor.end()
-                && colorF[p.second] != valueToColor[p.first] )
-            {
-                temp = p.second;
-                shouldCoalloc = true;
-                c1 = colorF[p.second];
-                c2 = valueToColor[p.first];
-            }
-            if(shouldCoalloc) {
-                for(auto& p : colorF) {
-                    if(p.second == c1) p.second = c2;
-                    else if(p.second == c2) p.second = c1;
-                }
-            }
-        }
-        
-        //update class-level variables
-        if(numColors < colorCount) numColors = colorCount;
-        for(auto p : colorF) {
-            valueToColor[p.first] = p.second;
-        }
-
+        //update global color count
+        numColors[&F] = colorCount;
     }
 }
 
@@ -354,19 +310,11 @@ map<Value *, unsigned int> RegisterGraph::GreedyColoring(vector<Value *> &PEO, u
 void RegisterGraph::InverseColorMap()
 {
 
-    for (int i = 0; i < numColors; i++)
-    {
-        colorToValue.push_back(vector<Value *>());
-    }
-
-    for (auto it = valueToColor.begin(); it != valueToColor.end(); ++it)
-    {
-        colorToValue[it->second].push_back(it->first);
-    }
-
-    for (int i = 0; i < numColors; i++)
-    {
-        assert(!colorToValue[i].empty() && "every list of colorToValue should not be empty");
+    for(Function& F : *M) {
+        colorToValue[&F] = vector<vector<Value*>>();
+        for(auto p : valueToColor[&F]) {
+            colorToValue[&F][p.second].push_back(p.first);
+        }
     }
 }
 

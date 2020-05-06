@@ -48,9 +48,11 @@ TEST_F(RegisterGraphTest, NoCondColorGraphTest1) {
     parseAssembly("test-ir/input1.ll");
     RegisterGraph RG(*M);
 
-    for(auto v : RG.getValues()) {
-        for(auto w : RG.getAdjList(v)) {
-            EXPECT_NE(RG.getValueToColor(v), RG.getValueToColor(w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
+    for(Function& F : *M) {
+        for(Value* v : RG.getValues(&F)) {
+            for(auto w : RG.getAdjList(v)) {
+                EXPECT_NE(RG.getValueToColor(&F, v), RG.getValueToColor(&F, w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
+            }
         }
     }
 }
@@ -59,29 +61,12 @@ TEST_F(RegisterGraphTest, NoCondColorGraphTest2) {
     parseAssembly("test-ir/input2.ll");
     RegisterGraph RG(*M);
 
-    for(auto v : RG.getValues()) {
-        for(auto w : RG.getAdjList(v)) {
-            EXPECT_NE(RG.getValueToColor(v), RG.getValueToColor(w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
+    for(Function& F : *M) {
+        for(Value* v : RG.getValues(&F)) {
+            for(auto w : RG.getAdjList(v)) {
+                EXPECT_NE(RG.getValueToColor(&F, v), RG.getValueToColor(&F, w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
+            }
         }
-    }
-}
-
-#define P pair<Value*, Value*>
-TEST_F(RegisterGraphTest, CoallocGraphTest1) {
-    parseAssembly("test-ir/input3.ll");
-    vector<pair<Value*, Value*>> coallocate = {
-        P(nameToValue["r0"], nameToValue["r5"]),
-        P(nameToValue["r1"], nameToValue["r6"]),
-    };
-    RegisterGraph RG(*M, coallocate);
-
-    for(auto v : RG.getValues()) {
-        for(auto w : RG.getAdjList(v)) {
-            EXPECT_NE(RG.getValueToColor(v), RG.getValueToColor(w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
-        }
-    }
-    for(auto p : coallocate) {
-        EXPECT_EQ(RG.getValueToColor(p.first), RG.getValueToColor(p.second));
     }
 }
 

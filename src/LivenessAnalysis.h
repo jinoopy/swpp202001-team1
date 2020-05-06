@@ -32,24 +32,25 @@ public:
 
   //Constructors
 
-  //Constructor with no coallocate request
   RegisterGraph(Module &);
-  //Constructor with coallocate requests
-  RegisterGraph(Module &, vector<pair<Value*, Value*>>&);
 
   //Interfaces
 
   auto& getValues() {return values;}
+  auto& getValues(Function* F) {return valuesInFunction[F];}
 
   auto& getAdjList() {return adjList;}
   auto& getAdjList(Value* v) {return adjList[v];}
 
-  int getNumColors() {return numColors;}
+  auto& getNumColors() {return numColors;}
+  int getNumColors(Function* F) {return numColors[F];}
 
   auto& getValueToColor() {return valueToColor;}
-  unsigned int getValueToColor(Value* v) {return valueToColor[v];}
+  auto& getValueToColor(Function* F) {return valueToColor[F];}
+  unsigned int getValueToColor(Function* F, Value* v) {return valueToColor[F][v];}
 
   auto& getColorToValue() {return colorToValue;}
+  auto& getColorToValue(Function* F) {return colorToValue[F];}
 
 private:
   
@@ -66,14 +67,13 @@ private:
   map<Value *, set<Value *>> adjList;
 
   //NUM_COLORS, valueToColor: result of ColorGraph();
-  //NUM_COLORS: total colors used ( 0 < c < NUM_COLORS)
   //valueToColor: Value=>color mapping
-  unsigned int numColors;
-  map<Value *, unsigned int> valueToColor;
+  map<Function*, unsigned int> numColors;
+  map<Function*, map<Value *, unsigned int>> valueToColor;
 
   //colorToValue: result of InverseColorMap()
   //color->Value mapping
-  vector<vector<Value *>> colorToValue;
+  map<Function*, vector<vector<Value *>>> colorToValue;
 
   //Functions for constructor RegisterGraph(Module&)
 
@@ -100,9 +100,7 @@ private:
 
   //Colors values so adjacent value have no same color
   //initializes NUM_COLORS, valueToColor
-  //Optional paramter coallocate: if can coallocate two values, then do so.
   void ColorGraph();
-  void ColorGraph(vector<pair<Value*, Value*>>&);
   //helper function for ColorGraph()
   //finds PEO via Lexicographic BFS algorithm
   vector<Value *> PerfectEliminationOrdering(vector<Value *> &);
