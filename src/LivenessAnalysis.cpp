@@ -18,6 +18,8 @@ RegisterGraph::RegisterGraph(Module &M)
 
 RegisterGraph::RegisterGraph(Module &M, vector<pair<Value*, Value*>>& coallocate)
 {
+    this->M = &M;
+
     //find all value-results
     SearchAllArgInst(M);
 
@@ -36,9 +38,11 @@ void RegisterGraph::SearchAllArgInst(Module &M)
 {
     for (Function &F : M)
     {
+        valuesInFunction[&F] = vector<Value*>();
         for (Argument &Arg : F.args())
         {
             values.push_back(&Arg);
+            valuesInFunction[&F].push_back(&Arg);
         }
         for (BasicBlock &BB : F)
         {
@@ -47,6 +51,7 @@ void RegisterGraph::SearchAllArgInst(Module &M)
                 if (!I.isTerminator() && !isStore(I))
                 {
                     values.push_back(&I);
+                    valuesInFunction[&F].push_back(&I);
                 }
             }
         }
@@ -191,15 +196,61 @@ void RegisterGraph::RegisterAdjList(vector<vector<bool>> &liveInterval)
 
 void RegisterGraph::ColorGraph(vector<pair<Value *, Value *>> &coallocate)
 {
-    //calculates PEO for values + adjList
-    vector<Value *> PEO = PerfectEliminationOrdering();
 
-    //colors the graph greedily with PEO;
-    reverse(PEO.begin(), PEO.end());
-    GreedyColoring(PEO, coallocate);
+    for(Function& F : *M) {
+        //calculates PEO for values + adjList
+        auto& valueF = valuesInFunction[&F];
+        vector<Value *> PEO = PerfectEliminationOrdering(valueF);
+
+        //colors the graph greedily with PEO;
+        reverse(PEO.begin(), PEO.end());
+        unsigned int colorCount;
+        map<Value *, unsigned int> colorF = GreedyColoring(PEO, colorCount);
+        
+        //coallocate interfunctional registers
+        
+        for(auto p : coallocate) {
+            bool shouldCoalloc = false;
+            unsigned int c1, c2;
+            Value* temp;
+            //if p.first is in F and p.second is colored differently,
+            if(find(valueF.begin(), valueF.end(), p.first) != valueF.end()
+                && valueToColor.find(p.second) != valueToColor.end()
+                && colorF[p.first] != valueToColor[p.second] )
+            {
+                temp = p.first;
+                shouldCoalloc = true;
+                c1 = colorF[p.first];
+                c2 = valueToColor[p.second];
+            }
+            //vice versa
+            else if(find(valueF.begin(), valueF.end(), p.second) != valueF.end()
+                && valueToColor.find(p.first) != valueToColor.end()
+                && colorF[p.second] != valueToColor[p.first] )
+            {
+                temp = p.second;
+                shouldCoalloc = true;
+                c1 = colorF[p.second];
+                c2 = valueToColor[p.first];
+            }
+            if(shouldCoalloc) {
+                for(auto& p : colorF) {
+                    if(p.second == c1) p.second = c2;
+                    else if(p.second == c2) p.second = c1;
+                }
+            }
+        }
+        
+        //update class-level variables
+        if(numColors < colorCount) numColors = colorCount;
+        for(auto p : colorF) {
+            valueToColor[p.first] = p.second;
+        }
+
+    }
 }
 
-vector<Value *> RegisterGraph::PerfectEliminationOrdering()
+vector<Value *> RegisterGraph::PerfectEliminationOrdering(vector<Value *> &values)
 {
 
     //FIXME: This is a typical disjoint set(union-find) with order problem;
@@ -256,8 +307,10 @@ vector<Value *> RegisterGraph::PerfectEliminationOrdering()
     return PEO;
 }
 
-void RegisterGraph::GreedyColoring(vector<Value *> &PEO, vector<pair<Value *, Value *>> &coallocate)
+map<Value *, unsigned int> RegisterGraph::GreedyColoring(vector<Value *> &PEO, unsigned int& NUM_COLORS)
 {
+
+    map<Value *, unsigned int> valueToColor;
 
     NUM_COLORS = 0;
 
@@ -269,30 +322,21 @@ void RegisterGraph::GreedyColoring(vector<Value *> &PEO, vector<pair<Value *, Va
         bool colorUsed[NUM_COLORS];
         for (auto jt = PEO.begin(); jt != it; ++jt)
         {
-            colorUsed[valueToColor[*jt]] = true;
+            if(adjList[*it].count(*jt) != 0) 
+            {
+                colorUsed[valueToColor[*jt]] = true;
+            }
         }
 
         //c: color for the vertex *it
-        //if coallocatable, coallocate colors greedily
         //if every neighbour nodes use all colors, c = NUM_COLORS
-        //else, it becomes the first non-used color
-        int c = -1;
-        for (auto pair : coallocate)
+        //else, it becomes the first non-used git color
+        int c = 0;
+        for (c = 0; c < NUM_COLORS; c++)
         {
-            //if coallocate request is present and can color the same,
-            if (pair.first == *it && valueToColor.find(pair.second) != valueToColor.end() && !colorUsed[valueToColor[pair.second]])
+            if (!colorUsed[c])
             {
-                c = valueToColor[pair.second];
-            }
-        }
-        if (c == -1)
-        {
-            for (c = 0; c < NUM_COLORS; c++)
-            {
-                if (!colorUsed[c])
-                {
-                    break;
-                }
+                break;
             }
         }
 
@@ -302,12 +346,15 @@ void RegisterGraph::GreedyColoring(vector<Value *> &PEO, vector<pair<Value *, Va
         if (c == NUM_COLORS)
             NUM_COLORS++;
     }
+
+    return valueToColor;
+
 }
 
 void RegisterGraph::InverseColorMap()
 {
 
-    for (int i = 0; i < NUM_COLORS; i++)
+    for (int i = 0; i < numColors; i++)
     {
         colorToValue.push_back(vector<Value *>());
     }
@@ -317,7 +364,7 @@ void RegisterGraph::InverseColorMap()
         colorToValue[it->second].push_back(it->first);
     }
 
-    for (int i = 0; i < NUM_COLORS; i++)
+    for (int i = 0; i < numColors; i++)
     {
         assert(!colorToValue[i].empty() && "every list of colorToValue should not be empty");
     }

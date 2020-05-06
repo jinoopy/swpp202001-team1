@@ -44,7 +44,7 @@ public:
   auto& getAdjList() {return adjList;}
   auto& getAdjList(Value* v) {return adjList[v];}
 
-  int getNumColors() {return NUM_COLORS;}
+  int getNumColors() {return numColors;}
 
   auto& getValueToColor() {return valueToColor;}
   unsigned int getValueToColor(Value* v) {return valueToColor[v];}
@@ -55,8 +55,12 @@ private:
   
   //Private Variables
 
+  //M: Module which is analyzed
+  Module* M;
+
   //values: result of SearchAllArgInst()
   vector<Value *> values;
+  map<Function*, vector<Value *>> valuesInFunction;
 
   //adjList: result of LiveInterval() + RegisterAdjList()
   map<Value *, set<Value *>> adjList;
@@ -64,7 +68,7 @@ private:
   //NUM_COLORS, valueToColor: result of ColorGraph();
   //NUM_COLORS: total colors used ( 0 < c < NUM_COLORS)
   //valueToColor: Value=>color mapping
-  unsigned int NUM_COLORS;
+  unsigned int numColors;
   map<Value *, unsigned int> valueToColor;
 
   //colorToValue: result of InverseColorMap()
@@ -101,10 +105,10 @@ private:
   void ColorGraph(vector<pair<Value*, Value*>>&);
   //helper function for ColorGraph()
   //finds PEO via Lexicographic BFS algorithm
-  vector<Value *> PerfectEliminationOrdering();
+  vector<Value *> PerfectEliminationOrdering(vector<Value *> &);
   //helper function for ColorGraph()
   //colors the graph greedily(adjList always represents a chordal graph)
-  void GreedyColoring(vector<Value *> &, vector<pair<Value *, Value *>>&);
+  map<Value *, unsigned int> GreedyColoring(vector<Value *> &, unsigned int&);
 
   //Makes colorToValue so easily retrieve all values with same color
   void InverseColorMap();
@@ -121,25 +125,5 @@ public:
 };
 
 } // namespace backend
-/* FIXME This causes error
-extern "C" ::llvm::PassPluginLibraryInfo
-llvmGetPassPluginInfo() {
-  return {
-    LLVM_PLUGIN_API_VERSION, "LivenessAnalysis", "v0.1",
-    [](PassBuilder &PB) {
-      PB.registerPipelineParsingCallback(
-        [](StringRef Name, ModulePassManager &MPM,
-           ArrayRef<PassBuilder::PipelineElement>) {
-          if (Name == "liveness") {
-            MPM.addPass(LivenessAnalysis());
-            return true;
-          }
-          return false;
-        }
-      );
-    }
-  };
-}
-*/
 
 #endif
