@@ -117,8 +117,7 @@ public:
 };
 
 } // namespace backend
-/*
-TODO This causes error
+/* FIXME This causes error
 extern "C" ::llvm::PassPluginLibraryInfo
 llvmGetPassPluginInfo() {
   return {
