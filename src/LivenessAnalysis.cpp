@@ -12,6 +12,12 @@ namespace backend
 
 RegisterGraph::RegisterGraph(Module &M)
 {
+    vector<pair<Value*, Value*>> emptyList;
+    RegisterGraph(M, emptyList);
+}
+
+RegisterGraph::RegisterGraph(Module &M, vector<pair<Value*, Value*>>& coallocate)
+{
     //find all value-results
     SearchAllArgInst(M);
 
@@ -22,7 +28,7 @@ RegisterGraph::RegisterGraph(Module &M)
     //Initialize adjList
     RegisterAdjList(liveInterval);
 
-    ColorGraph();
+    ColorGraph(coallocate);
 }
 
 #define isStore(I) (dyn_cast<StoreInst>(&I) != nullptr)
@@ -108,7 +114,7 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
     //if any dominated block uses find, 'isAlive' = true
     for (BasicBlock &succ : *BB.getParent())
     {
-        if (DT.dominates(&BB, &succ) && &succ!=&BB)
+        if (DT.dominates(&BB, &succ) && &succ != &BB)
         {
             isAlive = LivenessSearch(*(succ.begin()), find, index, live, DT) || isAlive;
         }
@@ -183,14 +189,14 @@ void RegisterGraph::RegisterAdjList(vector<vector<bool>> &liveInterval)
     }
 }
 
-void RegisterGraph::ColorGraph()
+void RegisterGraph::ColorGraph(vector<pair<Value *, Value *>> &coallocate)
 {
-
     //calculates PEO for values + adjList
     vector<Value *> PEO = PerfectEliminationOrdering();
 
     //colors the graph greedily with PEO;
-    GreedyColoring(PEO);
+    reverse(PEO.begin(), PEO.end());
+    GreedyColoring(PEO, coallocate);
 }
 
 vector<Value *> RegisterGraph::PerfectEliminationOrdering()
@@ -247,11 +253,10 @@ vector<Value *> RegisterGraph::PerfectEliminationOrdering()
 
     assert(PEO.size() == values.size() && "PEO should be the same size as values");
 
-    reverse(PEO.begin(), PEO.end());
     return PEO;
 }
 
-void RegisterGraph::GreedyColoring(vector<Value *> &PEO)
+void RegisterGraph::GreedyColoring(vector<Value *> &PEO, vector<pair<Value *, Value *>> &coallocate)
 {
 
     NUM_COLORS = 0;
@@ -268,14 +273,26 @@ void RegisterGraph::GreedyColoring(vector<Value *> &PEO)
         }
 
         //c: color for the vertex *it
+        //if coallocatable, coallocate colors greedily
         //if every neighbour nodes use all colors, c = NUM_COLORS
         //else, it becomes the first non-used color
-        int c;
-        for (c = 0; c < NUM_COLORS; c++)
+        int c = -1;
+        for (auto pair : coallocate)
         {
-            if (!colorUsed[c])
+            //if coallocate request is present and can color the same,
+            if (pair.first == *it && valueToColor.find(pair.second) != valueToColor.end() && !colorUsed[valueToColor[pair.second]])
             {
-                break;
+                c = valueToColor[pair.second];
+            }
+        }
+        if (c == -1)
+        {
+            for (c = 0; c < NUM_COLORS; c++)
+            {
+                if (!colorUsed[c])
+                {
+                    break;
+                }
             }
         }
 

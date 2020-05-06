@@ -32,7 +32,10 @@ public:
 
   //Constructors
 
+  //Constructor with no coallocate request
   RegisterGraph(Module &);
+  //Constructor with coallocate requests
+  RegisterGraph(Module &, vector<pair<Value*, Value*>>&);
 
   //Interfaces
 
@@ -93,14 +96,15 @@ private:
 
   //Colors values so adjacent value have no same color
   //initializes NUM_COLORS, valueToColor
-  //TODO add must(function call)&can(phi nodes) coalesce features
+  //Optional paramter coallocate: if can coallocate two values, then do so.
   void ColorGraph();
+  void ColorGraph(vector<pair<Value*, Value*>>&);
   //helper function for ColorGraph()
   //finds PEO via Lexicographic BFS algorithm
   vector<Value *> PerfectEliminationOrdering();
   //helper function for ColorGraph()
   //colors the graph greedily(adjList always represents a chordal graph)
-  void GreedyColoring(vector<Value *> &);
+  void GreedyColoring(vector<Value *> &, vector<pair<Value *, Value *>>&);
 
   //Makes colorToValue so easily retrieve all values with same color
   void InverseColorMap();
