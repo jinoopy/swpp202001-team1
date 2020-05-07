@@ -56,7 +56,8 @@ vector<Value *> RegisterGraph::SearchAllArgInst(Module &M)
 #define isArgument(V) (dyn_cast<Argument>(V) != nullptr)
 vector<vector<bool>> RegisterGraph::LiveInterval(Module &M, vector<Value *> &values)
 {
-
+    //Value v is live in instruction I iff...
+    //live[I][index of v in values] = true
     map<Instruction *, vector<bool>> live;
 
     int N = values.size();
@@ -115,7 +116,7 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
 
     //if any dominated block uses find, 'isAlive' = true
     for (BasicBlock &succ : *BB.getParent()) {
-        if (DT.dominates(&BB, &succ))
+        if (DT.dominates(&BB, &succ) && &BB != &succ)
         {
             isAlive = LivenessSearch(*(succ.begin()), find, index, live, DT) || isAlive;
         }
@@ -138,7 +139,7 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
         }
     }
 
-    //Iterate through all instructions before curr
+    //Iterate through all instructions after curr
     //'curr' == mostly the first node of BB; 'find' in the first call
     for (auto it = BB.rbegin(); it != BB.rend(); ++it)
     {
