@@ -87,6 +87,8 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M, vector<Value *> &val
         //'start': Where to start the search.
         Instruction &start = (isArgument(V) ? *(F.getEntryBlock().begin()) : *(dyn_cast<Instruction>(V)));
 
+        //finds if V is live in the basic block parent of inst. start.
+        //recursively searches through the basic block DT and store result in live.
         LivenessSearch(start, *V, i, live, DT);
         i++;
     }
@@ -119,12 +121,14 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
         if (DT.dominates(&BB, &succ) && &BB != &succ)
         {
             isAlive = LivenessSearch(*(succ.begin()), find, index, live, DT) || isAlive;
+            if(isAlive) break;
         }
     }
     
     //Search successors to check if 'find' is used further on
     for (BasicBlock *succ : successors(&BB))
     {
+        if(isAlive) break;
         //if successor uses 'find' in its phi node:
         for (PHINode &phi : succ->phis())
         {
@@ -134,6 +138,7 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
                 if (phival == &find)
                 {
                     isAlive = true;
+                    break;
                 }
             }
         }
@@ -144,6 +149,7 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
     for (auto it = BB.rbegin(); it != BB.rend(); ++it)
     {
         Instruction &I = *it;
+        if(!isAlive) {
         for (auto &op : I.operands())
         {
             //if 'find' is used, set 'find' alive
@@ -151,9 +157,10 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
             {
                 isAlive = true;
             }
-            //if 'find' is alive in I, (if 'find' == 'I' it is not alive yet)
-            live[&I][index] = isAlive && (&I != &find);
         }
+        }
+        //if 'find' is alive in I, (if 'find' == 'I' it is not alive yet)
+        live[&I][index] = isAlive && (&I != &find);
         if (&I == &curr)
         {
             break;
