@@ -21,6 +21,7 @@ RegisterGraph::RegisterGraph(Module &M)
     vector<vector<bool>> liveInterval;
     liveInterval = LiveInterval(M);
 
+
     //Initialize adjList
     RegisterAdjList(liveInterval);
 
@@ -55,7 +56,8 @@ void RegisterGraph::SearchAllArgInst(Module &M)
 #define isArgument(V) (dyn_cast<Argument>(V) != nullptr)
 vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
 {
-
+    //Value v is live in instruction I iff...
+    //live[I][index of v in values] = true
     map<Instruction *, vector<bool>> live;
 
     int N = values.size();
@@ -84,6 +86,9 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
 
         //'start': Where to start the search.
         Instruction &start = (isArgument(V) ? *(F.getEntryBlock().begin()) : *(dyn_cast<Instruction>(V)));
+
+        //finds if V is live in the basic block parent of inst. start.
+        //recursively searches through the basic block DT and store result in live.
         LivenessSearch(start, *V, i, live, DT);
         i++;
     }
@@ -111,17 +116,18 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
 
     bool isAlive = false;
     //if any dominated block uses find, 'isAlive' = true
-    for (BasicBlock &succ : *BB.getParent())
-    {
-        if (DT.dominates(&BB, &succ) && &succ != &BB)
+    for (BasicBlock &succ : *BB.getParent()) {
+        if (DT.dominates(&BB, &succ) && &BB != &succ)
         {
             isAlive = LivenessSearch(*(succ.begin()), find, index, live, DT) || isAlive;
+            if(isAlive) break;
         }
     }
-
+    
     //Search successors to check if 'find' is used further on
     for (BasicBlock *succ : successors(&BB))
     {
+        if(isAlive) break;
         //if successor uses 'find' in its phi node:
         for (PHINode &phi : succ->phis())
         {
@@ -131,25 +137,32 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
                 if (phival == &find)
                 {
                     isAlive = true;
+                    break;
                 }
             }
         }
     }
 
-    //Iterate through all instructions before curr
+    //Iterate through all instructions after curr
     //'curr' == mostly the first node of BB; 'find' in the first call
     for (auto it = BB.rbegin(); it != BB.rend(); ++it)
     {
         Instruction &I = *it;
-        for (auto &op : I.operands())
-        {
-            //if 'find' is used, set 'find' alive
-            if (&find == op.get())
+        if(!isAlive) {
+            for (auto &op : I.operands())
             {
-                isAlive = true;
+                //if 'find' is used, set 'find' alive
+                if (&find == op.get())
+                {
+                    isAlive = true;
+                }
             }
-            //if 'find' is alive in I, (if 'find' == 'I' it is not alive yet)
-            live[&I][index] = isAlive && (&I != &find);
+        }
+        //if 'find' is alive in I, (if 'find' == 'I' it is not alive yet)
+        live[&I][index] = isAlive && (&I != &find);
+        if (&I == &curr)
+        {
+            break;
         }
         if (&I == &curr)
         {

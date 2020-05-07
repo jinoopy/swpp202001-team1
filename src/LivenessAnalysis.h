@@ -29,7 +29,6 @@ class RegisterGraph
 {
 
 public:
-
   //Constructors
 
   RegisterGraph(Module &);
