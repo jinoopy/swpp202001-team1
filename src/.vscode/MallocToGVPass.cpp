@@ -14,14 +14,14 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
 
     Function* FMain = M.getFunction("main");
     for(Instruction& I : FMain->getEntryBlock()) {
-        CallInst* CallI = dyn_cast<CallInst>(&I);
-        if(CallI != nullptr && CallI->getCalledFunction()->getName() == "malloc") {
+        CallInst* malloc = dyn_cast<CallInst>(&I);
+        if(malloc != nullptr && malloc->getCalledFunction()->getName() == "malloc") {
             
-            Type* T = I.getType();
+            Type* T = getMallocType(malloc);
             assert(T!=nullptr && "return of malloc should be a pointer");
 
             //TODO
-            Constant* initVal = getInitVal(&I);
+            Constant* initVal = getMallocInitVal(malloc);
 
             //create corresponding GV
             GlobalVariable* GV = new GlobalVariable(
@@ -30,9 +30,9 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
                 /*isConstant=*/ false,
                 /*Linkage=*/ GlobalValue::InternalLinkage,
                 /*Initializer=*/ initVal,
-                /*Name=*/ (I.hasName()? "gv."+I.getName() : "")
+                /*Name=*/ (malloc->hasName()? "gv."+malloc->getName() : "")
             );
-            replaceAllUseToGV(&I, GV);
+            replaceMallocToGV(malloc, GV);
             //by AliasAnalysis, swap all uses of CallI to
         }
     }

@@ -26,9 +26,19 @@ private:
     Module* M;
     ModuleAnalysisManager* MAM;
 
-    Constant* getInitVal(Instruction* ptr);
+    //getMallocType(): finds the actual pointer type of malloc()
+    //tracks the first bitcast operation done by malloc
+    //returns i8* for default
+    Type* getMallocType(CallInst*);
 
-    void replaceAllUseToGV(Instruction* malloc, GlobalVariable* gv);
+    //getInitVal(): finds the first store and fetch the value stored.
+    //if the store is not constant, returns nullptr
+    Constant* getMallocInitVal(CallInst*);
+
+    //replaceMallocToGv():
+    //perform AliasAnalysis and find every use of malloc
+    //replace every load&store operations which memory alias
+    void replaceMallocToGV(CallInst*, GlobalVariable*);
 
 };
 
