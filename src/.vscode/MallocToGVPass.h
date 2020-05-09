@@ -23,17 +23,23 @@ public:
     PreservedAnalyses run(Module &, ModuleAnalysisManager &);
 
 private:
+    //Module scope of analysis
     Module* M;
+    //Context of M
+    LLVMContext* Context;
+    //Module Analysis Manager
     ModuleAnalysisManager* MAM;
+    //main() from the Module M
+    Function* FMain;
 
     //getMallocType(): finds the actual pointer type of malloc()
-    //tracks the first bitcast operation done by malloc
-    //returns i8* for default
-    Type* getMallocType(CallInst*);
+    //tracks the first bitcast operation and returns it, nullptr if not found
+    BitCastInst* getMallocType(CallInst*);
 
-    //getInitVal(): finds the first store and fetch the value stored.
-    //if the store is not constant, returns nullptr
-    Constant* getMallocInitVal(CallInst*);
+    //getInitVal(): finds the first store returns it
+    //traks the first store operation and returns it, nullptr if not found
+    //store should be constant to be globalized
+    StoreInst* getMallocInitVal(CallInst*);
 
     //replaceMallocToGv():
     //perform AliasAnalysis and find every use of malloc
