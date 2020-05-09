@@ -44,7 +44,7 @@ private:
     //replaceMallocToGv():
     //perform AliasAnalysis and find every use of malloc
     //replace every load&store operations which memory alias
-    void replaceMallocToGV(CallInst*, GlobalVariable*);
+    void replaceMallocToGV(Function*, Instruction*, GlobalVariable*);
 
 };
 
