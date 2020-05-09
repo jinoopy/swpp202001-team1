@@ -34,11 +34,13 @@ void RegisterGraph::SearchAllArgInst(Module &M)
     for (Function &F : M)
     {
         valuesInFunction[&F] = vector<Value*>();
+        /*
         for (Argument &Arg : F.args())
         {
             values.push_back(&Arg);
             valuesInFunction[&F].push_back(&Arg);
         }
+        */
         for (BasicBlock &BB : F)
         {
             for (Instruction &I : BB)
