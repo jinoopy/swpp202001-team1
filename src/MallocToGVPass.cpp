@@ -13,9 +13,6 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
     this->MAM = &MAM;
     this->Context = &(M.getContext());
 
-    //Int8Ptr type; constant.
-    Type *Int8Ptr = IntegerType::get(*Context, 8)->getPointerElementType();
-
     FMain = M.getFunction("main");
     for (Instruction &I : FMain->getEntryBlock())
     {
@@ -27,30 +24,31 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
             //Bitcast instruction which transforms the type of malloc.
             //if no bitcast instruction performed, value of malloc() is used directly
             Instruction *bcI = getMallocType(cI);
-            if(bcI == nullptr) {
+            if(bcI != nullptr) {
                 malloc = bcI;
             }
-            Type *T = dyn_cast<PointerType>(bcI->getType());
+            PointerType *T = dyn_cast<PointerType>(malloc->getType());
             assert(T != nullptr && "return of malloc should be a pointer");
 
             //Save instruction which stores the initial value.
-            StoreInst *stI = getMallocInitVal(cI);
+            StoreInst *stI = getMallocInitVal(malloc);
             Constant *initVal = stI != nullptr ? dyn_cast<Constant>(stI->getValueOperand()) : nullptr;
-            if (initVal == nullptr)
-                continue;
 
             //create corresponding GV
             GlobalVariable *GV = new GlobalVariable(
                 /*Module=*/M,
-                /*Type=*/T,
+                /*Type=*/T->getElementType(),
                 /*isConstant=*/false,
-                /*Linkage=*/GlobalValue::InternalLinkage,
-                /*Initializer=*/initVal,
+                /*Linkage=*/GlobalValue::CommonLinkage,
+                /*Initializer=*/nullptr,
                 /*Name=*/(malloc->hasName() ? "gv." + malloc->getName() : ""));
+            GV->setInitializer(initVal);
 
             replaceMallocToGV(malloc, GV);
         }
     }
+
+    return PreservedAnalyses::all();
 }
 
 BitCastInst *MallocToGVPass::getMallocType(CallInst *malloc)
@@ -85,7 +83,7 @@ void MallocToGVPass::replaceMallocToGV(Instruction * malloc, GlobalVariable *GV)
 {
     map<Function*, Value*> equalArgs = findEqualPtrArgs(malloc);
 
-    for(auto& p : equalArgs) {
+    for(auto p : equalArgs) {
         p.second->replaceAllUsesWith(GV);
     }
 }
@@ -103,7 +101,7 @@ map<Function*, Value*> MallocToGVPass::findEqualPtrArgs(Value *Ptr)
         Function* F = qF.front(); qF.pop();
         //if equivalent ptr argument of Ptr is present, store the value.
         Value* ptrInF;
-        if(find(equalPtr.begin(), equalPtr.end(), F) != equalPtr.end()) {
+        if(equalPtr.find(F) != equalPtr.end()) {
             ptrInF = equalPtr[F];
         }
         else ptrInF = nullptr;
@@ -129,7 +127,7 @@ map<Function*, Value*> MallocToGVPass::findEqualPtrArgs(Value *Ptr)
                 Function* calledF = cI->getCalledFunction();
                 Argument* eqArg = calledF->getArg(argN);
 
-                if(find(equalPtr.begin(), equalPtr.end(), calledF) != equalPtr.end()) {
+                if(equalPtr.find(calledF) != equalPtr.end()) {
                     assert(eqArg == equalPtr[calledF] && "wrong GV propagation");
                 }
                 else {
