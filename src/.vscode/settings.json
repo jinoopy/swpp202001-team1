@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "functional": "cpp",
+        "istream": "cpp",
+        "memory": "cpp",
+        "array": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xlocnum": "cpp",
+        "xloctime": "cpp",
+        "__functional_base": "cpp",
+        "locale": "cpp",
+        "string": "cpp"
+    }
+}
