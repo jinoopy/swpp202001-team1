@@ -19,18 +19,22 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
     FMain = M.getFunction("main");
     for (Instruction &I : FMain->getEntryBlock())
     {
-        CallInst *malloc = dyn_cast<CallInst>(&I);
-        if (malloc != nullptr && malloc->getCalledFunction()->getName() == "malloc")
+        CallInst *cI = dyn_cast<CallInst>(&I);
+        if (cI != nullptr && cI->getCalledFunction()->getName() == "malloc")
         {
-
+            //final pointer passed to other functions
+            Instruction* malloc = cI;
             //Bitcast instruction which transforms the type of malloc.
-            BitCastInst *bcI = getMallocType(malloc);
-            //if no bitcast instruction performed, pointer is default int8*
-            Type *T = bcI != nullptr ? dyn_cast<PointerType>(bcI->getType()) : Int8Ptr;
+            //if no bitcast instruction performed, value of malloc() is used directly
+            Instruction *bcI = getMallocType(cI);
+            if(bcI == nullptr) {
+                malloc = bcI;
+            }
+            Type *T = dyn_cast<PointerType>(bcI->getType());
             assert(T != nullptr && "return of malloc should be a pointer");
 
-            //Store instruction which stores the initial value.
-            StoreInst *stI = getMallocInitVal(malloc);
+            //Save instruction which stores the initial value.
+            StoreInst *stI = getMallocInitVal(cI);
             Constant *initVal = stI != nullptr ? dyn_cast<Constant>(stI->getValueOperand()) : nullptr;
             if (initVal == nullptr)
                 continue;
@@ -44,7 +48,7 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
                 /*Initializer=*/initVal,
                 /*Name=*/(malloc->hasName() ? "gv." + malloc->getName() : ""));
 
-            replaceMallocToGV(/*TODO*/);
+            replaceMallocToGV(malloc, GV);
         }
     }
 }
@@ -63,7 +67,7 @@ BitCastInst *MallocToGVPass::getMallocType(CallInst *malloc)
     return nullptr;
 }
 
-StoreInst *MallocToGVPass::getMallocInitVal(CallInst *malloc)
+StoreInst *MallocToGVPass::getMallocInitVal(Instruction *malloc)
 {
     for (Instruction &I : FMain->getEntryBlock())
     {
@@ -77,12 +81,66 @@ StoreInst *MallocToGVPass::getMallocInitVal(CallInst *malloc)
     return nullptr;
 }
 
-void MallocToGVPass::replaceMallocToGV(/*TODO*/)
+void MallocToGVPass::replaceMallocToGV(Instruction * malloc, GlobalVariable *GV)
 {
-    //TODO
-    //Use Andersen Alias Analysis(an interprocedural AA)
-    //(implemented in https://github.com/grievejia/andersen)
-    //to find wether pointers alias.
+    map<Function*, Value*> equalArgs = findEqualPtrArgs(malloc);
+
+    for(auto& p : equalArgs) {
+        p.second->replaceAllUsesWith(GV);
+    }
+}
+
+map<Function*, Value*> MallocToGVPass::findEqualPtrArgs(Value *Ptr)
+{
+    map<Function*, Value*> equalPtr;
+    queue<Function *> qF;
+
+    qF.push(FMain);
+    equalPtr[FMain] = Ptr;
+    while (!qF.empty())
+    {
+        //F in current search
+        Function* F = qF.front(); qF.pop();
+        //if equivalent ptr argument of Ptr is present, store the value.
+        Value* ptrInF;
+        if(find(equalPtr.begin(), equalPtr.end(), F) != equalPtr.end()) {
+            ptrInF = equalPtr[F];
+        }
+        else ptrInF = nullptr;
+
+        //for all CallInst in F,
+        for (auto it = inst_begin(F); it != inst_end(F); ++it)
+        {
+            CallInst *cI = dyn_cast<CallInst>(&*it);
+            if (cI)
+            {
+                //finds the index of ptrInF
+                //f(op0, op1, ptrInF, op3) => 2
+                unsigned int argN;
+                for(argN = 0; argN<cI->getNumArgOperands(); argN++) {
+                    if(cI->getArgOperand(argN) == ptrInF) {
+                        break;
+                    }
+                }
+                if(argN == cI->getNumArgOperands()) continue;
+
+                //chooses the equivaent argument from called function
+                //2 => define f(arg0, arg1, arg2) => arg2
+                Function* calledF = cI->getCalledFunction();
+                Argument* eqArg = calledF->getArg(argN);
+
+                if(find(equalPtr.begin(), equalPtr.end(), calledF) != equalPtr.end()) {
+                    assert(eqArg == equalPtr[calledF] && "wrong GV propagation");
+                }
+                else {
+                    equalPtr[calledF] = eqArg;
+                    qF.push(calledF);
+                }
+            }
+        }
+    }
+
+    return equalPtr;
 }
 
 } // namespace optim

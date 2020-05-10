@@ -8,9 +8,11 @@
 #include "llvm/Passes/PassPlugin.h"
 
 #include "llvm/Support/raw_ostream.h"
-#include <string>
+#include <set>
+#include <queue>
 
 using namespace llvm;
+using namespace std;
 
 namespace optim
 {
@@ -34,17 +36,21 @@ private:
 
     //getMallocType(): finds the actual pointer type of malloc()
     //tracks the first bitcast operation and returns it, nullptr if not found
-    BitCastInst* getMallocType(CallInst*);
+    BitCastInst* getMallocType(CallInst* malloc);
 
     //getInitVal(): finds the first store returns it
     //traks the first store operation and returns it, nullptr if not found
     //store should be constant to be globalized
-    StoreInst* getMallocInitVal(CallInst*);
+    StoreInst* getMallocInitVal(Instruction* malloc);
 
     //replaceMallocToGv():
-    //perform AliasAnalysis and find every use of malloc
-    //replace every load&store operations which memory alias
-    void replaceMallocToGV(Function*, Instruction*, GlobalVariable*);
+    //perform AliasAnalysis and find every use of CallInst
+    //replace every operations which share value
+    void replaceMallocToGV(Instruction* malloc, GlobalVariable*);
+
+    //helper function for replaceMallocToGV()
+    //finds argument-propagated replicants of the Value* argument
+    map<Function*, Value*> findEqualPtrArgs(Value* malloc);
 
 };
 
