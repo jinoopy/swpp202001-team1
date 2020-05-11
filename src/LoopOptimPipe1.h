@@ -23,13 +23,32 @@ using namespace llvm;
 using namespace std;
 
 namespace optim {
-class LoopOptimPipe1 : public AnalysisInfoMixin<LoopOptimPipe1> {
-private:
-    friend AnalysisInfoMixin<LoopOptimPipe1>;
-    static AnalysisKey Key;
+class LoopOptimPipe1 : public PassInfoMixin<LoopOptimPipe1> {
 public:
-    PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
+    PreservedAnalyses run(Module &, ModuleAnalysisManager &);
+
+private:
+
 };
+
+extern "C" ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo()
+{
+    return {
+        LLVM_PLUGIN_API_VERSION, "LoopOptimPipe1", "v0.1",
+        [](PassBuilder &PB) {
+            PB.registerPipelineParsingCallback(
+                [](StringRef Name, ModulePassManager &MPM,
+                   ArrayRef<PassBuilder::PipelineElement>) {
+                    if (Name == "loop-optim-pipe1")
+                    {
+                        MPM.addPass(LoopOptimPipe1());
+                        return true;
+                    }
+                    return false;
+                });
+        }};
+}
 }
 
 #endif 
