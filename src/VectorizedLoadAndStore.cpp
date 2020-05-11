@@ -102,6 +102,7 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 					}
 				}
 
+				//IMPORTANT: VERY dangerous assumption made here.
 				//we consider that two corresponding nodes directly can be vectorized.
 				//we have to analyze more through the behavior of loop unroll pass.
 				assert(firstGEPloads.size() == secondGEPloads.size());
