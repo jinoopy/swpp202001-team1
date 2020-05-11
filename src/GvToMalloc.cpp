@@ -21,17 +21,22 @@ namespace optim
             m_index++;
         }
         // replace call instruction with new arguments.
+
+        vector<Function> old_functions;
+        vector<Function> new_functions;
+        map<Function *, Function *> fMap; // By using fMap, we can call the new function(arguments changed function).
         for(auto &f : M.functions())
         {
-            AddArgumentsToFunctionDef(M, Context, f, malloc);
-            for(auto *usr : f.users())
-            {
-                CallInst *cI = dyn_cast<CallInst>(usr);
-                if(cI != nullptr)
-                {
-                    AddArgumentsToCallInst(f, cI, malloc);
-                }
-            }
+            old_functions.push_back(f);
+        }
+        for(auto &f : old_functions)
+        {
+            new_functions.push_back(AddArgumentsToFunctionDef(M, Context, f, malloc));  // after changing the definition(arguments) except main function.
+            fMap[&f] = &new_functions[new_functions.size()-1];  // mapping old function pointer to new function pointer.
+        }
+        for(auto &f : new_functions)    // For each function, we will replace all of call instructions.
+        {
+            AddArgumentsToCallInst(fMap, f, malloc);
         }
     }
 
@@ -49,6 +54,7 @@ namespace optim
         IRBuilder<> builder(first);
         CallInst *malloc = builder.CreateCall(MallocF, ConstantInt::get(Type::getInt64Ty(Context), size), // %ma1 = call i8* @malloc(i64 size)
                                             "ma" + std::to_string(m_index));
+        
         Value *bitCast = builder.CreateBitCast(malloc, type->getPointerTo(), "gv" + std::to_string(m_index)); // %gv1 = bitcast i8* %ma1 to type*
 
         auto constInt_value = dyn_cast<ConstantInt>(value); // getting The real value in C++ integer type not llvm value type. 
@@ -76,9 +82,9 @@ namespace optim
     */
 
     // get all the malloc variables And add them as new arguments in function.
-    void GvToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
+    Function& GvToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
     {
-        if(f.getName() == "main") return;
+        if(f.getName() == "main") return f;
         else
         {
             FunctionType *FTy = f.getFunctionType();
@@ -107,19 +113,44 @@ namespace optim
             }
             SmallVector<ReturnInst*, 8> returns;
             CloneFunctionInto(NewFunc, &f, VMap, f.getSubprogram() != nullptr, returns, "");
+            return *NewFunc;
         }
     }
 
-    void GvToMalloc::AddArgumentsToCallInst(Function &f, CallInst* fCall, Value *malloc)
+    void GvToMalloc::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
     {
-        IRBuilder<> builder((fCall)); // make new instruction on the fCall instruction.
-        vector<Value *> args; // existing arguments + new malloc argument
-        for(int i = 0; i < fCall->getNumArgOperands(); i++)
+        for(auto &I = inst_begin(f); I != inst_end(f); I++)
         {
-            args.push_back(fCall->getArgOperand(i));
+            CallInst *cI = dyn_cast<CallInst>(&*I);
+            IRBuilder<> builder((cI)); // make new instruction on the fCall instruction.
+            vector<Value *> args; // origianl arguments + new malloc argument
+            for(int i = 0; i < cI->getNumArgOperands(); i++)    // original arguments
+            {
+                args.push_back(cI->getArgOperand(i));
+            }
+            if(f.getName() == "main")   // In case of main function we should put the malloc variables directly but not arguments.
+            {
+                for(auto i = 0; i < malloc.size(); i++)
+                {
+                    args.push_back(malloc[i]);
+                }
+            }
+            else    // In case of other functions, we should put the function arguments in call instruction. 
+            {
+                for(auto i = 0; i < malloc.size(); i++)
+                {
+                    for(auto &arg : f.args())
+                    {
+                        if(arg.getName() == malloc[i]->getName()) // malloc variable's name is same with function argument ex) f(arg0, arg1, arN, gv0 , gv1 .. gvN)
+                        {
+                            args.push_back(dyn_cast<Value>(&arg));
+                        }
+                    }
+                }
+            }
+            auto *newInst_func = fMap[cI->getCalledFunction()];     // By using fMap, we can call the new function(arguments changed function).
+            CallInst *newInst = builder.CreateCall(newInst_func, args, cI->getName());
+            cI->eraseFromParent(); // after making new call instruction, erase the original instruction.
         }
-        args.push_back(malloc);
-        CallInst *newInst = builder.CreateCall(&f, args, fCall->getName());
-        fCall->eraseFromParent(); // after making new call instruction, erase the original instruction.
     }
 } // namespace backend

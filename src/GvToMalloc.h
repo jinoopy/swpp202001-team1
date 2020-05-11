@@ -26,6 +26,9 @@ using namespace std;
 namespace optim {
 class GvToMalloc : public PassInfoMixin<GvToMalloc>{
 public:
+//   This run function is the main function of this class.
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
+
 //   Make new malloc variable to replace the GV
   // And make store instruction after the call instruction
 //   And the return value(Value*) will be used to add arguments of function 
@@ -33,15 +36,14 @@ public:
 
 //   When Malloc variable is added, we have to give the variables to other functions.
 //   So we should add some arguments in function definition before we put the variables to call instruction of functions.
-//   get all the malloc variables And add them as new arguments in function.
-  void AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc);
+//   To do this, we first get all the malloc variables And add them as new arguments in function.
+  Function& AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc);
   
 //   After the  change of function definition, 
-//   we should put new malloc variables to call instruction of functions.
-  void AddArgumentsToCallInst(Function &f,CallInst* fCall, Value *malloc);
-
-//   This run function is the main function of this class.
-  PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
+//   we should put new malloc variables to call instructions of functions.
+//   In case of main function, we will use the malloc variables as the arguments of call instructions.
+//   And case of other functions, we will use the function arguments as the arguments of call instructions. 
+  void AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc);
 };
 
 }
