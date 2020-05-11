@@ -38,6 +38,30 @@ namespace optim
         {
             AddArgumentsToCallInst(fMap, f, malloc);
         }
+        int i =0;
+        for(auto gv = GVs.begin(); gv != GVs.end(); gv++, i++)  // every gv,
+        {
+            for(auto &use : gv->uses()) // every use,
+            {
+                Function *func = dyn_cast<Instruction>(use.getUser())->getFunction();   // first get the function of use.
+                if(func->getName() == "main")   // if the function is main function, use malloc.
+                {
+                    use.set(malloc[i]);
+                }
+                else    // if it is not main, use the function argument. find the argument by name.
+                {
+                    auto args = func->args();
+                    for(auto j = args.begin(); j != args.end; j++)
+                    {
+                        if(j->getName() == "gv" + std::to_string(i))
+                        {
+                            use.set(j);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     Value* GvToMalloc::MakeNewMalloc(Module &M, LLVMContext &Context, Type *type, llvm::Constant *value, int m_index)
@@ -89,11 +113,11 @@ namespace optim
         {
             FunctionType *FTy = f.getFunctionType();
             std::vector<Type *> Params;
-            for(const Argument &I : f.args())
+            for(const Argument &I : f.args())   // add the original function arguments.
             {
                 Params.push_back(I.getType());
             }
-            for(int i = 0; i < malloc.size(); i++)
+            for(int i = 0; i < malloc.size(); i++)  // add new function arguments.
             {
                 Params.push_back(malloc[i]->getType());
             }
@@ -102,12 +126,12 @@ namespace optim
             Function *NewFunc = Function::Create(NFTy, f.getLinkage(), f.getAddressSpace(), f.getName(), f.getParent());  // RecreateFunction(&f, NFTy);
             auto VMap = ValueToValueMapTy();
             Function::arg_iterator DestI = NewFunc->arg_begin();
-            for(const Argument &I : f.args())
+            for(const Argument &I : f.args())   // set the name of original arguments to original name.
             {
                 DestI->setName(I.getName());
                 VMap[&I] = &*DestI++;
             }
-            for(int i = 0; i < malloc.size(); i++, DestI++)
+            for(int i = 0; i < malloc.size(); i++, DestI++) // match the name of new arguments to the name of malloc variables in main function. 
             {
                 DestI->setName(malloc[i]->getName());
             }
