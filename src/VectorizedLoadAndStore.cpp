@@ -177,7 +177,7 @@ vector<GetElementPtrInst *> VectorizedLoadAndStorePass::findGEPs(BasicBlock &BB,
 			ptrType = Type::getInt16PtrTy(Context);
 			break;
 		case 32:
-			ptrType = Type::getInt16PtrTy(Context);
+			ptrType = Type::getInt32PtrTy(Context);
 			break;
 		default:
 			assert(false && "must not reach, size should be one from 8, 16, 32");
