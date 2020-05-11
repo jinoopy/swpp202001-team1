@@ -7,6 +7,7 @@
 #include "llvm/IR/PassManager.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
+#include "llvm/Transforms/Utils/Cloning.h"
 
 #include "llvm/Analysis/PostDominators.h"
 
@@ -25,7 +26,6 @@ using namespace std;
 namespace optim {
 class GvToMalloc : public PassInfoMixin<GvToMalloc>{
 public:
-  Function *RecreateFunction(Function *Func, FunctionType *NewType);
 //   Make new malloc variable to replace the GV
   // And make store instruction after the call instruction
 //   And the return value(Value*) will be used to add arguments of function 
@@ -33,11 +33,11 @@ public:
 
 //   When Malloc variable is added, we have to give the variables to other functions.
 //   So we should add some arguments in function definition before we put the variables to call instruction of functions.
-  void AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, Type *gv_type); // This function only needs the size of the malloc variable
+  void AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, Type *gv_type, string gvName); // This function only needs the size of the malloc variable
   
-//   After the definition of function changes, 
+//   After the change of function definition, 
 //   we should put new malloc variables to call instruction of functions.
-  void AddArgumentsToCallInst(Instruction* malloc);
+  void AddArgumentsToCallInst(Function &f,CallInst* fCall, Value *malloc);
 
 //   This run function is the main function of this class.
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);

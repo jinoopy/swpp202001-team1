@@ -5,6 +5,35 @@ using namespace std;
 
 namespace optim
 {
+    PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM)
+    {
+        GvToMalloc *GTM;
+        auto &Context = M.getContext();
+        
+        auto &GVs = M.getGlobalList();
+        int m_index = 0;
+        for(auto gv = GVs.begin(); gv != GVs.end(); gv++)
+        {
+            auto a = gv->getName();
+            auto type = gv->getValueType();
+            auto *value = gv->getInitializer();
+            Value *malloc = GTM->MakeNewMalloc(M, Context, type, value, m_index);
+            for(auto &f : M.functions())
+            {
+                GTM->AddArgumentsToFunctionDef(M, Context, f, type, "gv" + std::to_string(m_index));
+                for(auto *usr : f.users())
+                {
+                    CallInst *cI = dyn_cast<CallInst>(usr);
+                    if(cI != nullptr)
+                    {
+                        AddArgumentsToCallInst(f, cI, malloc);
+                    }
+                }
+            }
+            
+            m_index++;
+        }
+    }
 
     Value* GvToMalloc::MakeNewMalloc(Module &M, LLVMContext &Context, Type *type, llvm::Constant *value, int m_index)
     {
@@ -22,16 +51,16 @@ namespace optim
                                             "ma" + std::to_string(m_index));
         auto *bitCast = builder.CreateBitCast(malloc, type->getPointerTo(), "gv" + std::to_string(m_index)); // %gv1 = bitcast i8* %ma1 to type*
 
-        auto constInt_value = dyn_cast<ConstantInt>(value);
+        auto constInt_value = dyn_cast<ConstantInt>(value); // getting The real value in C++ integer type not llvm value type. 
         int64_t init_value = constInt_value->getSExtValue();
-        if(init_value == 0) return bitCast;
-        else
+        if(init_value != 0)
         {
-            auto *store = builder.CreateStore(value, bitCast); // initialize the variable to original value if it was initialized with some value.
+            auto *store = builder.CreateStore(value, bitCast); // initialize the variable as the original value if it was initialized with some value.
         }
-        
+        return bitCast;
     }
-
+     
+    /*
     Function *RecreateFunction(Function *Func, FunctionType *NewType) {
         Function *NewFunc = Function::Create(NewType, Func->getLinkage());
         NewFunc->copyAttributesFrom(Func);
@@ -44,74 +73,45 @@ namespace optim
                                     Func->getFunctionType()->getPointerTo()));
         return NewFunc;
     }
+    */
 
-
-    void AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, Type *gv_type)
+    void AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, Type *gv_type, string gvName)
     {
         if(f.getName() == "main") return;
         else
         {
-            Type *PtrType = Type::getInt8PtrTy(f.getContext());
-
             FunctionType *FTy = f.getFunctionType();
-            SmallVector<Type *, 8> Params(FTy->param_begin(), FTy->param_end());
-            Params.push_back(PtrType);
+            std::vector<Type *> Params;
+            for(const Argument &I : f.args())
+            {
+                Params.push_back(I.getType());
+            }
+            Params.push_back(gv_type);
             FunctionType *NFTy = FunctionType::get(FTy->getReturnType(), Params, false);
-            Function *NewFunc = RecreateFunction(&f, NFTy);
-            
-            NewFunc->setAttributes(
-                f.getAttributes().addAttribute(f.getContext(), FTy->getNumParams()+1, Attribute::NoAlias));
-            
-            for(Function::arg_iterator Arg = f.arg_begin(), E = f.arg_end(), NewArg = NewFunc->arg_begin();
-                        Arg != E; Arg++, NewArg++)
+            Function *NewFunc = Function::Create(NFTy, f.getLinkage(), f.getAddressSpace(), f.getName(), f.getParent());  // RecreateFunction(&f, NFTy);
+            auto VMap = ValueToValueMapTy();
+            Function::arg_iterator DestI = NewFunc->arg_begin();
+            for(const Argument &I : f.args())
             {
-                Arg->replaceAllUsesWith(NewArg);
-                NewArg->takeName(Arg);
+                DestI->setName(I.getName());
+                VMap[&I] = &*DestI++;
             }
-
-            f.eraseFromParent();
-
-            /*
-            auto args = f.args();
-            Argument* argArray;
-            int index = 0;
-            for(auto &arg : args)
-            {
-                f.addParamAttr(arg);
-            }
-
-            auto *tempFTy = f.getType();
-            f.addParamAttr(0, )
-
-             Function *tempF = Function::Create(tempFTy);
-            */
+            DestI->setName(gvName);
+            SmallVector<ReturnInst*, 8> returns;
+            CloneFunctionInto(NewFunc, &f, VMap, f.getSubprogram() != nullptr, returns, "");
         }
     }
 
-    void AddArgumentsToCallInst(Instruction* malloc)
+    void AddArgumentsToCallInst(Function &f, CallInst* fCall, Value *malloc)
     {
-
-    }
-
-    PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM)
-    {
-        GvToMalloc *GTM;
-        auto &Context = M.getContext();
-        
-        auto &GVs = M.getGlobalList();
-        int m_index = 0;
-        for(auto gv = GVs.begin(); gv != GVs.end(); gv++)
+        IRBuilder<> builder((fCall)); // make new instruction on the fCall instruction.
+        vector<Value *> args; // existing arguments + new malloc argument
+        for(int i = 0; i < fCall->getNumArgOperands(); i++)
         {
-            auto a = gv->getName();
-            auto type = gv->getValueType();
-            auto *value = gv->getInitializer();
-            Value *malloc = GTM->MakeNewMalloc(M, Context, type, value, m_index);
-            for(auto &f : M.functions())
-            {
-                GTM->AddArgumentsToFunctionDef(M, Context, f, type);
-            }
-            
-            m_index++;
+            args.push_back(fCall->getArgOperand(i));
         }
+        args.push_back(malloc);
+        CallInst *newInst = builder.CreateCall(&f, args, fCall->getName());
+        fCall->eraseFromParent(); // after making new call instruction, erase the original instruction.
     }
 } // namespace backend
