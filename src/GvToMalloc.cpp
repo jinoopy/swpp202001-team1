@@ -5,33 +5,33 @@ using namespace std;
 
 namespace optim
 {
-    PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM)
+    PreservedAnalyses GvToMalloc::run(Module &M, ModuleAnalysisManager &MAM)
     {
-        GvToMalloc *GTM;
         auto &Context = M.getContext();
         
         auto &GVs = M.getGlobalList();
         int m_index = 0;
+        vector<Value *> malloc;
         for(auto gv = GVs.begin(); gv != GVs.end(); gv++)
         {
             auto a = gv->getName();
             auto type = gv->getValueType();
             auto *value = gv->getInitializer();
-            Value *malloc = GTM->MakeNewMalloc(M, Context, type, value, m_index);
-            for(auto &f : M.functions())
+            malloc.push_back(MakeNewMalloc(M, Context, type, value, m_index));
+            m_index++;
+        }
+        // replace call instruction with new arguments.
+        for(auto &f : M.functions())
+        {
+            AddArgumentsToFunctionDef(M, Context, f, malloc);
+            for(auto *usr : f.users())
             {
-                GTM->AddArgumentsToFunctionDef(M, Context, f, type, "gv" + std::to_string(m_index));
-                for(auto *usr : f.users())
+                CallInst *cI = dyn_cast<CallInst>(usr);
+                if(cI != nullptr)
                 {
-                    CallInst *cI = dyn_cast<CallInst>(usr);
-                    if(cI != nullptr)
-                    {
-                        AddArgumentsToCallInst(f, cI, malloc);
-                    }
+                    AddArgumentsToCallInst(f, cI, malloc);
                 }
             }
-            
-            m_index++;
         }
     }
 
@@ -49,7 +49,7 @@ namespace optim
         IRBuilder<> builder(first);
         CallInst *malloc = builder.CreateCall(MallocF, ConstantInt::get(Type::getInt64Ty(Context), size), // %ma1 = call i8* @malloc(i64 size)
                                             "ma" + std::to_string(m_index));
-        auto *bitCast = builder.CreateBitCast(malloc, type->getPointerTo(), "gv" + std::to_string(m_index)); // %gv1 = bitcast i8* %ma1 to type*
+        Value *bitCast = builder.CreateBitCast(malloc, type->getPointerTo(), "gv" + std::to_string(m_index)); // %gv1 = bitcast i8* %ma1 to type*
 
         auto constInt_value = dyn_cast<ConstantInt>(value); // getting The real value in C++ integer type not llvm value type. 
         int64_t init_value = constInt_value->getSExtValue();
@@ -75,7 +75,8 @@ namespace optim
     }
     */
 
-    void AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, Type *gv_type, string gvName)
+    // get all the malloc variables And add them as new arguments in function.
+    void GvToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
     {
         if(f.getName() == "main") return;
         else
@@ -86,7 +87,11 @@ namespace optim
             {
                 Params.push_back(I.getType());
             }
-            Params.push_back(gv_type);
+            for(int i = 0; i < malloc.size(); i++)
+            {
+                Params.push_back(malloc[i]->getType());
+            }
+            
             FunctionType *NFTy = FunctionType::get(FTy->getReturnType(), Params, false);
             Function *NewFunc = Function::Create(NFTy, f.getLinkage(), f.getAddressSpace(), f.getName(), f.getParent());  // RecreateFunction(&f, NFTy);
             auto VMap = ValueToValueMapTy();
@@ -96,13 +101,16 @@ namespace optim
                 DestI->setName(I.getName());
                 VMap[&I] = &*DestI++;
             }
-            DestI->setName(gvName);
+            for(int i = 0; i < malloc.size(); i++, DestI++)
+            {
+                DestI->setName(malloc[i]->getName());
+            }
             SmallVector<ReturnInst*, 8> returns;
             CloneFunctionInto(NewFunc, &f, VMap, f.getSubprogram() != nullptr, returns, "");
         }
     }
 
-    void AddArgumentsToCallInst(Function &f, CallInst* fCall, Value *malloc)
+    void GvToMalloc::AddArgumentsToCallInst(Function &f, CallInst* fCall, Value *malloc)
     {
         IRBuilder<> builder((fCall)); // make new instruction on the fCall instruction.
         vector<Value *> args; // existing arguments + new malloc argument

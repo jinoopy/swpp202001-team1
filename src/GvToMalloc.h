@@ -33,9 +33,10 @@ public:
 
 //   When Malloc variable is added, we have to give the variables to other functions.
 //   So we should add some arguments in function definition before we put the variables to call instruction of functions.
-  void AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, Type *gv_type, string gvName); // This function only needs the size of the malloc variable
+//   get all the malloc variables And add them as new arguments in function.
+  void AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc);
   
-//   After the change of function definition, 
+//   After the  change of function definition, 
 //   we should put new malloc variables to call instruction of functions.
   void AddArgumentsToCallInst(Function &f,CallInst* fCall, Value *malloc);
 
