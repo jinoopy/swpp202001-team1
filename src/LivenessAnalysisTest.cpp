@@ -50,6 +50,14 @@ TEST_F(RegisterGraphTest, ColorGraphTest1) {
 
     for(Function& F : *M) {
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
+        for(int i = 0; i < RG.getNumColors(&F); i++) {
+            outs() << "color " << i << " : ";
+            for(Value* v : RG.getColorToValue(&F)[i]) {
+                outs() << (v->hasName() ? v->getName() : "no-name") << " ";
+            }
+            outs() << "\n";
+        }
+        outs() << "\n";
         for(Value* v : RG.getValues(&F)) {
             for(auto w : RG.getAdjList(v)) {
                 EXPECT_NE(RG.getValueToColor(&F, v), RG.getValueToColor(&F, w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
@@ -64,6 +72,13 @@ TEST_F(RegisterGraphTest, ColorGraphTest2) {
 
     for(Function& F : *M) {
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
+        for(int i = 0; i < RG.getNumColors(&F); i++) {
+            outs() << "color " << i << " : ";
+            for(Value* v : RG.getColorToValue(&F)[i]) {
+                outs() << (v->hasName() ? v->getName() : "no-name") << " ";
+            }
+            outs() << "\n";
+        }
         for(Value* v : RG.getValues(&F)) {
             for(auto w : RG.getAdjList(v)) {
                 EXPECT_NE(RG.getValueToColor(&F, v), RG.getValueToColor(&F, w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
@@ -78,6 +93,14 @@ TEST_F(RegisterGraphTest, ColorGraphTest3) {
 
     for(Function& F : *M) {
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
+        for(int i = 0; i < RG.getNumColors(&F); i++) {
+            outs() << "color " << i << " : ";
+            for(Value* v : RG.getColorToValue(&F)[i]) {
+                outs() << (v->hasName() ? v->getName() : "no-name") << " ";
+            }
+            outs() << "\n";
+        }
+        outs() << "\n";
         for(Value* v : RG.getValues(&F)) {
             for(auto w : RG.getAdjList(v)) {
                 EXPECT_NE(RG.getValueToColor(&F, v), RG.getValueToColor(&F, w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
@@ -92,6 +115,14 @@ TEST_F(RegisterGraphTest, ColorGraphTest4) {
 
     for(Function& F : *M) {
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
+        for(int i = 0; i < RG.getNumColors(&F); i++) {
+            outs() << "color " << i << " : ";
+            for(Value* v : RG.getColorToValue(&F)[i]) {
+                outs() << (v->hasName() ? v->getName() : "no-name") << " ";
+            }
+            outs() << "\n";
+        }
+        outs() << "\n";
         for(Value* v : RG.getValues(&F)) {
             for(auto w : RG.getAdjList(v)) {
                 EXPECT_NE(RG.getValueToColor(&F, v), RG.getValueToColor(&F, w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
@@ -106,6 +137,14 @@ TEST_F(RegisterGraphTest, ColorGraphTest5) {
 
     for(Function& F : *M) {
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
+        for(int i = 0; i < RG.getNumColors(&F); i++) {
+            outs() << "color " << i << " : ";
+            for(Value* v : RG.getColorToValue(&F)[i]) {
+                outs() << (v->hasName() ? v->getName() : "no-name") << " ";
+            }
+            outs() << "\n";
+        }
+        outs() << "\n";
         for(Value* v : RG.getValues(&F)) {
             for(auto w : RG.getAdjList(v)) {
                 EXPECT_NE(RG.getValueToColor(&F, v), RG.getValueToColor(&F, w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";

@@ -26,6 +26,8 @@ RegisterGraph::RegisterGraph(Module &M)
     RegisterAdjList(liveInterval);
 
     ColorGraph();
+
+    InverseColorMap();
 }
 
 #define isStore(I) (dyn_cast<StoreInst>(&I) != nullptr)
@@ -324,9 +326,11 @@ map<Value *, unsigned int> RegisterGraph::GreedyColoring(vector<Value *> &PEO, u
 
 void RegisterGraph::InverseColorMap()
 {
-
     for(Function& F : *M) {
-        colorToValue[&F] = vector<vector<Value*>>();
+        colorToValue[&F] = vector<vector<Value*>>(numColors[&F]);;
+        for(int i = 0; i <numColors[&F]; i++) {
+            colorToValue[&F][i] = vector<Value*>();
+        }
         for(auto p : valueToColor[&F]) {
             colorToValue[&F][p.second].push_back(p.first);
         }
