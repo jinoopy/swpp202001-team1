@@ -110,7 +110,10 @@ namespace optim
     // get all the malloc variables And add them as new arguments in function.
     Function& GVToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
     {
-        if(f.getName() == "main") return f;
+        if(f.getName() == "main")
+        {
+            return f;
+        }
         else
         {
             FunctionType *FTy = f.getFunctionType();
