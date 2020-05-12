@@ -168,13 +168,10 @@ bool RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
         {
             break;
         }
-        if (&I == &curr)
-        {
-            break;
-        }
     }
 
     return isAlive;
+
 }
 
 void RegisterGraph::RegisterAdjList(vector<vector<bool>> &liveInterval)
