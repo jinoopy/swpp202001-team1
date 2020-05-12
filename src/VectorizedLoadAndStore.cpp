@@ -228,23 +228,21 @@ void VectorizedLoadAndStorePass::vectorizeLoads(GetElementPtrInst *GEPI, GetElem
 	LI->insertAfter(castedGEPI);
 
 	// decompose loaded value into two value (X, Z)
-	Instruction *X, *Y, *Z;
+	Instruction *X, *Y;
 	X = BinaryOperator::CreateURem(LI, ConstantInt::get(Context, APInt(bits << 1, 1llu << bits, false)));
 	TruncInst *XTrunc = new TruncInst(X, numTypeOfBits);
 	Y = BinaryOperator::CreateUDiv(LI, ConstantInt::get(Context, APInt(bits << 1, 1llu << bits, false)));
-	Z = BinaryOperator::CreateURem(Y, ConstantInt::get(Context, APInt(bits << 1, 1llu << bits, false)));
-	TruncInst *ZTrunc = new TruncInst(Z, numTypeOfBits);
+	TruncInst *YTrunc = new TruncInst(Y, numTypeOfBits);
 
 	// replace existing values with new values from vectorized load instruction
 	LI1->replaceAllUsesWith(XTrunc);
-	LI2->replaceAllUsesWith(ZTrunc);
+	LI2->replaceAllUsesWith(YTrunc);
 
 	// insert instruction properly
 	X->insertAfter(LI);
 	XTrunc->insertAfter(X);
 	Y->insertAfter(XTrunc);
-	Z->insertAfter(Y);
-	ZTrunc->insertAfter(Z);
+	YTrunc->insertAfter(Y);
 
 	// remove useless instruction
 	LI1->eraseFromParent();
@@ -277,12 +275,12 @@ void VectorizedLoadAndStorePass::vectorizeStores(GetElementPtrInst *GEPI, GetEle
 
 	// concatenate two value into one to store once
 	Instruction *X, *Y, *Z;
-	ZExtInst *W1 = new ZExtInst(STI2->getOperand(0), numType);
-	ZExtInst *W2 = new ZExtInst(STI1->getOperand(0), numType);
-	castedGEPI->insertBefore(nextGEPI);
-	X = BinaryOperator::CreateAdd(W1, ConstantInt::get(Context, APInt(bits << 1, 0, false)));
+	ZExtInst *W1 = new ZExtInst(STI2->getValueOperand(), numType);
+	ZExtInst *W2 = new ZExtInst(STI1->getValueOperand(), numType);
+	castedGEPI->insertBefore(STI2);
+	X = BinaryOperator::CreateOr(W1, ConstantInt::get(Context, APInt(bits << 1, 0, false)));
 	Y = BinaryOperator::CreateMul(X, ConstantInt::get(Context, APInt(bits << 1, 1llu << bits, false)));
-	Z = BinaryOperator::CreateAdd(Y, W2);
+	Z = BinaryOperator::CreateOr(Y, W2);
 	StoreInst *STI = new StoreInst(Z, castedGEPI);
 	
 	// insert instruction properly
