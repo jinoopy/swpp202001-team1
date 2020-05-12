@@ -22,21 +22,21 @@ namespace optim
         }
         // replace call instruction with new arguments.
 
-        vector<Function> old_functions;
-        vector<Function> new_functions;
+        vector<Function*> old_functions;
+        vector<Function*> new_functions;
         map<Function *, Function *> fMap; // By using fMap, we can call the new function(arguments changed function).
         for(auto &f : M.functions())
         {
-            old_functions.push_back(f);
+            old_functions.push_back(&f);
         }
         for(auto &f : old_functions)
         {
-            new_functions.push_back(AddArgumentsToFunctionDef(M, Context, f, malloc));  // after changing the definition(arguments) except main function.
-            fMap[&f] = &new_functions[new_functions.size()-1];  // mapping old function pointer to new function pointer.
+            new_functions.push_back(&AddArgumentsToFunctionDef(M, Context, *f, malloc));  // after changing the definition(arguments) except main function.
+            fMap[f] = new_functions[new_functions.size()-1];  // mapping old function pointer to new function pointer.
         }
         for(auto &f : new_functions)    // For each function, we will replace all of call instructions.
         {
-            AddArgumentsToCallInst(fMap, f, malloc);
+            AddArgumentsToCallInst(fMap, *f, malloc);
         }
         int i =0;
         for(auto gv = GVs.begin(); gv != GVs.end(); gv++, i++)  // every gv,
@@ -51,7 +51,7 @@ namespace optim
                 else    // if it is not main, use the function argument. find the argument by name.
                 {
                     auto args = func->args();
-                    for(auto j = args.begin(); j != args.end; j++)
+                    for(auto j = args.begin(); j != args.end(); j++)
                     {
                         if(j->getName() == "gv" + std::to_string(i))
                         {
@@ -62,6 +62,8 @@ namespace optim
                 }
             }
         }
+
+        return PreservedAnalyses::all();
     }
 
     Value* GVToMalloc::MakeNewMalloc(Module &M, LLVMContext &Context, Type *type, llvm::Constant *value, int m_index)
@@ -143,7 +145,7 @@ namespace optim
 
     void GVToMalloc::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
     {
-        for(auto &I = inst_begin(f); I != inst_end(f); I++)
+        for(auto I = inst_begin(f); I != inst_end(f); I++)
         {
             CallInst *cI = dyn_cast<CallInst>(&*I);
             IRBuilder<> builder((cI)); // make new instruction on the fCall instruction.
