@@ -24,7 +24,7 @@ using namespace llvm;
 using namespace std;
 
 namespace optim {
-class GvToMalloc : public PassInfoMixin<GvToMalloc>{
+class GVToMalloc : public PassInfoMixin<GVToMalloc>{
 public:
 //   This run function is the main function of this class.
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
@@ -46,19 +46,16 @@ public:
   void AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc);
 };
 
-}
-/*
-TODO This causes error
 extern "C" ::llvm::PassPluginLibraryInfo
 llvmGetPassPluginInfo() {
   return {
-    LLVM_PLUGIN_API_VERSION, "LivenessAnalysis", "v0.1",
+    LLVM_PLUGIN_API_VERSION, "GVToMallocPass", "v0.1",
     [](PassBuilder &PB) {
       PB.registerPipelineParsingCallback(
         [](StringRef Name, ModulePassManager &MPM,
            ArrayRef<PassBuilder::PipelineElement>) {
-          if (Name == "liveness") {
-            MPM.addPass(LivenessAnalysis());
+          if (Name == "gv-malloc") {
+            MPM.addPass(GVToMalloc());
             return true;
           }
           return false;
@@ -67,6 +64,7 @@ llvmGetPassPluginInfo() {
     }
   };
 }
-*/
+
+} // namespace optim
 
 #endif

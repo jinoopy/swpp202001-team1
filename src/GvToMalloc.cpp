@@ -1,11 +1,11 @@
-#include "GvToMalloc.h"
+#include "GVToMalloc.h"
 
 using namespace llvm;
 using namespace std;
 
 namespace optim
 {
-    PreservedAnalyses GvToMalloc::run(Module &M, ModuleAnalysisManager &MAM)
+    PreservedAnalyses GVToMalloc::run(Module &M, ModuleAnalysisManager &MAM)
     {
         auto &Context = M.getContext();
         
@@ -64,7 +64,7 @@ namespace optim
         }
     }
 
-    Value* GvToMalloc::MakeNewMalloc(Module &M, LLVMContext &Context, Type *type, llvm::Constant *value, int m_index)
+    Value* GVToMalloc::MakeNewMalloc(Module &M, LLVMContext &Context, Type *type, llvm::Constant *value, int m_index)
     {
         auto size= type->getScalarSizeInBits();
         
@@ -106,7 +106,7 @@ namespace optim
     */
 
     // get all the malloc variables And add them as new arguments in function.
-    Function& GvToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
+    Function& GVToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
     {
         if(f.getName() == "main") return f;
         else
@@ -141,7 +141,7 @@ namespace optim
         }
     }
 
-    void GvToMalloc::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
+    void GVToMalloc::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
     {
         for(auto &I = inst_begin(f); I != inst_end(f); I++)
         {
