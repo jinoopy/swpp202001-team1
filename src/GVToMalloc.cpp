@@ -12,8 +12,10 @@ namespace optim
         auto &GVs = M.getGlobalList();
         int m_index = 0;
         vector<Value *> malloc;
+        outs() << "line 15 in run\n";
         for(auto gv = GVs.begin(); gv != GVs.end(); gv++)
         {
+            outs() << "gv loop : " << gv->getName() << "\n";
             auto a = gv->getName();
             auto type = gv->getValueType();
             auto *value = gv->getInitializer();
@@ -27,33 +29,44 @@ namespace optim
         map<Function *, Function *> fMap; // By using fMap, we can call the new function(arguments changed function).
         for(auto &f : M.functions())
         {
+            outs() << "old function loop - " << f.getName() << "\n";
             //if(f.getLinkage() == Function::ExternalLinkage)
             //if(f.getFnAttribute(Attribute::OptimizeNone) != nullptr){
             if(DO_NOT_CONSIDER.find(f.getName()) == DO_NOT_CONSIDER.end()) {
+                outs() << "old function loop - " << f.getName() << " : pushed\n";
                 old_functions.push_back(&f);
             }
         }
         
         for(auto &f : old_functions)
         {
-            outs() << f->getName() << "\n";
+            outs() << "Add Argument To Function Def loop : " << f->getName() << "\n";
             new_functions.push_back(&AddArgumentsToFunctionDef(M, Context, *f, malloc));  // after changing the definition(arguments) except main function.
             fMap[f] = new_functions[new_functions.size()-1];  // mapping old function pointer to new function pointer.
         }
-        
-        for(auto &f : new_functions)    // For each function, we will replace all of call instructions.
+        if(!new_functions.empty())
         {
-            AddArgumentsToCallInst(fMap, *f, malloc);
+            for(auto &f : new_functions)    // For each function, we will replace all of call instructions.
+            {
+                outs() << "Add Argument To Call Inst loop : " << f->getName() << "\n";
+                AddArgumentsToCallInst(fMap, *f, malloc);
+            }
         }
         
         int i =0;
         for(auto gv = GVs.begin(); gv != GVs.end(); gv++, i++)  // every gv,
         {
+            
+            outs() << "gv outer loop - " << gv->getName() << "\n";
+            /*
             for(auto &use : gv->uses()) // every use,
             {
+                if(i == 30) break;
+                outs() << "gv outer loop - " << gv->getName() << " - " << use->getName() << "\n";
                 Function *func = dyn_cast<Instruction>(use.getUser())->getFunction();   // first get the function of use.
                 if(func->getName() == "main")   // if the function is main function, use malloc.
                 {
+                    outs() << "gv use set - " << func->getName() << "\n";
                     use.set(malloc[i]);
                 }
                 else    // if it is not main, use the function argument. find the argument by name.
@@ -69,8 +82,38 @@ namespace optim
                     }
                 }
             }
+            */
+            for(Function& F : M) 
+            {
+                outs() << "gv set loop - Function " << F.getName() << "\n";
+                auto isWithinFn = [&](Use& u) 
+                {
+                    return dyn_cast<Instruction>(u.getUser())->getFunction()==&F;
+                };
+                Value* replaceV;
+                if(F.getName() == "main") 
+                {
+                    replaceV = malloc[i];
+                    outs() << "gv set loop - Function " << F.getName() << " - replaceV\n";
+                }
+                else
+                {
+                    auto args = F.args();
+                    for(auto j = args.begin(); j != args.end(); j++)
+                    {
+                        if(j->getName() == "gv" + std::to_string(i))
+                        {
+                            replaceV = &*j;
+                            break;
+                        }
+                    }
+                    outs() << "gv set loop - Function " << F.getName() << " - replaceV\n";
+                }
+                gv->replaceUsesWithIf(replaceV, isWithinFn);
+                outs() << "gv set loop - Function " << F.getName() << " - replaced\n";
+            }
         }
-
+        
         return PreservedAnalyses::all();
     }
 
@@ -101,94 +144,99 @@ namespace optim
         return bitCast;
     }
      
-    /*
-    Function *RecreateFunction(Function *Func, FunctionType *NewType) {
-        Function *NewFunc = Function::Create(NewType, Func->getLinkage());
-        NewFunc->copyAttributesFrom(Func);
-        Func->getParent()->getFunctionList().insert(Func->getIterator(), NewFunc);
-        NewFunc->takeName(Func);
-        NewFunc->getBasicBlockList().splice(NewFunc->begin(),
-                                            Func->getBasicBlockList());
-        Func->replaceAllUsesWith(
-            ConstantExpr::getBitCast(NewFunc,
-                                    Func->getFunctionType()->getPointerTo()));
-        return NewFunc;
-    }
-    */
-
     // get all the malloc variables And add them as new arguments in function.
     Function& GVToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
     {
         if(f.getName() == "main")
         {
+            outs() << "Function - AddArgToFunctionDef - " << f.getName() << "\n";
             return f;
         }
         else
         {
+            outs() << "Function - AddArgToFunctionDef - " << f.getName() << "\n";
             FunctionType *FTy = f.getFunctionType();
             std::vector<Type *> Params;
             for(const Argument &I : f.args())   // add the original function arguments.
             {
+                outs() << "Function - AddArgToFunctionDef - " << f.getName() << " - arg : " << I.getName() << "\n";
                 Params.push_back(I.getType());
             }
             for(int i = 0; i < malloc.size(); i++)  // add new function arguments.
             {
+                outs() << "Function - AddArgToFunctionDef - " << f.getName() << " - arg(malloc) : " << malloc[i]->getName() << "\n";
                 Params.push_back(malloc[i]->getType());
             }
             
             FunctionType *NFTy = FunctionType::get(FTy->getReturnType(), Params, false);
             Function *NewFunc = Function::Create(NFTy, f.getLinkage(), f.getAddressSpace(), f.getName(), f.getParent());  // RecreateFunction(&f, NFTy);
+            outs() << "Function - AddArgToFunctionDef - " << f.getName() << " - newFunc Created\n";
             auto VMap = ValueToValueMapTy();
             Function::arg_iterator DestI = NewFunc->arg_begin();
             for(const Argument &I : f.args())   // set the name of original arguments to original name.
             {
+                outs() << "Function - AddArgToFunctionDef - " << f.getName() << " - Set arg Name & VMap - " << I.getName();
                 DestI->setName(I.getName());
                 VMap[&I] = &*DestI++;
+                outs() << "Function - AddArgToFunctionDef - " << f.getName() << " - Set arg Name & VMap - " << I.getName() <<" : OK\n";
             }
             for(int i = 0; i < malloc.size(); i++, DestI++) // match the name of new arguments to the name of malloc variables in main function. 
             {
+                outs() << "Function - AddArgToFunctionDef - " << f.getName() << " - Set arg Name & VMap - " << malloc[i]->getName() << " : OK";
                 DestI->setName(malloc[i]->getName());
             }
             SmallVector<ReturnInst*, 8> returns;
+            outs() << "Function - AddArgToFunctionDef - " << f.getName() << " - Before CloneFunctionInto";
             CloneFunctionInto(NewFunc, &f, VMap, f.getSubprogram() != nullptr, returns, "");
+            outs() << "Function - AddArgToFunctionDef - " << f.getName() << " - After CloneFUnctionInto : " << f.getName() << " To " << NewFunc->getName() ;
             return *NewFunc;
         }
     }
 
     void GVToMalloc::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
     {
+        outs() << "Function - AddArgToCallInst - " << f.getName() << "\n";
         for(auto I = inst_begin(f); I != inst_end(f); I++)
         {
+            outs() << "Function - AddArgToCallInst - Inst." << I->getName() << "\n";
             CallInst *cI = dyn_cast<CallInst>(&*I);
-            IRBuilder<> builder((cI)); // make new instruction on the fCall instruction.
-            vector<Value *> args; // origianl arguments + new malloc argument
-            for(int i = 0; i < cI->getNumArgOperands(); i++)    // original arguments
+            if(cI != nullptr)
             {
-                args.push_back(cI->getArgOperand(i));
-            }
-            if(f.getName() == "main")   // In case of main function we should put the malloc variables directly but not arguments.
-            {
-                for(auto i = 0; i < malloc.size(); i++)
-                {
-                    args.push_back(malloc[i]);
+                if(DO_NOT_CONSIDER.find(cI->getCalledFunction()->getName()) != DO_NOT_CONSIDER.end()) {
+                    continue;
                 }
-            }
-            else    // In case of other functions, we should put the function arguments in call instruction. 
-            {
-                for(auto i = 0; i < malloc.size(); i++)
+                outs() << "Function - AddArgToCallInst - " << f.getName() << " - cI " << cI->getName() << "\n";
+                IRBuilder<> builder((cI)); // make new instruction on the fCall instruction.
+                vector<Value *> args; // origianl arguments + new malloc argument
+                for(int i = 0; i < cI->getNumArgOperands(); i++)    // original arguments
                 {
-                    for(auto &arg : f.args())
+                    args.push_back(cI->getArgOperand(i));
+                }
+                if(f.getName() == "main")   // In case of main function we should put the malloc variables directly but not arguments.
+                {
+                    for(auto i = 0; i < malloc.size(); i++)
                     {
-                        if(arg.getName() == malloc[i]->getName()) // malloc variable's name is same with function argument ex) f(arg0, arg1, arN, gv0 , gv1 .. gvN)
+                        args.push_back(malloc[i]);
+                    }
+                }
+                else    // In case of other functions, we should put the function arguments in call instruction. 
+                {
+                    for(auto i = 0; i < malloc.size(); i++)
+                    {
+                        for(auto &arg : f.args())
                         {
-                            args.push_back(dyn_cast<Value>(&arg));
+                            if(arg.getName() == malloc[i]->getName()) // malloc variable's name is same with function argument ex) f(arg0, arg1, arN, gv0 , gv1 .. gvN)
+                            {
+                                args.push_back(dyn_cast<Value>(&arg));
+                            }
                         }
                     }
                 }
+                auto *newInst_func = fMap[cI->getCalledFunction()];     // By using fMap, we can call the new function(arguments changed function).
+                CallInst *newInst = builder.CreateCall(newInst_func, args, cI->getName());
+                cI->eraseFromParent(); // after making new call instruction, erase the original instruction.
             }
-            auto *newInst_func = fMap[cI->getCalledFunction()];     // By using fMap, we can call the new function(arguments changed function).
-            CallInst *newInst = builder.CreateCall(newInst_func, args, cI->getName());
-            cI->eraseFromParent(); // after making new call instruction, erase the original instruction.
         }
+        outs() << "Function - AddArgToCallInst - " << f.getName() << " : finished\n";
     }
 } // namespace backend

@@ -50,7 +50,7 @@ TEST_F(GVToMallocTest, Test1) {
     GVToMalloc pass;
     pass.run(*M , MAM);
 
-    //M->print(outs(), nullptr);
+    M->print(outs(), nullptr);
     //removed pointer variables from other function
     EXPECT_EQ(0, 0);
 }
@@ -68,7 +68,7 @@ TEST_F(GVToMallocTest, Test2) {
 }
 
 TEST_F(GVToMallocTest, Test3) {
-    parseAssembly("test-ir/input3.ll");
+    parseAssembly("test-ir/input1.ll");
     GVToMalloc pass;
     pass.run(*M , MAM);
 
