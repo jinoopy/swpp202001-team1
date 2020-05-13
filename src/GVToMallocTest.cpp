@@ -46,11 +46,11 @@ protected:
 };
 
 TEST_F(GVToMallocTest, Test1) {
-    parseAssembly("test-ir/input1.ll");
+    parseAssembly("test-ir/input3.ll");
     GVToMalloc pass;
     pass.run(*M , MAM);
 
-    M->print(outs(), nullptr);
+    //M->print(outs(), nullptr);
     //removed pointer variables from other function
     EXPECT_EQ(0, 0);
 }
@@ -69,17 +69,6 @@ TEST_F(GVToMallocTest, Test2) {
 
 TEST_F(GVToMallocTest, Test3) {
     parseAssembly("test-ir/input3.ll");
-    GVToMalloc pass;
-    pass.run(*M , MAM);
-
-    M->print(outs(), nullptr);
-    //removed pointer variables from other function
-    // EXPECT_EQ(nameToValue["ptr"]->getNumUses(), 0);
-    EXPECT_EQ(0, 0);
-}
-
-TEST_F(GVToMallocTest, Test4) {
-    parseAssembly("test-ir/input4.ll");
     GVToMalloc pass;
     pass.run(*M , MAM);
 

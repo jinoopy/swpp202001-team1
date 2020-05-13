@@ -27,17 +27,25 @@ namespace optim
         map<Function *, Function *> fMap; // By using fMap, we can call the new function(arguments changed function).
         for(auto &f : M.functions())
         {
-            old_functions.push_back(&f);
+            //if(f.getLinkage() == Function::ExternalLinkage)
+            //if(f.getFnAttribute(Attribute::OptimizeNone) != nullptr){
+            if(DO_NOT_CONSIDER.find(f.getName()) == DO_NOT_CONSIDER.end()) {
+                old_functions.push_back(&f);
+            }
         }
+        
         for(auto &f : old_functions)
         {
+            outs() << f->getName() << "\n";
             new_functions.push_back(&AddArgumentsToFunctionDef(M, Context, *f, malloc));  // after changing the definition(arguments) except main function.
             fMap[f] = new_functions[new_functions.size()-1];  // mapping old function pointer to new function pointer.
         }
+        
         for(auto &f : new_functions)    // For each function, we will replace all of call instructions.
         {
             AddArgumentsToCallInst(fMap, *f, malloc);
         }
+        
         int i =0;
         for(auto gv = GVs.begin(); gv != GVs.end(); gv++, i++)  // every gv,
         {
@@ -73,7 +81,8 @@ namespace optim
         auto *MallocFTy = FunctionType::get(Type::getInt8PtrTy(Context), {Type::getInt64Ty(Context)}, false); // make malloc function
         Function *MallocF = Function::Create(MallocFTy, Function::ExternalLinkage,
                                                 "malloc", M);
-
+        MallocF->addFnAttr(Attribute::OptimizeNone);
+        MallocF->addFnAttr(Attribute::NoInline);
         auto main = M.getFunction("main"); // get main function for inserting malloc instruction.
         BasicBlock &Entry = main->getEntryBlock();
         auto *first = Entry.getFirstNonPHI();   //The position of starting instruction in this BasicBlock(Entry).

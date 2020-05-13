@@ -44,6 +44,9 @@ public:
 //   In case of main function, we will use the malloc variables as the arguments of call instructions.
 //   And case of other functions, we will use the function arguments as the arguments of call instructions. 
   void AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc);
+
+private:
+  const set<StringRef> DO_NOT_CONSIDER = {"malloc", "free", "input", "output"};
 };
 
 extern "C" ::llvm::PassPluginLibraryInfo
