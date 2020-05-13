@@ -203,7 +203,7 @@ namespace optim
         outs() << "Function - AddArgToCallInst - " << f.getName() << "\n";
         for (auto &BB : f)
         {
-            for (auto I = BB.begin(); I != BB.end();++I)
+            for (auto I = BB.begin(); I != BB.end();)
             {
                 outs() << "Function - AddArgToCallInst - Inst." << I->getOpcodeName() << "\n";
                 CallInst *cI = dyn_cast<CallInst>(&*I);
@@ -211,6 +211,7 @@ namespace optim
                 {
                     if (DO_NOT_CONSIDER.find(cI->getCalledFunction()->getName()) != DO_NOT_CONSIDER.end())
                     {
+                        ++I;
                         continue;
                     }
                     outs() << "Function - AddArgToCallInst - " << f.getName() << " - cI " << cI->getName() << "\n";
@@ -245,6 +246,7 @@ namespace optim
                     cI->replaceAllUsesWith(newInst);
                     I = cI->eraseFromParent(); // after making new call instruction, erase the original instruction.
                 }
+                else ++I;
             }
         }
         outs() << "Function - AddArgToCallInst - " << f.getName() << " : finished\n";
