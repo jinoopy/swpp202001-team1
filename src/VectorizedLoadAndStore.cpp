@@ -43,70 +43,74 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 		for(unsigned bits = 8; bits <= 32; bits <<= 1) {
 			// GEP instruction 중 bits에 대응하는 pointer(8 -> i8*)를 찾아옴
 			vector<GetElementPtrInst *> GEPs = findGEPs(BB, bits);
-			vector<GetElementPtrInst *> orderGEPs(indvars.size());
+			map<Instruction *, vector<GetElementPtrInst *>> orderGEPs;
+			// vector<GetElementPtrInst *> orderGEPs(indvars.size());
 			for(GetElementPtrInst *GEP : GEPs) {
 				// finds the least significant operand (index)
 				// e.g. arr[x][y][z], z is returned
 				Instruction *last_index = dyn_cast<Instruction>(GEP->getOperand(GEP->getNumOperands() - 1));
+				Instruction *basePTR = dyn_cast<Instruction>(GEP->getOperand(GEP->getNumOperands() - 2));
 				// if the last index is not an instruction, do not consider(indvar must be instruction)
-				if(!last_index) {
+				if(!last_index || !basePTR) {
 					continue;
 				}
 
 				// if last_index is in current list of induction variables,
 				if(orderIndvars.find(last_index) != orderIndvars.end()) {
 					// assume same index accessing does not exist
-					assert(orderGEPs[orderIndvars[last_index]] == nullptr
-						&& "equal instruction error; refer to the comment in VectorizedLoadAndStorePass::vectorize()");
+					// assert(orderGEPs[orderIndvars[last_index]] == nullptr
+					//	&& "equal instruction error; refer to the comment in VectorizedLoadAndStorePass::vectorize()");
 					// map to GEP
-					orderGEPs[orderIndvars[last_index]] = GEP;
+					orderGEPs[basePTR][orderIndvars[last_index]] = GEP;
 				}
 			}
 
-			// group load and store if possible
-			for(int i = 0; i < orderGEPs.size() - 1; i+=2) {
-				// find all loads and stores for first & second GEP
-				auto firstGEP = orderGEPs[i];
-				vector<LoadInst *> firstGEPloads;
-				vector<StoreInst *> firstGEPstores;
-				auto secondGEP = orderGEPs[i+1];
-				vector<LoadInst *> secondGEPloads;
-				vector<StoreInst *> secondGEPstores;
-				for(auto &I : BB) {
-					LoadInst *lI = dyn_cast<LoadInst>(&I);
-					StoreInst *stI = dyn_cast<StoreInst>(&I);
-					// if I : LoadInst
-					if(lI) {
-						if(lI->getPointerOperand() == firstGEP) {
-							firstGEPloads.push_back(lI);
+			for(pair<Instruction *, vector<GetElementPtrInst *>> basePTR : orderGEPs) {
+				for(int i = 0; i < basePTR.second.size() - 1; i+=2) {
+					// find all loads and stores for first & second GEP
+					auto firstGEP = basePTR.second[i];
+					vector<LoadInst *> firstGEPloads;
+					vector<StoreInst *> firstGEPstores;
+					auto secondGEP = basePTR.second[i+1];
+					vector<LoadInst *> secondGEPloads;
+					vector<StoreInst *> secondGEPstores;
+					for(auto &I : BB) {
+						LoadInst *lI = dyn_cast<LoadInst>(&I);
+						StoreInst *stI = dyn_cast<StoreInst>(&I);
+						// if I : LoadInst
+						if(lI) {
+							if(lI->getPointerOperand() == firstGEP) {
+								firstGEPloads.push_back(lI);
+							}
+							if(lI->getPointerOperand() == secondGEP) {
+								secondGEPloads.push_back(lI);
+							}
 						}
-						if(lI->getPointerOperand() == secondGEP) {
-							secondGEPloads.push_back(lI);
+						// if I : storeInst
+						if(stI) {
+							if(stI->getPointerOperand() == firstGEP) {
+								firstGEPstores.push_back(stI);
+							}
+							if(stI->getPointerOperand() == secondGEP) {
+								secondGEPstores.push_back(stI);
+							}
 						}
 					}
-					// if I : storeInst
-					if(stI) {
-						if(stI->getPointerOperand() == firstGEP) {
-							firstGEPstores.push_back(stI);
-						}
-						if(stI->getPointerOperand() == secondGEP) {
-							secondGEPstores.push_back(stI);
-						}
+					
+					// IMPORTANT: VERY dangerous assumption made here.
+					// we consider that two corresponding nodes directly can be vectorized.
+					// we have to analyze more through the behavior of loop unroll pass.
+					if(firstGEPloads.size() != secondGEPloads.size() || firstGEPstores.size() != secondGEPstores.size()) {
+						continue;
 					}
-				}
-				
-				// IMPORTANT: VERY dangerous assumption made here.
-				// we consider that two corresponding nodes directly can be vectorized.
-				// we have to analyze more through the behavior of loop unroll pass.
-				assert(firstGEPloads.size() == secondGEPloads.size());
-				assert(firstGEPstores.size() == secondGEPstores.size());
 
-				for(int j = 0; j < firstGEPloads.size(); j++) {
-					vectorizeLoads(firstGEP, secondGEP, firstGEPloads[j], secondGEPloads[j], BB, bits);
-				}
-				for(int j = 0; j < firstGEPstores.size(); j++) {
-					vectorizeStores(firstGEP, secondGEP, firstGEPstores[j], secondGEPstores[j], BB, bits);
-				}
+					for(int j = 0; j < firstGEPloads.size(); j++) {
+						vectorizeLoads(firstGEP, secondGEP, firstGEPloads[j], secondGEPloads[j], BB, bits);
+					}
+					for(int j = 0; j < firstGEPstores.size(); j++) {
+						vectorizeStores(firstGEP, secondGEP, firstGEPstores[j], secondGEPstores[j], BB, bits);
+					}
+				}				
 			}
 		}
 	}
@@ -161,7 +165,7 @@ vector<vector<Instruction *>> VectorizedLoadAndStorePass::findIndvars(BasicBlock
 	int count = 0;
 	// remove meaningless vector
 	for(auto it = insts.begin(); it != insts.end();) {
-		if(it->size() < 2) {
+		if(it->size() < 3) {
 			count++;
 			it = insts.erase(it);
 		} else {
@@ -278,8 +282,7 @@ void VectorizedLoadAndStorePass::vectorizeStores(GetElementPtrInst *GEPI, GetEle
 	ZExtInst *W1 = new ZExtInst(STI2->getValueOperand(), numType);
 	ZExtInst *W2 = new ZExtInst(STI1->getValueOperand(), numType);
 	castedGEPI->insertBefore(STI2);
-	X = BinaryOperator::CreateOr(W1, ConstantInt::get(Context, APInt(bits << 1, 0, false)));
-	Y = BinaryOperator::CreateMul(X, ConstantInt::get(Context, APInt(bits << 1, 1llu << bits, false)));
+	Y = BinaryOperator::CreateMul(W1, ConstantInt::get(Context, APInt(bits << 1, 1llu << bits, false)));
 	Z = BinaryOperator::CreateOr(Y, W2);
 	StoreInst *STI = new StoreInst(Z, castedGEPI);
 	
@@ -287,8 +290,7 @@ void VectorizedLoadAndStorePass::vectorizeStores(GetElementPtrInst *GEPI, GetEle
 	STI->insertAfter(castedGEPI);
 	Z->insertBefore(STI);
 	Y->insertBefore(Z);
-	X->insertBefore(Y);
-	W1->insertBefore(X);
+	W1->insertBefore(Y);
 	W2->insertBefore(W1);
 
 	// remove useless instruction

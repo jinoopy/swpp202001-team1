@@ -79,6 +79,17 @@ TEST_F(VectorizedLoadAndStoreTest, Test3) {
     M->print(outs(), nullptr);
 }
 
+TEST_F(VectorizedLoadAndStoreTest, Test4) {
+    parseAssembly("test-ir/input4_opt.ll");
+    VectorizedLoadAndStorePass pass;
+	for(Function &F : *M) {
+		FunctionAnalysisManager FAM;
+   		pass.run(F, FAM);
+	}
+
+    M->print(outs(), nullptr);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
