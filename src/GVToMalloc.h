@@ -1,5 +1,5 @@
-#ifndef LIVENESS_ANALYSIS_H
-#define LIVENESS_ANALYSIS_H
+#ifndef GV_TO_MALLOC_H
+#define GV_TO_MALLOC_H
 
 #include "llvm/IR/Function.h"
 #include "llvm/IR/BasicBlock.h"
