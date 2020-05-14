@@ -49,7 +49,8 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 				// finds the least significant operand (index)
 				// e.g. arr[x][y][z], z is returned
 				Instruction *last_index = dyn_cast<Instruction>(GEP->getOperand(GEP->getNumOperands() - 1));
-				Instruction *basePTR = dyn_cast<Instruction>(GEP->getOperand(GEP->getNumOperands() - 2));
+				Instruction *basePTR = dyn_cast<Instruction>(GEP->getPointerOperand());
+
 				// if the last index is not an instruction, do not consider(indvar must be instruction)
 				if(!last_index || !basePTR) {
 					continue;
@@ -61,10 +62,13 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 					// assert(orderGEPs[orderIndvars[last_index]] == nullptr
 					//	&& "equal instruction error; refer to the comment in VectorizedLoadAndStorePass::vectorize()");
 					// map to GEP
+					if(orderGEPs.find(basePTR) == orderGEPs.end()) {
+						orderGEPs[basePTR] = vector<GetElementPtrInst *>(indvars.size());
+					}
+
 					orderGEPs[basePTR][orderIndvars[last_index]] = GEP;
 				}
 			}
-
 			for(pair<Instruction *, vector<GetElementPtrInst *>> basePTR : orderGEPs) {
 				for(int i = 0; i < basePTR.second.size() - 1; i+=2) {
 					// find all loads and stores for first & second GEP
@@ -103,6 +107,7 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 					if(firstGEPloads.size() != secondGEPloads.size() || firstGEPstores.size() != secondGEPstores.size()) {
 						continue;
 					}
+					
 
 					for(int j = 0; j < firstGEPloads.size(); j++) {
 						vectorizeLoads(firstGEP, secondGEP, firstGEPloads[j], secondGEPloads[j], BB, bits);
@@ -110,7 +115,8 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 					for(int j = 0; j < firstGEPstores.size(); j++) {
 						vectorizeStores(firstGEP, secondGEP, firstGEPstores[j], secondGEPstores[j], BB, bits);
 					}
-				}				
+					secondGEP->eraseFromParent();
+				}		
 			}
 		}
 	}
@@ -251,7 +257,7 @@ void VectorizedLoadAndStorePass::vectorizeLoads(GetElementPtrInst *GEPI, GetElem
 	// remove useless instruction
 	LI1->eraseFromParent();
 	LI2->eraseFromParent();
-	nextGEPI->eraseFromParent();
+	// nextGEPI->eraseFromParent();
 }
 
 // This function vectorize store function.
@@ -296,7 +302,7 @@ void VectorizedLoadAndStorePass::vectorizeStores(GetElementPtrInst *GEPI, GetEle
 	// remove useless instruction
 	STI1->eraseFromParent();
 	STI2->eraseFromParent();
-	nextGEPI->eraseFromParent();
+	// nextGEPI->eraseFromParent();
 }
 
 }
