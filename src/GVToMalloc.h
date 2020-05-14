@@ -32,7 +32,7 @@ public:
 //   Make new malloc variable to replace the GV
   // And make store instruction after the call instruction
 //   And the return value(Value*) will be used to add arguments of function 
-  Value* MakeNewMalloc(Module &M, LLVMContext &Context, Type *type, llvm::Constant *value, int m_index);
+  Value* MakeNewMalloc(Module &M, LLVMContext &Context, Function *MallocF, Type *type, llvm::Constant *value, int m_index);
 
 //   When Malloc variable is added, we have to give the variables to other functions.
 //   So we should add some arguments in function definition before we put the variables to call instruction of functions.

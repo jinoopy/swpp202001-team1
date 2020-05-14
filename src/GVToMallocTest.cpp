@@ -45,36 +45,33 @@ protected:
 
 };
 
-TEST_F(GVToMallocTest, Test1) {
-    parseAssembly("test-ir/input3.ll");
-    GVToMalloc pass;
-    pass.run(*M , MAM);
-
-    M->print(outs(), nullptr);
-    //removed pointer variables from other function
-    EXPECT_EQ(0, 0);
-}
-
-TEST_F(GVToMallocTest, Test2) {
-    parseAssembly("test-ir/input2.ll");
-    GVToMalloc pass;
-    pass.run(*M , MAM);
-
-    M->print(outs(), nullptr);
-    //removed pointer variables from other function
-    // EXPECT_EQ(nameToValue["ptr"]->getNumUses(), 0);
-    // EXPECT_EQ(nameToValue["ptr2"]->getNumUses(), 0);
-    EXPECT_EQ(0, 0);
-}
-
-TEST_F(GVToMallocTest, Test3) {
+TEST_F(GVToMallocTest, Test1) {     // This test case has two global variables and two functions (main, foo).
     parseAssembly("test-ir/input1.ll");
     GVToMalloc pass;
     pass.run(*M , MAM);
 
     M->print(outs(), nullptr);
-    //removed pointer variables from other function
-    // EXPECT_EQ(nameToValue["ptr"]->getNumUses(), 0);
+    
+    EXPECT_EQ(0, 0);
+}
+
+TEST_F(GVToMallocTest, Test2) {     // This test case has one global variable and two functions (main, foo).
+    parseAssembly("test-ir/input2.ll");
+    GVToMalloc pass;
+    pass.run(*M , MAM);
+
+    M->print(outs(), nullptr);
+    
+    EXPECT_EQ(0, 0);
+}
+
+TEST_F(GVToMallocTest, Test3) {     // This test case has one global variable and one function (main).
+    parseAssembly("test-ir/input3.ll");
+    GVToMalloc pass;
+    pass.run(*M , MAM);
+
+    M->print(outs(), nullptr);
+    
     EXPECT_EQ(0, 0);
 }
 
