@@ -49,6 +49,7 @@ TEST_F(RegisterGraphTest, ColorGraphTest1) {
     RegisterGraph RG(*M);
 
     for(Function& F : *M) {
+        if(RG.getNumColors(&F) == 0) continue;
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
         for(int i = 0; i < RG.getNumColors(&F); i++) {
             outs() << "color " << i << " : ";
@@ -71,6 +72,7 @@ TEST_F(RegisterGraphTest, ColorGraphTest2) {
     RegisterGraph RG(*M);
 
     for(Function& F : *M) {
+        if(RG.getNumColors(&F) == 0) continue;
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
         for(int i = 0; i < RG.getNumColors(&F); i++) {
             outs() << "color " << i << " : ";
@@ -92,6 +94,7 @@ TEST_F(RegisterGraphTest, ColorGraphTest3) {
     RegisterGraph RG(*M);
 
     for(Function& F : *M) {
+        if(RG.getNumColors(&F) == 0) continue;
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
         for(int i = 0; i < RG.getNumColors(&F); i++) {
             outs() << "color " << i << " : ";
@@ -114,6 +117,7 @@ TEST_F(RegisterGraphTest, ColorGraphTest4) {
     RegisterGraph RG(*M);
 
     for(Function& F : *M) {
+        if(RG.getNumColors(&F) == 0) continue;
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
         for(int i = 0; i < RG.getNumColors(&F); i++) {
             outs() << "color " << i << " : ";
@@ -136,6 +140,7 @@ TEST_F(RegisterGraphTest, ColorGraphTest5) {
     RegisterGraph RG(*M);
 
     for(Function& F : *M) {
+        if(RG.getNumColors(&F) == 0) continue;
         outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
         for(int i = 0; i < RG.getNumColors(&F); i++) {
             outs() << "color " << i << " : ";

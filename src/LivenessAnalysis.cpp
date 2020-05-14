@@ -16,17 +16,15 @@ RegisterGraph::RegisterGraph(Module &M)
 
     //find all value-results
     SearchAllArgInst(M);
-
+    
     //Find live interval for all values
     vector<vector<bool>> liveInterval;
     liveInterval = LiveInterval(M);
-
-
+    
     //Initialize adjList
     RegisterAdjList(liveInterval);
-
     ColorGraph();
-
+    
     InverseColorMap();
 }
 
@@ -46,7 +44,8 @@ void RegisterGraph::SearchAllArgInst(Module &M)
         {
             for (Instruction &I : BB)
             {
-                if (DO_NOT_CONSIDER.find(I.getOpcode())==DO_NOT_CONSIDER.end())
+                if (DO_NOT_CONSIDER.find(I.getOpcode())==DO_NOT_CONSIDER.end()
+                    || (SAME_CONSIDER.find(I.getOpcode())!=SAME_CONSIDER.end() && (isa<Argument>(I.getOperand(0)) || isa<AllocaInst>(I.getOperand(0))) ) )
                 {
                     values.push_back(&I);
                     valuesInFunction[&F].push_back(&I);
@@ -213,7 +212,7 @@ void RegisterGraph::ColorGraph()
         reverse(PEO.begin(), PEO.end());
         unsigned int colorCount;
         valueToColor[&F] = GreedyColoring(PEO, colorCount);
-        
+
         //update global color count
         numColors[&F] = colorCount;
     }
@@ -226,6 +225,8 @@ vector<Value *> RegisterGraph::PerfectEliminationOrdering(vector<Value *> &value
     //I do not know how to apply the feature.
     //Time complexity can reduced from O(EV2) to O(EV).
 
+    //if not defined function, do not consider anyway
+    if(values.size() == 0) return vector<Value*>();
     //Initially, Sigma contains a single set of all value in values.
     list<set<Value *>> Sigma = {set<Value *>(values.begin(), values.end())};
     vector<Value *> PEO;

@@ -60,6 +60,12 @@ private:
                                       Instruction::Ret,
                                       Instruction::Switch,
                                       Instruction::Br};
+  set<unsigned int> SAME_CONSIDER = {Instruction::GetElementPtr,
+                                      Instruction::BitCast,
+                                      Instruction::PtrToInt,
+                                      Instruction::IntToPtr,
+                                      Instruction::SExt,
+                                      Instruction::ZExt};                           
 
   //M: Module which is analyzed
   Module* M;
