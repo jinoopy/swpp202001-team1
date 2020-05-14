@@ -30,7 +30,6 @@ RegisterGraph::RegisterGraph(Module &M)
     InverseColorMap();
 }
 
-#define isStore(I) (dyn_cast<StoreInst>(&I) != nullptr)
 void RegisterGraph::SearchAllArgInst(Module &M)
 {
     for (Function &F : M)
@@ -47,7 +46,7 @@ void RegisterGraph::SearchAllArgInst(Module &M)
         {
             for (Instruction &I : BB)
             {
-                if (!I.isTerminator() && !isStore(I))
+                if (DO_NOT_CONSIDER.find(I.getOpcode())==DO_NOT_CONSIDER.end())
                 {
                     values.push_back(&I);
                     valuesInFunction[&F].push_back(&I);

@@ -55,6 +55,18 @@ private:
   
   //Private Variables
 
+  set<unsigned int> DO_NOT_CONSIDER = {Instruction::Store,
+                                      Instruction::Alloca,
+                                      Instruction::GetElementPtr,
+                                      Instruction::PtrToInt,
+                                      Instruction::IntToPtr,
+                                      Instruction::BitCast,
+                                      Instruction::SExt,
+                                      Instruction::ZExt,
+                                      Instruction::Ret,
+                                      Instruction::Switch,
+                                      Instruction::Br};
+
   //M: Module which is analyzed
   Module* M;
 
