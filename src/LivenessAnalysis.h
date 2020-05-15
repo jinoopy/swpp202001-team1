@@ -100,7 +100,7 @@ private:
   vector<vector<bool>> LiveInterval(Module &);
   //helper function for LiveInterval()
   //does the recursive search for dominators and branches
-  bool LivenessSearch(Instruction &, Value &, int, map<Instruction *, vector<bool>> &, DominatorTree &);
+  void LivenessSearch(Instruction &, Value &, int, map<Instruction *, vector<bool>> &, DominatorTree &);
 
   //2. Construct live graph and assign different colors to
   //   values which are live together

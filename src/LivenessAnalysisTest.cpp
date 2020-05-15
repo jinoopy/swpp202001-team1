@@ -158,6 +158,28 @@ TEST_F(RegisterGraphTest, ColorGraphTest5) {
     }
 }
 
+TEST_F(RegisterGraphTest, ColorGraphTest6) {
+    parseAssembly("test-ir/input6.ll");
+    RegisterGraph RG(*M);
+
+    for(Function& F : *M) {
+        if(RG.getNumColors(&F) == 0) continue;
+        outs() << F.getName() << " " << RG.getNumColors(&F) << " colors needed\n";
+        for(int i = 0; i < RG.getNumColors(&F); i++) {
+            outs() << "color " << i << " : ";
+            for(Value* v : RG.getColorToValue(&F)[i]) {
+                outs() << (v->hasName() ? v->getName() : "no-name") << " ";
+            }
+            outs() << "\n";
+        }
+        outs() << "\n";
+        for(Value* v : RG.getValues(&F)) {
+            for(auto w : RG.getAdjList(v)) {
+                EXPECT_NE(RG.getValueToColor(&F, v), RG.getValueToColor(&F, w)) << "registers" << v->getName() << " " << w->getName() << " should not be the same color\n";
+            }
+        }
+    }
+}
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
