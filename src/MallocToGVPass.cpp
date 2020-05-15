@@ -40,9 +40,8 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
                 /*Type=*/T->getElementType(),
                 /*isConstant=*/false,
                 /*Linkage=*/GlobalValue::CommonLinkage,
-                /*Initializer=*/nullptr,
+                /*Initializer=*/initVal,
                 /*Name=*/(malloc->hasName() ? "gv." + malloc->getName() : ""));
-            GV->setInitializer(initVal);
 
             replaceMallocToGV(malloc, GV);
         }
