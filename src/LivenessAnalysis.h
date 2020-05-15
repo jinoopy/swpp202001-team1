@@ -99,8 +99,8 @@ private:
   //mark liveness of each values in each instruction
   vector<vector<bool>> LiveInterval(Module &);
   //helper function for LiveInterval()
-  //does the recursive search for dominators and branches
-  void LivenessSearch(Instruction &, Value &, int, map<Instruction *, vector<bool>> &, DominatorTree &);
+  //does the recursive search from use to def, making the value to be live
+  void LivenessSearch(Instruction &, Value &, int, map<Instruction *, vector<bool>> &);
 
   //2. Construct live graph and assign different colors to
   //   values which are live together

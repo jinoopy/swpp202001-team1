@@ -84,7 +84,6 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
         //'F': Function which 'V' is located.
         Function &F = *dyn_cast<Instruction>(V)->getFunction();
         //Get the DominatorTree for 'F'.
-        DominatorTree DT(F);
 
         //'start': Where to start the search.
         Instruction &def = *dyn_cast<Instruction>(V);
@@ -93,7 +92,7 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
         //recursively searches through the basic blocks and store result in live.
         for(auto& v : V->uses()) {
             if(isa<Instruction>(v.getUser())) {
-                LivenessSearch(*dyn_cast<Instruction>(v.getUser()), *V, i, live, DT);
+                LivenessSearch(*dyn_cast<Instruction>(v.getUser()), *V, i, live);
             }
         }
         i++;
@@ -115,7 +114,7 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
     return result;
 }
 
-void RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, map<Instruction *, vector<bool>> &live, DominatorTree &DT)
+void RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, map<Instruction *, vector<bool>> &live)
 {
 
     BasicBlock &BB = *(curr.getParent());
@@ -134,7 +133,7 @@ void RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, ma
         }
     }
     for(auto it = pred_begin(&BB); it != pred_end(&BB); ++it) {
-        LivenessSearch(*((*it)->rbegin()), find, index, live, DT);
+        LivenessSearch(*((*it)->rbegin()), find, index, live);
     }
 
 }
