@@ -45,7 +45,7 @@ namespace optim
         for (auto &f : old_functions)
         {
             new_functions.push_back(&AddArgumentsToFunctionDef(M, Context, *f, malloc)); // after changing the definition(arguments) except main function.
-            fMap[f] = new_functions[new_functions.size() - 1];                           // mapping old function pointer to new function pointer.
+            fMap[f] = new_functions.back();                           // mapping old function pointer to new function pointer.
         }
         if (!new_functions.empty())
         {
