@@ -1,6 +1,9 @@
 @GV = global i32 2, align 4
+@arr = global [3 x i32] [i32 1, i32 2, i32 3]
 
 define i32 @main() #0 {
+  %idx_0 = getelementptr [3 x i32], [3 x i32]* @arr, i64 0, i64 0
+  store i32 10, i32* %idx_0
   %1 = alloca i32, align 4
   %2 = alloca i32, align 4
   store i32 0, i32* %1, align 4

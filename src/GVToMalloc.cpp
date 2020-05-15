@@ -21,8 +21,8 @@ namespace optim
 
         for (auto gv = GVs.begin(); gv != GVs.end(); gv++)
         {
-            auto a = gv->getName();
             auto type = gv->getValueType();
+            if(type->getTypeID() != 11) continue;
             auto *value = gv->getInitializer();
             malloc.push_back(MakeNewMalloc(M, Context, MallocF, type, value, m_index));
             m_index++;
@@ -63,6 +63,7 @@ namespace optim
         }
         for (auto gv = GVs.begin(); gv != GVs.end(); gv++, i++) // every gv,
         {
+            if(gv->getValueType()->getTypeID() != 11) continue;
             for (Function &F : M)
             {
                 auto isWithinFn = [&](Use &u) {
