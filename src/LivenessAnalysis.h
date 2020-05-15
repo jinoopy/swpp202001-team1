@@ -15,65 +15,125 @@
 
 #include <map>
 #include <vector>
+#include <set>
+#include <algorithm>
 
 using namespace llvm;
 using namespace std;
 
-namespace backend {
+namespace backend
+{
 
-//RegisterGraph: stores the colored register graph information
-class RegisterGraph {
+//RegisterGraph: stores the colored register graph information and provides interface
+class RegisterGraph
+{
+
 public:
-  //TODO
-  //Should move into Constructor local variable
-  vector<vector<bool>> live_values;
+  //Constructors
 
-  //Construct RegisterGraph with Module
-  RegisterGraph(Module&);
+  RegisterGraph(Module &);
+
+  //Interfaces
+
+  auto& getValues() {return values;}
+  auto& getValues(Function* F) {return valuesInFunction[F];}
+
+  auto& getAdjList() {return adjList;}
+  auto& getAdjList(Value* v) {return adjList[v];}
+
+  auto& getNumColors() {return numColors;}
+  int getNumColors(Function* F) {return numColors[F];}
+
+  auto& getValueToColor() {return valueToColor;}
+  auto& getValueToColor(Function* F) {return valueToColor[F];}
+  unsigned int getValueToColor(Function* F, Value* v) {return valueToColor[F][v];}
+
+  auto& getColorToValue() {return colorToValue;}
+  auto& getColorToValue(Function* F) {return colorToValue[F];}
+
+private:
+  
+  //Private Variables
+
+  set<unsigned int> DO_NOT_CONSIDER = {Instruction::Store,
+                                      Instruction::Alloca,
+                                      Instruction::Ret,
+                                      Instruction::Switch,
+                                      Instruction::Br};
+  set<unsigned int> SAME_CONSIDER = {Instruction::GetElementPtr,
+                                      Instruction::BitCast,
+                                      Instruction::PtrToInt,
+                                      Instruction::IntToPtr,
+                                      Instruction::SExt,
+                                      Instruction::ZExt};                           
+
+  //M: Module which is analyzed
+  Module* M;
+
+  //values: result of SearchAllArgInst()
+  vector<Value *> values;
+  map<Function*, vector<Value *>> valuesInFunction;
+
+  //adjList: result of LiveInterval() + RegisterAdjList()
+  map<Value *, set<Value *>> adjList;
+
+  //NUM_COLORS, valueToColor: result of ColorGraph();
+  //valueToColor: Value=>color mapping
+  map<Function*, unsigned int> numColors;
+  map<Function*, map<Value *, unsigned int>> valueToColor;
+
+  //colorToValue: result of InverseColorMap()
+  //color->Value mapping
+  map<Function*, vector<vector<Value *>>> colorToValue;
+
+  //Functions for constructor RegisterGraph(Module&)
+
+  //1. Construct liveness interval
 
   //Finds all instructions that can be alive in some point.
   //i.e. finds all Arguments & Instructions that contain valid values.
   //GVs and non-value Inst.(store, br, ...) are not considered.
-  vector<Value*>  SearchAllArgInst(Module&);
+  void SearchAllArgInst(Module &);
 
   //Recursively(post-order) searches through all instructions
   //mark liveness of each values in each instruction
-  vector<vector<bool>> LiveInterval(Module&, vector<Value*>&);
+  vector<vector<bool>> LiveInterval(Module &);
+  //helper function for LiveInterval()
+  //does the recursive search from use to def, making the value to be live
+  void LivenessSearch(Instruction &, Value &, int, map<Instruction *, vector<bool>> &);
 
-  //helper function for LiveInterval(); does the recursive search
-  bool LivenessSearch(Instruction&, Value&, int, map<Instruction*, vector<bool>>&, DominatorTree&);
+  //2. Construct live graph and assign different colors to
+  //   values which are live together
 
+  //Adjacency list of Argumetns & value-containing Instructions
+  //two insts. are adjacent iff live inerval overlap.
+  void RegisterAdjList(vector<vector<bool>> &);
+
+  //Colors values so adjacent value have no same color
+  //initializes NUM_COLORS, valueToColor
+  void ColorGraph();
+  //helper function for ColorGraph()
+  //finds PEO via Lexicographic BFS algorithm
+  vector<Value *> PerfectEliminationOrdering(vector<Value *> &);
+  //helper function for ColorGraph()
+  //colors the graph greedily(adjList always represents a chordal graph)
+  map<Value *, unsigned int> GreedyColoring(vector<Value *> &, unsigned int&);
+
+  //Makes colorToValue so easily retrieve all values with same color
+  void InverseColorMap();
 };
 
-class LivenessAnalysis : public AnalysisInfoMixin<LivenessAnalysis>{
+class LivenessAnalysis : public AnalysisInfoMixin<LivenessAnalysis>
+{
   friend AnalysisInfoMixin<LivenessAnalysis>;
   static AnalysisKey Key;
+
 public:
   using Result = RegisterGraph;
   RegisterGraph run(Module &M, ModuleAnalysisManager &MAM);
 };
 
-}
-/*
-TODO This causes error
-extern "C" ::llvm::PassPluginLibraryInfo
-llvmGetPassPluginInfo() {
-  return {
-    LLVM_PLUGIN_API_VERSION, "LivenessAnalysis", "v0.1",
-    [](PassBuilder &PB) {
-      PB.registerPipelineParsingCallback(
-        [](StringRef Name, ModulePassManager &MPM,
-           ArrayRef<PassBuilder::PipelineElement>) {
-          if (Name == "liveness") {
-            MPM.addPass(LivenessAnalysis());
-            return true;
-          }
-          return false;
-        }
-      );
-    }
-  };
-}
-*/
+} // namespace backend
+
 
 #endif
