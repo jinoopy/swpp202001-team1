@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "~/llvmscript/llvm-project-10.0/llvm/include",
+                "~/llvmscript/llvm-10.0-release/include",
+                "~/llvmscript/llvm-project-10.0/llvm/utils/unittest/googletest/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
