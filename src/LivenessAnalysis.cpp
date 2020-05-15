@@ -287,9 +287,9 @@ map<Value *, unsigned int> RegisterGraph::GreedyColoring(vector<Value *> &PEO, u
     //fetch values by Perfect Elimination Order
     for (auto it = PEO.begin(); it != PEO.end(); ++it)
     {
-
         //mark all colors which vertex before *it has used
         bool colorUsed[NUM_COLORS];
+        for(bool& b : colorUsed) b = false;
         for (auto jt = PEO.begin(); jt != it; ++jt)
         {
             if(adjList[*it].count(*jt) != 0) 

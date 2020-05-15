@@ -1,26 +1,22 @@
 define i32 @main() {
-  %a0 = add i32 3, 5
-  %b0 = add i32 4, 2
-  %c0 = add i32 8, 3
-  %d0 = add i32 6, 5
-  %e0 = call i32 @foo(i32 %a0, i32 %b0, i32 %c0, i32 %d0)
-  %f0 = call i32 @bar(i32 %a0, i32 %c0, i32 %b0, i32 %d0)
-  %g0 = add i32 %e0, %f0
-  ret i32 %g0
+entry:
+  %a = call i32 @value()
+  %b = call i32 @value()
+  %c = call i32 @value()
+  %cmp = icmp eq i32 %a, %b
+  br i1 %cmp, label %BB1, label %BB2
+BB1:
+  %d = call i32 @value()
+  %e = call i32 @value()
+  %f = call i32 @foo(i32 %b, i32 %c, i32 %d, i32 %e)
+  br label %BB2
+BB2:
+  %g = phi i32 [%d, %BB1], [0, %entry]
+  %h = phi i32 [%e, %BB1], [0, %entry]
+  %i = call i32 @foo(i32 %a, i32 %b, i32 %g, i32 %h)
+  %j = call i32 @foo(i32 %c, i32 %b, i32 %g, i32 %h)
+  ret i32 0
 }
 
-define i32 @foo(i32 %a1, i32 %b1, i32 %c1, i32 %d1) {
-  %e1 = add i32 %a1, %b1
-  %f1 = add i32 %c1, %d1
-  %g1 = add i32 %e1, %f1
-  %h1 = call i32 @bar(i32 %a1, i32 %b1, i32 %c1, i32 %d1)
-  %i1 = add i32 %g1, %h1
-  ret i32 %i1
-}
-
-define i32 @bar(i32 %a2, i32 %b2, i32 %c2, i32 %d2) {
-  %e2 = mul i32 %a2, %b2
-  %f2 = mul i32 %c2, %d2
-  %g2 = mul i32 %e2, %f2
-  ret i32 %g2
-}
+declare i32 @value()
+declare i32 @foo(i32, i32, i32, i32)
