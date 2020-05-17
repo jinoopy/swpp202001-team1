@@ -1,5 +1,5 @@
-#ifndef VECTORIZED_LOAD_AND_STORE_H
-#define VECTORIZED_LOAD_AND_STORE_H
+#ifndef VECTORIZE_LOAD_STORE_H
+#define VECTORIZE_LOAD_STORE_H
 
 #include "llvm/IR/PassManager.h"
 #include "llvm/IR/BasicBlock.h"
@@ -16,7 +16,7 @@ using namespace std;
 
 namespace optim {
 
-class VectorizedLoadAndStorePass : public PassInfoMixin<VectorizedLoadAndStorePass> {
+class VectorizeLoadStorePass : public PassInfoMixin<VectorizeLoadStorePass> {
 public:
 	PreservedAnalyses run(Function &F, FunctionAnalysisManager &AM);
 	

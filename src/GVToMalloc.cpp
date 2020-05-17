@@ -5,7 +5,7 @@ using namespace std;
 
 namespace optim
 {
-    PreservedAnalyses GVToMalloc::run(Module &M, ModuleAnalysisManager &MAM)
+    PreservedAnalyses GVToMallocPass::run(Module &M, ModuleAnalysisManager &MAM)
     {
         auto &Context = M.getContext();
 
@@ -93,7 +93,7 @@ namespace optim
         return PreservedAnalyses::all();
     }
 
-    Value *GVToMalloc::MakeNewMalloc(Module &M, LLVMContext &Context, Function *MallocF, Type *type, llvm::Constant *value, int m_index)
+    Value *GVToMallocPass::MakeNewMalloc(Module &M, LLVMContext &Context, Function *MallocF, Type *type, llvm::Constant *value, int m_index)
     {
         auto size = type->getScalarSizeInBits();
 
@@ -116,7 +116,7 @@ namespace optim
     }
 
     // get all the malloc variables And add them as new arguments in function.
-    Function &GVToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
+    Function &GVToMallocPass::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
     {
         if (f.getName() == "main")
         {
@@ -137,7 +137,7 @@ namespace optim
 
             FunctionType *NFTy = FunctionType::get(FTy->getReturnType(), Params, false);
             Function *NewFunc = Function::Create(NFTy, f.getLinkage(), f.getAddressSpace(), f.getName(), f.getParent()); // RecreateFunction(&f, NFTy);
-            auto VMap = ValueToValueMapTy();
+            ValueToValueMapTy VMap;
             Function::arg_iterator DestI = NewFunc->arg_begin();
             for (const Argument &I : f.args()) // set the name of original arguments to original name.
             {
@@ -154,7 +154,7 @@ namespace optim
         }
     }
 
-    void GVToMalloc::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
+    void GVToMallocPass::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
     {
         for (auto &BB : f)
         {

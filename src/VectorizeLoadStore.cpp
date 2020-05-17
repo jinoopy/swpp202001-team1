@@ -1,4 +1,4 @@
-#include "VectorizedLoadAndStore.h"
+#include "VectorizeLoadStore.h"
 
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/PatternMatch.h"
@@ -15,7 +15,7 @@ using namespace std;
 
 namespace optim {
 
-PreservedAnalyses VectorizedLoadAndStorePass::run(Function &F, FunctionAnalysisManager &AM) {
+PreservedAnalyses VectorizeLoadStorePass::run(Function &F, FunctionAnalysisManager &AM) {
 	for(BasicBlock &BB : F) {
 		vectorize(BB);
 	}
@@ -23,7 +23,7 @@ PreservedAnalyses VectorizedLoadAndStorePass::run(Function &F, FunctionAnalysisM
 	return PreservedAnalyses::all();
 }
 
-void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
+void VectorizeLoadStorePass::vectorize(BasicBlock& BB) {
 
 	// IMPORTANT:
 	// we assume that no same instruction exists in BB by GVN / GCSE passes.
@@ -60,7 +60,7 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 				if(orderIndvars.find(last_index) != orderIndvars.end()) {
 					// assume same index accessing does not exist
 					// assert(orderGEPs[orderIndvars[last_index]] == nullptr
-					//	&& "equal instruction error; refer to the comment in VectorizedLoadAndStorePass::vectorize()");
+					//	&& "equal instruction error; refer to the comment in VectorizeLoadStorePass::vectorize()");
 					// map to GEP
 					if(orderGEPs.find(basePTR) == orderGEPs.end()) {
 						orderGEPs[basePTR] = vector<GetElementPtrInst *>(indvars.size());
@@ -124,7 +124,7 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 
 // This function makes std::vector, which is consist of chain lists
 // that are made by iterative add instruction of index.
-vector<vector<Instruction *>> VectorizedLoadAndStorePass::findIndvars(BasicBlock &BB) {
+vector<vector<Instruction *>> VectorizeLoadStorePass::findIndvars(BasicBlock &BB) {
 	// insts will contain chain list of add instruction,
 	// which is instruction on index.
 	vector<vector<Instruction *>> insts;
@@ -182,7 +182,7 @@ vector<vector<Instruction *>> VectorizedLoadAndStorePass::findIndvars(BasicBlock
 }
 
 // This function collects GetElementPtr Instruction of given pointer type of size in BB.
-vector<GetElementPtrInst *> VectorizedLoadAndStorePass::findGEPs(BasicBlock &BB, unsigned size) {
+vector<GetElementPtrInst *> VectorizeLoadStorePass::findGEPs(BasicBlock &BB, unsigned size) {
 	LLVMContext &Context = BB.getContext();
 	vector<GetElementPtrInst *> GEPs;
 	Type *ptrType;
@@ -209,7 +209,7 @@ vector<GetElementPtrInst *> VectorizedLoadAndStorePass::findGEPs(BasicBlock &BB,
 }
 
 // This function vectorize load instruction.
-void VectorizedLoadAndStorePass::vectorizeLoads(GetElementPtrInst *GEPI, GetElementPtrInst *nextGEPI, LoadInst *LI1, LoadInst *LI2, BasicBlock &BB, unsigned bits) {
+void VectorizeLoadStorePass::vectorizeLoads(GetElementPtrInst *GEPI, GetElementPtrInst *nextGEPI, LoadInst *LI1, LoadInst *LI2, BasicBlock &BB, unsigned bits) {
 	LLVMContext &Context = BB.getContext();
 	Type *ptrType, *numType, *numTypeOfBits;
 	switch(bits) {
@@ -261,7 +261,7 @@ void VectorizedLoadAndStorePass::vectorizeLoads(GetElementPtrInst *GEPI, GetElem
 }
 
 // This function vectorize store function.
-void VectorizedLoadAndStorePass::vectorizeStores(GetElementPtrInst *GEPI, GetElementPtrInst *nextGEPI, StoreInst *STI1, StoreInst *STI2, BasicBlock &BB, unsigned bits) {
+void VectorizeLoadStorePass::vectorizeStores(GetElementPtrInst *GEPI, GetElementPtrInst *nextGEPI, StoreInst *STI1, StoreInst *STI2, BasicBlock &BB, unsigned bits) {
 	LLVMContext &Context = BB.getContext();
 	Type *ptrType, *numType;
 	switch(bits) {
