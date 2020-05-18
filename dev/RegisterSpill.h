@@ -34,14 +34,24 @@ class SpillCostAnalysis : public AnalysisInfoMixin<SpillCostAnalysis>
 public:
 
   //For stack-loaded variables, cost needed per color is the sum of:
-  static const float ALLOCA_COST = 1.2;
-  static const float LOAD_COST = 2;
-  static const float STORE_COST = 2;
+  //spilled variables are proven to reside in 
+  static const float ALLOCA_COST = 1.2,
+                    LOAD_COST = 2,
+                    STORE_COST = 2;
+
+  //For undecided iterations of loops, the default iteration count.
+  static const unsigned DEFAULT_LOOP = 50;
 
   //1-1 mapping between colors(unsigned int) and spill cost(float)
-  using Result = vector<float>;
+  using Result = map<Function*, vector<float>>;
 
-  vector<float> run(Module &M, ModuleAnalysisManager &MAM);
+  //Calculates the estimated spill cost of each set of equally-colored registers.
+  //Note that this pass performs just a heuristic method; it may not be accurate
+  Result run(Module &M, ModuleAnalysisManager &MAM);
+
+private:
+
+  unsigned countUsesWithLoopTripCount(Value*, ScalarEvolution&, LoopInfo&);
 };
 
 //TODO
