@@ -1,4 +1,5 @@
 #include "RegisterSpill.h"
+#include "LivenessAnalysis.h"
 
 #include "llvm/AsmParser/Parser.h"
 #include "llvm/Support/raw_ostream.h"
@@ -53,14 +54,73 @@ TEST_F(SpillCostTest, SpillCostTest1) {
     auto result = SpillCostAnalysis().run(*M, MAM);
 
     for(Function& F : *M) {
-        outs() << F.getName() << " coloration result\n";
+        if(F.isDeclaration()) continue;
+        outs() << "===============================\n";
+        outs() << F.getName() << "() coloration result\n";
         for(unsigned color = 0; color < RG.getNumColors(&F); color++) {
-            outs() << color << ":\n  ";
+            outs() << "Color " << color << ":\n  ";
             for(Value* V : RG.getColorToValue(&F)[color]) {
                 outs() << V->getName() << " ";
             }
-            outs() << "\n";
-            outs() << result[&F][color];
+            stringstream ss;
+            ss << fixed << setprecision(2) << result[&F][color];
+            outs() << "\n  Spill cost: " << ss.str() << "\n";
         }
     }
+    outs() << "===============================\n";
+}
+
+TEST_F(SpillCostTest, SpillCostTest2) {
+    parseAssembly("test-ir/input2.ll");
+    
+    RegisterGraph RG(*M);
+    ModuleAnalysisManager MAM;
+
+    auto result = SpillCostAnalysis().run(*M, MAM);
+
+    for(Function& F : *M) {
+        if(F.isDeclaration()) continue;
+        outs() << "===============================\n";
+        outs() << F.getName() << "() coloration result\n";
+        for(unsigned color = 0; color < RG.getNumColors(&F); color++) {
+            outs() << "Color " << color << ":\n  ";
+            for(Value* V : RG.getColorToValue(&F)[color]) {
+                outs() << V->getName() << " ";
+            }
+            stringstream ss;
+            ss << fixed << setprecision(2) << result[&F][color];
+            outs() << "\n  Spill cost: " << ss.str() << "\n";
+        }
+    }
+    outs() << "===============================\n";
+}
+
+TEST_F(SpillCostTest, SpillCostTest3) {
+    parseAssembly("test-ir/input3.ll");
+    
+    RegisterGraph RG(*M);
+    ModuleAnalysisManager MAM;
+
+    auto result = SpillCostAnalysis().run(*M, MAM);
+
+    for(Function& F : *M) {
+        if(F.isDeclaration()) continue;
+        outs() << "===============================\n";
+        outs() << F.getName() << "() coloration result\n";
+        for(unsigned color = 0; color < RG.getNumColors(&F); color++) {
+            outs() << "Color " << color << ":\n  ";
+            for(Value* V : RG.getColorToValue(&F)[color]) {
+                outs() << V->getName() << " ";
+            }
+            stringstream ss;
+            ss << fixed << setprecision(2) << result[&F][color];
+            outs() << "\n  Spill cost: " << ss.str() << "\n";
+        }
+    }
+    outs() << "===============================\n";
+}
+
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

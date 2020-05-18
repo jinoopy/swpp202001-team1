@@ -26,18 +26,21 @@ using namespace std;
 namespace backend
 {
 
+//For stack-loaded variables, cost needed per color is the sum of:
+//spilled variables are proven to reside in 
+static float ALLOCA_COST = 1.2,
+             LOAD_COST = 2,
+             STORE_COST = 2;
+
+//static const unsigned int AVAILABLE_REG = 16;
+static unsigned int AVAILABLE_REG = 16;
+
 class SpillCostAnalysis : public AnalysisInfoMixin<SpillCostAnalysis>
 {
   friend AnalysisInfoMixin<SpillCostAnalysis>;
   static AnalysisKey Key;
 
 public:
-
-  //For stack-loaded variables, cost needed per color is the sum of:
-  //spilled variables are proven to reside in 
-  static const float ALLOCA_COST = 1.2,
-                    LOAD_COST = 2,
-                    STORE_COST = 2;
 
   //For undecided iterations of loops, the default iteration count.
   static const unsigned DEFAULT_LOOP = 50;
@@ -58,9 +61,6 @@ private:
 class RegisterSpillPass : public PassInfoMixin<RegisterSpillPass>
 {
 public:
-
-  //static const unsigned int AVAILABLE_REG = 16;
-  static const unsigned int AVAILABLE_REG = 16;
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
 };
 
