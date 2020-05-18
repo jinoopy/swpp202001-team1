@@ -1,5 +1,5 @@
-#ifndef MALLOC_GV_H
-#define MALLOC_GV_H
+#ifndef MALLOC_TO_GV_H
+#define MALLOC_TO_GV_H
 
 #include "llvm/IR/PassManager.h"
 #include "llvm/IR/GlobalVariable.h"

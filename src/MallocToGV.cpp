@@ -1,4 +1,4 @@
-#include "MallocToGVPass.h"
+#include "MallocToGV.h"
 
 namespace optim
 {
