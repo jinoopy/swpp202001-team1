@@ -63,4 +63,90 @@ unsigned SpillCostAnalysis::countLoopTripCount(Instruction* I, ScalarEvolution& 
     return count;
 }
 
+//---------------------------------------------------------------
+//class RegisterSpillPass
+//---------------------------------------------------------------
+
+PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
+{
+    this->M = &M;
+    RegisterGraph RG(M);
+    auto SpillCostResult = SpillCostAnalysis().run(M, MAM);
+
+    for(Function& F : M) {
+        if(F.isDeclaration()) continue;
+
+        unsigned numColor = RG.getNumColors(&F);
+        vector<float> spillCost = SpillCostResult[&F];
+
+        //sort spillOrder while finding the Need-To-Be-Spilled set
+
+        //total spilled registers
+        unsigned spillCount;
+        //isSpilled[c] = true if c should be spilled
+        //FIXME: O(N^2) algorithm used here. Is there any better choice?
+        vector<bool> isSpilled(RG.getNumColors(&F), false);
+        for(spillCount = 0; spillCount <= numColor; spillCount++) {
+            //numBuffer: # of leftover registers after assigning constantly-loaded colors
+            int numBuffer = REGISTER_CAP-numColor+spillCount;
+            if(numBuffer >= 1 && spilledEnough(numBuffer, isSpilled, &F, RG)) {
+                break;
+            }
+
+            //Color which is most cheap to spill(among colors not spilled yet)
+            unsigned minColor = 0;
+            for(unsigned j = 1; j < numColor; j++) {
+                if(!isSpilled[j] && spillCost[minColor] > spillCost[j]) {
+                    minColor = j;
+                }
+            }
+            isSpilled[minColor] = true;
+        }
+
+        //FIXME: Debug output
+        outs() << "Spill analysis result of " << F.getName() << " : \n";
+        outs() << "  Total colors: " << numColor << "\n";
+        outs() << "  Spilled colors: " << spillCount << "\n  ";
+        for(int i = 0; i < numColor; i++) {
+            if(isSpilled[i]) {
+                outs() << i << " ";
+            }
+        }
+        outs() << "\n";
+
+        //TODO
+        //Implement the spilling transformation.
+    }
+
+    return PreservedAnalyses::all();
+}
+
+bool RegisterSpillPass::spilledEnough(unsigned numBuffer, vector<bool> isSpilled, Function* F, RegisterGraph& RG) {
+
+    for(auto it = inst_begin(F); it != inst_end(F); ++it) {
+        Instruction& I = *it;
+
+        unsigned regCount = 0, memCount = 0;
+        for(auto& use : I.operands()) {
+            Value* operand = use.get();
+
+            //If operand is not to be colored nor spilled, do nothing
+            if(find(RG.getValues(F), operand) == RG.getValues(F).end()) continue;
+
+            if(isSpilled[RG.getValueToColor(F, operand)]) {
+                memCount++;
+            }
+            else {
+                regCount++;
+            }
+        }
+        if(memCount > numBuffer || regCount > REGISTER_CAP - numBuffer) {
+            return false;
+        }
+    }
+
+
+    return true;
+}
+
 }

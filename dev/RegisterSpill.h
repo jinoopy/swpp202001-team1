@@ -59,11 +59,24 @@ private:
   
 };
 
-//TODO
 class RegisterSpillPass : public PassInfoMixin<RegisterSpillPass>
 {
+  //Module which this analysis runs.
+  Module* M;
+
 public:
+
+  //Register file size of the target machine.
+  //static const unsigned REGISTER_CAP = 16;
+  //FIXME: Testing purposes(Most conventional level programs fall in 16 regs)
+  static const unsigned REGISTER_CAP = 4;
+
+  //Finds the registers that need to be spilled
+  //and actually spills them by adding alloca, store, and load.
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
+
+  //Searches through all functions and check if the spilling is enough.
+  bool spilledEnough(unsigned, vector<bool>, Function*, RegisterGraph&);
 };
 
 }

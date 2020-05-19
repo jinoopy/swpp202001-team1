@@ -14,7 +14,7 @@ BB2:
   %g = phi i32 [%d, %BB1], [0, %entry]
   %h = phi i32 [%e, %BB1], [0, %entry]
   %i = call i32 @foo(i32 %a, i32 %b, i32 %g, i32 %h)
-  %j = call i32 @foo(i32 %c, i32 %b, i32 %g, i32 %h)
+  %j = call i32 @foo(i32 %c, i32 %a, i32 %g, i32 %h)
   ret i32 0
 }
 

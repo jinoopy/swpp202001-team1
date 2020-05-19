@@ -32,11 +32,11 @@ if [[ "$1" == "build" || "$1" == "all" ]]; then
 
   $CXX $ISYSROOT $CXXFLAGS $LDFLAGS $LIBS RegisterSpill.cpp SpillCostAnalysisTest.cpp ../src/LivenessAnalysis.cpp -lpthread -lm \
        $SRCROOT/utils/unittest/googletest/src/gtest-all.cc \
-       -o run
+       -o runPR1
 fi
 
 if [[ "$1" == "run" || "$1" == "all" ]]; then
   echo "----- run -----"
   set +e
-  ./run
+  ./runPR1
 fi
