@@ -54,7 +54,7 @@ public:
 
 private:
 
-  unsigned countUsesWithLoopTripCount(Value*, ScalarEvolution&, LoopInfo&);
+  unsigned countLoopTripCount(Instruction*, ScalarEvolution&, LoopInfo&);
 };
 
 //TODO

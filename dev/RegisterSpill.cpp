@@ -31,10 +31,12 @@ map<Function*, vector<float>> SpillCostAnalysis::run(Module &M, ModuleAnalysisMa
         vector<float> cost(RG.getNumColors(&F));
         for(unsigned int c = 0; c < RG.getNumColors(&F); c++) {
             cost[c] = ALLOCA_COST;
-            cost[c] += STORE_COST * RG.getColorToValue(&F)[c].size();
             for(auto reg : RG.getColorToValue(&F)[c]) {
                 
-                cost[c] += LOAD_COST * countUsesWithLoopTripCount(reg, SCE, LI);
+                cost[c] += STORE_COST * countLoopTripCount(dyn_cast<Instruction>(reg), SCE, LI);
+                for(User* u : reg->users()) {
+                    cost[c] += LOAD_COST * countLoopTripCount(dyn_cast<Instruction>(u), SCE, LI);
+                }
                 
             }
         }
@@ -45,23 +47,18 @@ map<Function*, vector<float>> SpillCostAnalysis::run(Module &M, ModuleAnalysisMa
     return SpillCost;
 }
 
-unsigned SpillCostAnalysis::countUsesWithLoopTripCount(Value* value, ScalarEvolution& SCE, LoopInfo& LI)
+unsigned SpillCostAnalysis::countLoopTripCount(Instruction* I, ScalarEvolution& SCE, LoopInfo& LI)
 {
     //FIXME: Using the result of ScalarEvolution raises SegFault.
     //Default loop trip count is used for every deterministic/undetermined loops.
-    unsigned count = 0;
-    for(Use& u : value->uses()) {
-        unsigned useCount = 1;
-        Instruction* I = dyn_cast<Instruction>(u.getUser());
-        if(I == nullptr) continue;
-        for(Loop* L : LI) {
-            if(L->contains(I)) {
-                //unsigned tripCount = SCE.getSmallConstantTripCount(L);
-                //useCount *= tripCount==0 ? DEFAULT_LOOP : tripCount;
-                useCount *= DEFAULT_LOOP;
-            }
+    unsigned count = 1;
+    if(I == nullptr) return 1;
+    for(Loop* L : LI) {
+        if(L->contains(I)) {
+            //unsigned tripCount = SCE.getSmallConstantTripCount(L);
+            //useCount *= tripCount==0 ? DEFAULT_LOOP : tripCount;
+            count *= DEFAULT_LOOP;
         }
-        count += useCount;
     }
     return count;
 }
