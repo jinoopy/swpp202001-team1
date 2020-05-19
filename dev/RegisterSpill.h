@@ -54,7 +54,9 @@ public:
 
 private:
 
+  //Counts the loop trip count considering all layers of loops
   unsigned countLoopTripCount(Instruction*, ScalarEvolution&, LoopInfo&);
+  
 };
 
 //TODO
