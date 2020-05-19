@@ -28,12 +28,12 @@ namespace backend
 
 //For stack-loaded variables, cost needed per color is the sum of:
 //spilled variables are proven to reside in 
-static float ALLOCA_COST = 1.2,
-             LOAD_COST = 2,
-             STORE_COST = 2;
+static const float ALLOCA_COST = 1.2,
+                   LOAD_COST = 2,
+                   STORE_COST = 2;
 
 //static const unsigned int AVAILABLE_REG = 16;
-static unsigned int AVAILABLE_REG = 16;
+static const unsigned int AVAILABLE_REG = 16;
 
 class SpillCostAnalysis : public AnalysisInfoMixin<SpillCostAnalysis>
 {
