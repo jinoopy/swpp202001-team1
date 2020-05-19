@@ -1,5 +1,7 @@
 import json
+import os
 import subprocess
+import re
 
 
 def readConfig():
@@ -8,7 +10,7 @@ def readConfig():
 
 def writeConfig(config):
     with open("config.json", "w") as configJSON:
-        json.dump(config, configJSON)
+        json.dump(config, configJSON, indent=4)
 
 def subprocessRun(command):
     return subprocess.run(command, shell=True, stdout=subprocess.PIPE).stdout.decode('utf-8').rstrip().replace("\n", " ")
@@ -23,7 +25,16 @@ def updateConfig(config):
     if mode == 1 :
         print("Write the directory of LLVM/bin.")
         print("Current directory : " + config["llvm-bin-dir"])
-        config["llvm-bin-dir"] = input()
+        llvmDir = input()
+        path = input()
+        while os.path.isdir(path) == False:
+            if path[0] == '~':
+                path = os.path.expanduser('~') + path[1:]
+                if os.path.isdir(path) == True:
+                    break
+                print("Failed: wrong path (" + path + ")")
+                path = input()
+        config["llvm-bin-dir"] = llvmDir
         writeConfig(config)
 
     elif mode == 2 :
@@ -33,19 +44,24 @@ def updateConfig(config):
         print("Write the name of the new pass file.")
         print("Format : lowers/numbers")
         print("Example: mem2reg, instcombine")
-        passName = input()
-        if not passName.isalnum() or passName in config["opt-pass"].keys():
-            print("Invalid input")
-            return
+        while True:
+            passName = input()
+            if not passName.isalnum() or passName in config["opt-pass"].keys():
+                print("Invalid input")
+                continue
+            break
         
         print("Write the file name(src/*.cpp) of the new pass file.")
         print("Example: src/XXX.cpp -> XXX.cpp")
         fileName = input()
-        if not fileName.isalnum() or not fileName.split(".")[1]!="cpp":
-            print("Invalid input")
-            return
+        regex = re.compile(r"[\d\w_]+\.cpp")
+        while True:
+            if not re.fullmatch(regex, fileName):
+                print("Invalid input")
+                continue
+            break
 
-        outputName = "".join(ch for ch in fileName if ch.isUpper() or ch.isDigit())
+        outputName = "".join(ch for ch in fileName if ch.isupper() or ch.isdigit())
         outputName = "lib" + outputName + ".so"
 
         config["opt-pass"][passName] = {"src" : fileName, "lib" : outputName}
@@ -63,13 +79,25 @@ def build(config):
     CXXFLAGS= CXXFLAGS + "-std=c++17 -I \"" + SRCROOT + "/include\""
     
     for p in config["opt-pass"].keys():
+        print("==========================")
         print("Compiling " + "./src/"+config["opt-pass"][p]["src"] + " ...")
         subprocess.run(CXX + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + " src/" + config["opt-pass"][p]["src"] + " -o " + "lib/"+config["opt-pass"][p]["lib"] + " -shared -fPIC", shell=True)
+        print("Complete!")
+    print("==========================")
 
 def opt(config):
     print("Enter the directory for .ll file.")
     llvmir = input()
-
+    
+    regex = re.compile(r"[\d\w_/.]+\.ll")
+    while True:
+        if not re.fullmatch(regex, llvmir):
+            print("Invalid input")
+            continue
+        if not os.path.isfile(llvmir):
+            print("File does not exist")
+            continue
+        break
     print("Current Available Pass pipelines:")
     presets = list(config["preset-passes"].keys())
     for i, pipe in enumerate(presets):
@@ -104,10 +132,9 @@ How the compiler.py works
 4. Run the backend(unimplemented)
 ==============================
 '''
-print(HELP, end = "")
 while True:
-    print("Enter the mode number(1~4) : ", end="")
-    mode = int(input())
+    print(HELP, end = "")
+    mode = int(input("Enter the mode number(1~4) : "))
     config = readConfig()
     if mode == 1:
         updateConfig(config)
