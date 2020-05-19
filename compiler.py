@@ -25,7 +25,6 @@ def updateConfig(config):
     if mode == 1 :
         print("Write the directory of LLVM/bin.")
         print("Current directory : " + config["llvm-bin-dir"])
-        llvmDir = input()
         path = input()
         while os.path.isdir(path) == False:
             if path[0] == '~':
@@ -34,7 +33,7 @@ def updateConfig(config):
                     break
                 print("Failed: wrong path (" + path + ")")
                 path = input()
-        config["llvm-bin-dir"] = llvmDir
+        config["llvm-bin-dir"] = path
         writeConfig(config)
 
     elif mode == 2 :
