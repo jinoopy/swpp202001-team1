@@ -94,10 +94,12 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
             }
 
             //Color which is most cheap to spill(among colors not spilled yet)
-            unsigned minColor = 0;
-            for(unsigned j = 1; j < numColor; j++) {
-                if(!isSpilled[j] && spillCost[minColor] > spillCost[j]) {
+            unsigned minColor;
+            unsigned minSpillCost = ~0; //MAX_UINT
+            for(unsigned j = 0; j < numColor; j++) {
+                if(!isSpilled[j] && minSpillCost > spillCost[j]) {
                     minColor = j;
+                    minSpillCost = spillCost[j];
                 }
             }
             isSpilled[minColor] = true;
