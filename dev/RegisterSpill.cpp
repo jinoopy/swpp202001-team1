@@ -84,7 +84,7 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
         //total spilled registers
         unsigned spillCount;
         //isSpilled[c] = true if c should be spilled
-        //FIXME: O(N^2) algorithm used here. Is there any better choice?
+        //FIXME: O(N*I) algorithm used here. Is there any better choice?
         vector<bool> isSpilled(RG.getNumColors(&F), false);
         for(spillCount = 0; spillCount <= numColor; spillCount++) {
             //numBuffer: # of leftover registers after assigning constantly-loaded colors
