@@ -63,6 +63,8 @@ class RegisterSpillPass : public PassInfoMixin<RegisterSpillPass>
 {
   //Module which this analysis runs.
   Module* M;
+  //Register graph for the module.
+  RegisterGraph RG;
 
 public:
 
@@ -80,7 +82,10 @@ private:
   //Searches through all functions and check if the spilling is enough.
   bool spilledEnough(unsigned, vector<bool>, Function*, RegisterGraph&);
 
-  void spillRegister(vector<bool>, Function*);
+  //Pre-order traverses through the function's basic blocks.
+  //In this way, if a BB has a single predecessor, the register state is already calculated.
+  //Spills the registers by adding store and load instructions.
+  void spillRegister(const vector<bool>&, const vector<AllocaInst*>&, map<BasicBlock*, vector<bool>>&, BasicBlock&);
 };
 
 }

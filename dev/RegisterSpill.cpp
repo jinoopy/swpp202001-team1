@@ -70,7 +70,7 @@ unsigned SpillCostAnalysis::countLoopTripCount(Instruction* I, ScalarEvolution& 
 PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
 {
     this->M = &M;
-    RegisterGraph RG(M);
+    this->RG = RegisterGraph(M);
     auto SpillCostResult = SpillCostAnalysis().run(M, MAM);
 
     for(Function& F : M) {
@@ -104,19 +104,22 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
             isSpilled[minColor] = true;
         }
 
-        //FIXME: Debug output
-        outs() << "Spill analysis result of " << F.getName() << " : \n";
-        outs() << "  Total colors: " << numColor << "\n";
-        outs() << "  Spilled colors: " << spillCount << "\n  ";
-        for(int i = 0; i < numColor; i++) {
-            if(isSpilled[i]) {
-                outs() << i << " ";
+        //Create alloca instructions to spill colored IR registers
+        BasicBlock& entryBlock = F.getEntryBlock();
+        vector<AllocaInst*> spillAlloca(numColor);
+        for(int c = 0; c < numColor; c++) {
+            if(isSpilled[c]) {
+                AllocaInst* allocC = new AllocaInst(Type::getInt64Ty(F.getContext()), 8, "color"+to_string(c), entryBlock.getFirstNonPHI());
+                spillAlloca[c] = allocC;
             }
         }
-        outs() << "\n";
 
-        //TODO: Implement spilling
-        spillRegister(isSpilled, &F);
+        map<BasicBlock*, vector<bool>> finalRegState;
+        spillRegister(isSpilled, spillAlloca, finalRegState, entryBlock);
+
+        //update the 
+        this->RG = RegisterGraph(M);
+        assert(RG.getNumColors(&F) <= REGISTER_CAP && "needed registers should decrease under CAP after spilling");
     }
 
     return PreservedAnalyses::all();
@@ -145,9 +148,64 @@ bool RegisterSpillPass::spilledEnough(unsigned numBuffer, vector<bool> isSpilled
             return false;
         }
     }
-
-
     return true;
+}
+
+void RegisterSpillPass::spillRegister(const vector<bool>& isSpilled, const vector<AllocaInst*>& spillAlloca, map<BasicBlock*, vector<bool>>& finalRegState, BasicBlock& BB)
+{
+    //if visited before, stop recursion.
+    if(finalRegState.find(&BB) != finalRegState.end()) return;
+
+    //Register File-loaded registers are marked as true.
+    vector<bool> live(isSpilled.size());
+    //If only predecessor, we assume that the liveness is preserved from the parent.
+    if(pred_size(&BB) == 1) {
+        assert(finalRegState.find(BB.getUniquePredecessor()) != finalRegState.end() && "If a predecessor of BB is unique, the ending state should be calculated");
+        live = finalRegState[BB.getUniquePredecessor()];
+    }
+    //Else, safely, we do assume that every color is discarded.
+    else {
+        for(int i = 0; i < isSpilled.size(); i++) {
+            live[i] = !isSpilled[i];
+        }
+    }
+
+    for(Instruction& I : BB) {
+        //check if I's operands are loaded on the register.
+        for(auto& use : I.operands()) {
+            Value* operand = use.getUser();
+            //if operand has not a color, skip.
+            if(find(RG.getValues().begin(), RG.getValues().end(), operand) == RG.getValues().end()) continue;
+
+            //if the color is not loaded on register,
+            unsigned opColor = RG.getValueToColor(BB.getParent())[operand];
+            if(!live[opColor] && isSpilled[opColor]) {
+                //modify the list of loaded registers.
+                unsigned replacedColor = findReplaced();
+                live[opColor] = true;
+                live[replacedColor] = false;
+                //insert the apparent load instruction and its supplementary ops(type casting)
+                insertLoad(spillAlloca[opColor], I);
+            }
+        }
+
+        //if I has a color,
+        if(find(RG.getValues().begin(), RG.getValues().end(), &I) != RG.getValues().end()) {
+            //modify the list of loaded registers
+            unsigned replacedColor = findReplaced();
+            live[RG.getValueToColor(BB.getParent())[&I]] = true;
+            live[replacedColor] = false;
+            //store the result to the apparent alloca'd memory.
+            unsigned IColor = RG.getValueToColor(BB.getParent())[&I];
+            insertStore(spillAlloca[IColor], I);
+        }
+    }
+
+    finalRegState[&BB] = live;
+
+    for(auto it = pred_begin(&BB); it != pred_end(&BB); ++it) {
+        spillRegister(isSpilled, spillAlloca, finalRegState, **it);
+    }
 }
 
 }
