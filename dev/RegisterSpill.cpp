@@ -56,7 +56,7 @@ unsigned SpillCostAnalysis::countLoopTripCount(Instruction* I, ScalarEvolution& 
     for(Loop* L : LI) {
         if(L->contains(I)) {
             //unsigned tripCount = SCE.getSmallConstantTripCount(L);
-            //useCount *= tripCount==0 ? DEFAULT_LOOP : tripCount;
+            //count *= tripCount==0 ? DEFAULT_LOOP : tripCount;
             count *= DEFAULT_LOOP;
         }
     }
@@ -84,7 +84,6 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
         //total spilled registers
         unsigned spillCount;
         //isSpilled[c] = true if c should be spilled
-        //FIXME: O(N*I) algorithm used here. Is there any better choice?
         vector<bool> isSpilled(RG.getNumColors(&F), false);
         for(spillCount = 0; spillCount <= numColor; spillCount++) {
             //numBuffer: # of leftover registers after assigning constantly-loaded colors
@@ -116,8 +115,8 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
         }
         outs() << "\n";
 
-        //TODO
-        //Implement the spilling transformation.
+        //TODO: Implement spilling
+        spillRegister(isSpilled, &F);
     }
 
     return PreservedAnalyses::all();

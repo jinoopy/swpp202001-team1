@@ -75,8 +75,12 @@ public:
   //and actually spills them by adding alloca, store, and load.
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
 
+private:
+
   //Searches through all functions and check if the spilling is enough.
   bool spilledEnough(unsigned, vector<bool>, Function*, RegisterGraph&);
+
+  void spillRegister(vector<bool>, Function*);
 };
 
 }
