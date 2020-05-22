@@ -109,7 +109,7 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
         vector<AllocaInst*> spillAlloca(numColor);
         for(int c = 0; c < numColor; c++) {
             if(isSpilled[c]) {
-                AllocaInst* allocC = new AllocaInst(Type::getInt64Ty(F.getContext()), 8, "color"+to_string(c), entryBlock.getFirstNonPHI());
+                AllocaInst* allocC = new AllocaInst(Type::getInt64Ty(F.getContext()), 0, "color"+to_string(c), entryBlock.getFirstNonPHI());
                 spillAlloca[c] = allocC;
             }
         }
@@ -117,7 +117,7 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
         map<BasicBlock*, vector<bool>> finalRegState;
         spillRegister(isSpilled, spillAlloca, finalRegState, entryBlock);
 
-        //update the 
+        //update the RegisterGraph and check if spilling is complete.
         this->RG = RegisterGraph(M);
         assert(RG.getNumColors(&F) <= REGISTER_CAP && "needed registers should decrease under CAP after spilling");
     }
@@ -163,7 +163,7 @@ void RegisterSpillPass::spillRegister(const vector<bool>& isSpilled, const vecto
         assert(finalRegState.find(BB.getUniquePredecessor()) != finalRegState.end() && "If a predecessor of BB is unique, the ending state should be calculated");
         live = finalRegState[BB.getUniquePredecessor()];
     }
-    //Else, safely, we do assume that every color is discarded.
+    //Else, for safety, we assume that every color is discarded.
     else {
         for(int i = 0; i < isSpilled.size(); i++) {
             live[i] = !isSpilled[i];
@@ -171,33 +171,58 @@ void RegisterSpillPass::spillRegister(const vector<bool>& isSpilled, const vecto
     }
 
     for(Instruction& I : BB) {
-        //check if I's operands are loaded on the register.
-        for(auto& use : I.operands()) {
-            Value* operand = use.getUser();
-            //if operand has not a color, skip.
-            if(find(RG.getValues().begin(), RG.getValues().end(), operand) == RG.getValues().end()) continue;
 
-            //if the color is not loaded on register,
-            unsigned opColor = RG.getValueToColor(BB.getParent())[operand];
-            if(!live[opColor] && isSpilled[opColor]) {
-                //modify the list of loaded registers.
-                unsigned replacedColor = findReplaced();
-                live[opColor] = true;
-                live[replacedColor] = false;
-                //insert the apparent load instruction and its supplementary ops(type casting)
-                insertLoad(spillAlloca[opColor], I);
+        //for phi nodes,
+        if(isa<PHINode>(I)) {
+            PHINode& phi = dyn_cast<PHINode>(I);
+            for(unsigned i = 0; i < phi.getNumIncomingValues(); i++) {
+                BasicBlock* phiBB = phi.getIncomingBlock(i);
+                Value* phiV = phi.getIncomingValue(i);
+
+                //if operand has no color, skip.
+                if(find(RG.getValues().begin(), RG.getValues().end(), phiV) == RG.getValues().end()) continue;
+
+                unsigned opColor = RG.getValueToColor(BB.getParent())[phiV];
+                if(!live[opColor] && isSpilled[opColor]) {
+                    //modify the list of loaded registers.
+                    unsigned replacedColor = findReplaced(&I, live, isSpilled, BB);
+                    live[opColor] = true;
+                    live[replacedColor] = false;
+                    //insert the apparent load instruction and its supplementary ops(type casting)
+                    insertLoad(phi.getOperandUse(PHINode::getOperandNumForIncomingValue(i)), spillAlloca[opColor], phiBB->getTerminator());
+                }
+            }
+        }
+        //for conventional instructions,
+        else {
+            //check if I's operands are loaded on the register.
+            for(auto& use : I.operands()) {
+                Value* operand = use.getUser();
+                //if operand has no color, skip.
+                if(find(RG.getValues().begin(), RG.getValues().end(), operand) == RG.getValues().end()) continue;
+
+                //if the color is not loaded on register,
+                unsigned opColor = RG.getValueToColor(BB.getParent())[operand];
+                if(!live[opColor] && isSpilled[opColor]) {
+                    //modify the list of loaded registers.
+                    unsigned replacedColor = findReplaced(&I, live, isSpilled, BB);
+                    live[opColor] = true;
+                    live[replacedColor] = false;
+                    //insert the apparent load instruction and its supplementary ops(type casting)
+                    insertLoad(use, spillAlloca[opColor], &I);
+                }
             }
         }
 
         //if I has a color,
         if(find(RG.getValues().begin(), RG.getValues().end(), &I) != RG.getValues().end()) {
             //modify the list of loaded registers
-            unsigned replacedColor = findReplaced();
+            unsigned replacedColor = findReplaced(I.getNextNode(), live, isSpilled, BB);
             live[RG.getValueToColor(BB.getParent())[&I]] = true;
             live[replacedColor] = false;
             //store the result to the apparent alloca'd memory.
             unsigned IColor = RG.getValueToColor(BB.getParent())[&I];
-            insertStore(spillAlloca[IColor], I);
+            insertStore(&I, spillAlloca[IColor], &I);
         }
     }
 
@@ -206,6 +231,31 @@ void RegisterSpillPass::spillRegister(const vector<bool>& isSpilled, const vecto
     for(auto it = pred_begin(&BB); it != pred_end(&BB); ++it) {
         spillRegister(isSpilled, spillAlloca, finalRegState, **it);
     }
+}
+
+unsigned RegisterSpillPass::findReplaced(Instruction* searchFrom, vector<bool> live, vector<bool> isSpilled, BasicBlock& scope) {
+
+    //sets that tracked 1. live, 2. spilled, 3. yet unused register color.
+    //if this set's size become 1, the last one standing should be replaced from the register file.
+    //else, if multiple candidates are left, return anything(UB).
+    set<unsigned> candidates;
+    for(int c = 0; c < live.size(); c++) {
+        if(live[c] && isSpilled[c]) candidates.insert(c);
+    }
+    if(candidates.size() == 1) return *candidates.begin();
+
+    for(Instruction* i = searchFrom; i != scope.getTerminator(); i = i->getNextNode()) {
+        for(auto operand : i->operand_values()) {
+            //if operand is not colored, skip.
+            if(find(RG.getValues().begin(), RG.getValues().end(), operand) == RG.getValues().end()) continue;
+
+            unsigned opColor = RG.getValueToColor(i->getFunction(), operand);
+            candidates.erase(opColor);
+            if(candidates.size() == 1) return *candidates.begin();
+        }
+    }
+
+    return *candidates.begin();
 }
 
 }
