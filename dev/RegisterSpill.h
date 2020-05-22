@@ -103,10 +103,10 @@ private:
   //Inserts the store instruction and corresponding type conversions
   // %storeVal = ..
   //----------------------------------------------
-  // %insertAfter = ..
   // %temp = (proper type conversion to i64) %storeVal
   // store %temp, %storeAt
-  void insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertAfter);
+  // %insertBefore
+  void insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore);
 
 };
 

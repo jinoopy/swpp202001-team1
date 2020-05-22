@@ -222,7 +222,7 @@ void RegisterSpillPass::spillRegister(const vector<bool>& isSpilled, const vecto
             live[replacedColor] = false;
             //store the result to the apparent alloca'd memory.
             unsigned IColor = RG.getValueToColor(BB.getParent())[&I];
-            insertStore(&I, spillAlloca[IColor], &I);
+            insertStore(&I, spillAlloca[IColor], I.getNextNode());
         }
     }
 
@@ -234,8 +234,7 @@ void RegisterSpillPass::spillRegister(const vector<bool>& isSpilled, const vecto
 }
 
 unsigned RegisterSpillPass::findReplaced(Instruction* searchFrom, vector<bool> live, vector<bool> isSpilled, BasicBlock& scope) {
-
-    //sets that tracked 1. live, 2. spilled, 3. yet unused register color.
+    //sets that remembers 1. live, 2. spilled, 3. yet unused register color.
     //if this set's size become 1, the last one standing should be replaced from the register file.
     //else, if multiple candidates are left, return anything(UB).
     set<unsigned> candidates;
@@ -254,8 +253,68 @@ unsigned RegisterSpillPass::findReplaced(Instruction* searchFrom, vector<bool> l
             if(candidates.size() == 1) return *candidates.begin();
         }
     }
-
     return *candidates.begin();
+}
+
+void RegisterSpillPass::insertLoad(Use& target, AllocaInst* loadFrom, Instruction* insertBefore) {
+    StringRef nameStr = target.getUser()->getName();
+
+    //Loads from the 'loadFrom' pointer, which stores equally colored value.
+    LoadInst* loadInst = new LoadInst(loadFrom, nameStr+".temp.l", insertBefore);
+
+    //Create an appropriate type conversing instruction(inttoptr, trunc, ...)
+    Value* typeConv;
+    Type* targetType = target.getUser()->getType();
+    
+    LLVMContext& Context = M->getContext();
+    if(targetType == Type::getInt64Ty(Context)) {
+        //no type conversion instruction should be created.
+        typeConv = loadInst;
+    }
+    else if(targetType->isIntegerTy()) {
+        //trunc operation can shrink the size of an integer.
+        typeConv = new TruncInst(loadInst, targetType, nameStr + ".temp.l", insertBefore);
+    }
+    else if(targetType->isPointerTy()) {
+        //inttoptr operation can change i64 to pointer.
+        typeConv = new IntToPtrInst(loadInst, targetType, nameStr + ".temp.l", insertBefore);
+    }
+    else {
+        assert(false && "type should be IntegerTy or PointerTy");
+    }
+
+    //Replace the original usage to the new one.
+    target.set(typeConv);
+}
+
+void RegisterSpillPass::insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore) {
+
+    StringRef nameStr = storeVal->getName();
+
+    //Create an appropriate type conversing instruction to i64
+    Value* typeConv;
+    Type* targetType = storeVal->getType();
+
+    LLVMContext& Context = M->getContext();
+    Type* i64Ty = Type::getInt64Ty(Context);
+    if(targetType == i64Ty) {
+        //no type conversion instruction should be created.
+        typeConv = storeVal;
+    }
+    else if(targetType->isIntegerTy()) {
+        //zext instructions zero-extend smaller integers to i64.
+        typeConv = new ZExtInst(storeVal, i64Ty, nameStr+".temp.s", insertBefore);
+    }
+    else if(targetType->isPointerTy()) {
+        //ptrtoint instructions convert pointer to i64.
+        typeConv = new PtrToIntInst(storeVal, i64Ty, nameStr+".temp.s", insertBefore);
+    }
+    else {
+        assert(false && "type should be IntegerTy or PointerTy");
+    }
+
+    //Create storeInst to store the value in appropriate alloca inst.
+    StoreInst* storeinst = new StoreInst(typeConv, storeAt, insertBefore);
 }
 
 }
