@@ -71,7 +71,7 @@ TEST_F(RegisterSpillTest, Test1) {
     RegisterSpillPass pass;
     pass.run(*M, MAM);
 
-    //M->print(outs(), nullptr);
+    M->print(outs(), nullptr);
 
     RG = RegisterGraph(*M);
     for(Function& F : *M) {
@@ -117,7 +117,7 @@ TEST_F(RegisterSpillTest, Test2) {
     RegisterSpillPass pass;
     pass.run(*M, MAM);
 
-    //M->print(outs(), nullptr);
+    M->print(outs(), nullptr);
 
     RG = RegisterGraph(*M);
     for(Function& F : *M) {
@@ -163,7 +163,7 @@ TEST_F(RegisterSpillTest, Test3) {
     RegisterSpillPass pass;
     pass.run(*M, MAM);
 
-    //M->print(outs(), nullptr);
+    M->print(outs(), nullptr);
 
     RG = RegisterGraph(*M);
     for(Function& F : *M) {
