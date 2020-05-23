@@ -85,7 +85,7 @@ private:
   //Pre-order traverses through the function's basic blocks.
   //In this way, if a BB has a single predecessor, the register state is already calculated.
   //Spills the registers by adding store and load instructions.
-  void spillRegister(unsigned, const vector<bool>&, const vector<AllocaInst*>&, set<BasicBlock*>, BasicBlock&);
+  void spillRegister(unsigned, const vector<bool>&, const vector<AllocaInst*>&, BasicBlock&);
 
   //Finds the most suitable color to discard from register memory.
   //Looks forward within the BB(scope), and finds the latest-used color and discard.

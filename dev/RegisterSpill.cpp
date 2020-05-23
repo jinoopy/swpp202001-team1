@@ -119,8 +119,7 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
                 spillAlloca[c] = allocC;
             }
         }
-        set<BasicBlock*> isVisited;
-        spillRegister(numBuffer, isSpilled, spillAlloca, isVisited, entryBlock);
+        spillRegister(numBuffer, isSpilled, spillAlloca, entryBlock);
 
         tRG = RegisterGraph(M);
         this->RG = &tRG;
@@ -155,12 +154,8 @@ bool RegisterSpillPass::spilledEnough(unsigned numBuffer, vector<bool> isSpilled
     return true;
 }
 
-void RegisterSpillPass::spillRegister(unsigned numBuffer, const vector<bool>& isSpilled, const vector<AllocaInst*>& spillAlloca, set<BasicBlock*> isVisited, BasicBlock& BB)
+void RegisterSpillPass::spillRegister(unsigned numBuffer, const vector<bool>& isSpilled, const vector<AllocaInst*>& spillAlloca, BasicBlock& BB)
 {
-
-    if(isVisited.find(&BB)!=isVisited.end()) return;
-    isVisited.insert(&BB);
-
     for(Instruction& I : BB) {
         //for phi nodes,
         if(isa<PHINode>(I)) {
@@ -202,9 +197,6 @@ void RegisterSpillPass::spillRegister(unsigned numBuffer, const vector<bool>& is
                 insertStore(&I, spillAlloca[IColor], I.getNextNode());
             }
         }
-    }
-    for(auto it = succ_begin(&BB); it != succ_end(&BB); ++it) {
-        spillRegister(numBuffer, isSpilled, spillAlloca, isVisited, **it);
     }
 }
 
