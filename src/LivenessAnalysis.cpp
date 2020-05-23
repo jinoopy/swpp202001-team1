@@ -310,15 +310,11 @@ void RegisterGraph::coallocateIfPossible() {
     for(Function& F : *M) {
         for(auto it = inst_begin(&F); it!=inst_end(&F); ++it) {
             Instruction& I = *it;
-            if(!I.hasOneUse()) continue;
-            if(DO_NOT_CONSIDER.find(I.getOpcode()) != DO_NOT_CONSIDER.end()) continue;
-            if(findValue(&I) == -1) continue;
+            if(!I.hasOneUse() || findValue(&I) == -1) continue;
 
             //Fetch the only user which follows right after.
             Instruction* user = dyn_cast<Instruction>(I.use_begin()->getUser());
-            if(I.getNextNode() != user) continue;
-            if(SAME_CONSIDER.find(user->getOpcode()) == SAME_CONSIDER.end()) continue;
-            if(findValue(user) == -1) continue;
+            if(I.getNextNode() != user || SAME_CONSIDER.find(user->getOpcode()) == SAME_CONSIDER.end() || findValue(user) == -1) continue;
 
             valueToColor[I.getFunction()][&I] = valueToColor[I.getFunction()][user];
         }

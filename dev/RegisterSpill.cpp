@@ -119,7 +119,9 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
                 spillAlloca[c] = allocC;
             }
         }
-        spillRegister(numBuffer, isSpilled, spillAlloca, entryBlock);
+        for(BasicBlock& BB : F) {
+            spillRegister(numBuffer, isSpilled, spillAlloca, BB);
+        }
 
         tRG = RegisterGraph(M);
         this->RG = &tRG;

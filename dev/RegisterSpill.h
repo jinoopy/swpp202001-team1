@@ -75,6 +75,7 @@ public:
 
   //Finds the registers that need to be spilled
   //and actually spills them by adding alloca, store, and load.
+  //Requirement: MUST execute Dead Store Elimination & GVN after running this.
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
 
 private:
