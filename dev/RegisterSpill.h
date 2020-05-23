@@ -64,7 +64,7 @@ class RegisterSpillPass : public PassInfoMixin<RegisterSpillPass>
   //Module which this analysis runs.
   Module* M;
   //Register graph for the module.
-  RegisterGraph RG;
+  RegisterGraph* RG;
 
 public:
 
@@ -80,16 +80,16 @@ public:
 private:
 
   //Searches through all functions and check if the spilling is enough.
-  bool spilledEnough(unsigned, vector<bool>, Function*, RegisterGraph&);
+  bool spilledEnough(unsigned, vector<bool>, Function*);
 
   //Pre-order traverses through the function's basic blocks.
   //In this way, if a BB has a single predecessor, the register state is already calculated.
   //Spills the registers by adding store and load instructions.
-  void spillRegister(const vector<bool>&, const vector<AllocaInst*>&, map<BasicBlock*, vector<bool>>&, BasicBlock&);
+  void spillRegister(unsigned, const vector<bool>&, const vector<AllocaInst*>&, set<BasicBlock*>, BasicBlock&);
 
   //Finds the most suitable color to discard from register memory.
   //Looks forward within the BB(scope), and finds the latest-used color and discard.
-  unsigned findReplaced(Instruction* searchFrom, vector<bool> live, vector<bool> isSpilled, BasicBlock& scope);
+  unsigned findReplaced(unsigned, Instruction*, vector<bool>, vector<bool>, BasicBlock&);
 
   //Inserts the load instruction and corresponding type conversions.
   // %temp0 = load %loadFrom

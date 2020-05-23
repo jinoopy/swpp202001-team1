@@ -38,6 +38,8 @@ public:
   auto& getValues() {return values;}
   auto& getValues(Function* F) {return valuesInFunction[F];}
 
+  unsigned findValue(Value* V);
+
   auto& getAdjList() {return adjList;}
   auto& getAdjList(Value* v) {return adjList[v];}
 
@@ -118,6 +120,10 @@ private:
   //helper function for ColorGraph()
   //colors the graph greedily(adjList always represents a chordal graph)
   map<Value *, unsigned int> GreedyColoring(vector<Value *> &, unsigned int&);
+  //helper function for ColorGraph()
+  //tries to coallocate insts. in SAME_CONSIDER if possible
+  //If a value's only single use is SAME_CONSIDER right after it, coallocate.
+  void coallocateIfPossible();
 
   //Makes colorToValue so easily retrieve all values with same color
   void InverseColorMap();

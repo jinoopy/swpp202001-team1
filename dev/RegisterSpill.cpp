@@ -70,25 +70,30 @@ unsigned SpillCostAnalysis::countLoopTripCount(Instruction* I, ScalarEvolution& 
 PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
 {
     this->M = &M;
-    this->RG = RegisterGraph(M);
+    RegisterGraph tRG(M);
+    this->RG = &tRG;
     auto SpillCostResult = SpillCostAnalysis().run(M, MAM);
 
     for(Function& F : M) {
         if(F.isDeclaration()) continue;
 
-        unsigned numColor = RG.getNumColors(&F);
-        vector<float> spillCost = SpillCostResult[&F];
+        //If spill not needed, do nothing for the function.
+        unsigned numColor = RG->getNumColors(&F);
+        if(numColor <= REGISTER_CAP) continue;
 
+        vector<float> spillCost = SpillCostResult[&F];
+        
         //sort spillOrder while finding the Need-To-Be-Spilled set
 
         //total spilled registers
         unsigned spillCount;
         //isSpilled[c] = true if c should be spilled
-        vector<bool> isSpilled(RG.getNumColors(&F), false);
+        vector<bool> isSpilled(RG->getNumColors(&F), false);
+        int numBuffer;
         for(spillCount = 0; spillCount <= numColor; spillCount++) {
             //numBuffer: # of leftover registers after assigning constantly-loaded colors
-            int numBuffer = REGISTER_CAP-numColor+spillCount;
-            if(numBuffer >= 1 && spilledEnough(numBuffer, isSpilled, &F, RG)) {
+            numBuffer = REGISTER_CAP-numColor+spillCount;
+            if(numBuffer >= 1 && spilledEnough(numBuffer, isSpilled, &F)) {
                 break;
             }
 
@@ -103,6 +108,7 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
             }
             isSpilled[minColor] = true;
         }
+        assert(numBuffer>0);
 
         //Create alloca instructions to spill colored IR registers
         BasicBlock& entryBlock = F.getEntryBlock();
@@ -113,19 +119,17 @@ PreservedAnalyses RegisterSpillPass::run(Module& M, ModuleAnalysisManager& MAM)
                 spillAlloca[c] = allocC;
             }
         }
+        set<BasicBlock*> isVisited;
+        spillRegister(numBuffer, isSpilled, spillAlloca, isVisited, entryBlock);
 
-        map<BasicBlock*, vector<bool>> finalRegState;
-        spillRegister(isSpilled, spillAlloca, finalRegState, entryBlock);
-
-        //update the RegisterGraph and check if spilling is complete.
-        this->RG = RegisterGraph(M);
-        assert(RG.getNumColors(&F) <= REGISTER_CAP && "needed registers should decrease under CAP after spilling");
+        tRG = RegisterGraph(M);
+        this->RG = &tRG;
     }
 
     return PreservedAnalyses::all();
 }
 
-bool RegisterSpillPass::spilledEnough(unsigned numBuffer, vector<bool> isSpilled, Function* F, RegisterGraph& RG) {
+bool RegisterSpillPass::spilledEnough(unsigned numBuffer, vector<bool> isSpilled, Function* F) {
 
     for(auto it = inst_begin(F); it != inst_end(F); ++it) {
         Instruction& I = *it;
@@ -135,9 +139,9 @@ bool RegisterSpillPass::spilledEnough(unsigned numBuffer, vector<bool> isSpilled
             Value* operand = use.get();
 
             //If operand is not to be colored nor spilled, do nothing
-            if(find(RG.getValues(F), operand) == RG.getValues(F).end()) continue;
+            if(RG->findValue(operand) == -1) continue;
 
-            if(isSpilled[RG.getValueToColor(F, operand)]) {
+            if(isSpilled[RG->getValueToColor(F, operand)]) {
                 memCount++;
             }
             else {
@@ -151,120 +155,68 @@ bool RegisterSpillPass::spilledEnough(unsigned numBuffer, vector<bool> isSpilled
     return true;
 }
 
-void RegisterSpillPass::spillRegister(const vector<bool>& isSpilled, const vector<AllocaInst*>& spillAlloca, map<BasicBlock*, vector<bool>>& finalRegState, BasicBlock& BB)
+void RegisterSpillPass::spillRegister(unsigned numBuffer, const vector<bool>& isSpilled, const vector<AllocaInst*>& spillAlloca, set<BasicBlock*> isVisited, BasicBlock& BB)
 {
-    //if visited before, stop recursion.
-    if(finalRegState.find(&BB) != finalRegState.end()) return;
 
-    //Register File-loaded registers are marked as true.
-    vector<bool> live(isSpilled.size());
-    //If only predecessor, we assume that the liveness is preserved from the parent.
-    if(pred_size(&BB) == 1) {
-        assert(finalRegState.find(BB.getUniquePredecessor()) != finalRegState.end() && "If a predecessor of BB is unique, the ending state should be calculated");
-        live = finalRegState[BB.getUniquePredecessor()];
-    }
-    //Else, for safety, we assume that every color is discarded.
-    else {
-        for(int i = 0; i < isSpilled.size(); i++) {
-            live[i] = !isSpilled[i];
-        }
-    }
+    if(isVisited.find(&BB)!=isVisited.end()) return;
+    isVisited.insert(&BB);
 
     for(Instruction& I : BB) {
-
         //for phi nodes,
         if(isa<PHINode>(I)) {
-            PHINode& phi = dyn_cast<PHINode>(I);
+            PHINode& phi = *(dyn_cast<PHINode>(&I));
             for(unsigned i = 0; i < phi.getNumIncomingValues(); i++) {
                 BasicBlock* phiBB = phi.getIncomingBlock(i);
                 Value* phiV = phi.getIncomingValue(i);
 
                 //if operand has no color, skip.
-                if(find(RG.getValues().begin(), RG.getValues().end(), phiV) == RG.getValues().end()) continue;
-
-                unsigned opColor = RG.getValueToColor(BB.getParent())[phiV];
-                if(!live[opColor] && isSpilled[opColor]) {
-                    //modify the list of loaded registers.
-                    unsigned replacedColor = findReplaced(&I, live, isSpilled, BB);
-                    live[opColor] = true;
-                    live[replacedColor] = false;
+                if(RG->findValue(phiV) == -1) continue;
+                unsigned opColor = RG->getValueToColor(BB.getParent())[phiV];
+                if(isSpilled[opColor]) {
                     //insert the apparent load instruction and its supplementary ops(type casting)
                     insertLoad(phi.getOperandUse(PHINode::getOperandNumForIncomingValue(i)), spillAlloca[opColor], phiBB->getTerminator());
                 }
             }
         }
-        //for conventional instructions,
+        //for other instructions,
         else {
             //check if I's operands are loaded on the register.
             for(auto& use : I.operands()) {
-                Value* operand = use.getUser();
+                Value* operand = use.get();
                 //if operand has no color, skip.
-                if(find(RG.getValues().begin(), RG.getValues().end(), operand) == RG.getValues().end()) continue;
+                if(RG->findValue(operand) == -1) continue;
 
                 //if the color is not loaded on register,
-                unsigned opColor = RG.getValueToColor(BB.getParent())[operand];
-                if(!live[opColor] && isSpilled[opColor]) {
-                    //modify the list of loaded registers.
-                    unsigned replacedColor = findReplaced(&I, live, isSpilled, BB);
-                    live[opColor] = true;
-                    live[replacedColor] = false;
+                unsigned opColor = RG->getValueToColor(BB.getParent())[operand];
+                if(isSpilled[opColor]) {
                     //insert the apparent load instruction and its supplementary ops(type casting)
                     insertLoad(use, spillAlloca[opColor], &I);
                 }
             }
         }
-
-        //if I has a color,
-        if(find(RG.getValues().begin(), RG.getValues().end(), &I) != RG.getValues().end()) {
-            //modify the list of loaded registers
-            unsigned replacedColor = findReplaced(I.getNextNode(), live, isSpilled, BB);
-            live[RG.getValueToColor(BB.getParent())[&I]] = true;
-            live[replacedColor] = false;
-            //store the result to the apparent alloca'd memory.
-            unsigned IColor = RG.getValueToColor(BB.getParent())[&I];
-            insertStore(&I, spillAlloca[IColor], I.getNextNode());
+        //if I has a spilled color,
+        if(RG->findValue(&I) != -1) {
+            unsigned IColor = RG->getValueToColor(BB.getParent())[&I];
+            if(isSpilled[IColor]) {
+                //store the result to the apparent alloca'd memory.
+                insertStore(&I, spillAlloca[IColor], I.getNextNode());
+            }
         }
     }
-
-    finalRegState[&BB] = live;
-
-    for(auto it = pred_begin(&BB); it != pred_end(&BB); ++it) {
-        spillRegister(isSpilled, spillAlloca, finalRegState, **it);
+    for(auto it = succ_begin(&BB); it != succ_end(&BB); ++it) {
+        spillRegister(numBuffer, isSpilled, spillAlloca, isVisited, **it);
     }
-}
-
-unsigned RegisterSpillPass::findReplaced(Instruction* searchFrom, vector<bool> live, vector<bool> isSpilled, BasicBlock& scope) {
-    //sets that remembers 1. live, 2. spilled, 3. yet unused register color.
-    //if this set's size become 1, the last one standing should be replaced from the register file.
-    //else, if multiple candidates are left, return anything(UB).
-    set<unsigned> candidates;
-    for(int c = 0; c < live.size(); c++) {
-        if(live[c] && isSpilled[c]) candidates.insert(c);
-    }
-    if(candidates.size() == 1) return *candidates.begin();
-
-    for(Instruction* i = searchFrom; i != scope.getTerminator(); i = i->getNextNode()) {
-        for(auto operand : i->operand_values()) {
-            //if operand is not colored, skip.
-            if(find(RG.getValues().begin(), RG.getValues().end(), operand) == RG.getValues().end()) continue;
-
-            unsigned opColor = RG.getValueToColor(i->getFunction(), operand);
-            candidates.erase(opColor);
-            if(candidates.size() == 1) return *candidates.begin();
-        }
-    }
-    return *candidates.begin();
 }
 
 void RegisterSpillPass::insertLoad(Use& target, AllocaInst* loadFrom, Instruction* insertBefore) {
-    StringRef nameStr = target.getUser()->getName();
-
+    StringRef nameStr = target.get()->getName();
+    
     //Loads from the 'loadFrom' pointer, which stores equally colored value.
     LoadInst* loadInst = new LoadInst(loadFrom, nameStr+".temp.l", insertBefore);
 
     //Create an appropriate type conversing instruction(inttoptr, trunc, ...)
     Value* typeConv;
-    Type* targetType = target.getUser()->getType();
+    Type* targetType = target.get()->getType();
     
     LLVMContext& Context = M->getContext();
     if(targetType == Type::getInt64Ty(Context)) {
@@ -288,7 +240,6 @@ void RegisterSpillPass::insertLoad(Use& target, AllocaInst* loadFrom, Instructio
 }
 
 void RegisterSpillPass::insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore) {
-
     StringRef nameStr = storeVal->getName();
 
     //Create an appropriate type conversing instruction to i64
