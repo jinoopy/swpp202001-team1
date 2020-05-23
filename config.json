@@ -15,7 +15,7 @@
         }
     },
     "preset-passes": {
-        "basic-optim": "-mem2reg, -icsccp",
+        "basic-optim": "-mem2reg -ipsccp",
         "inst-optim": "-reassociate -instcombine -scce -deadargelim -deadstoreelim -adce",
         "loop-vectorize": "-loop-simplify -loop-rotate -lcssa -indvars -loop-unroll -gvn -load lib/libVLS.so -simplifycfg",
         "loop-optim-1": "-loop-simplify -loop-rotate -lcssa -licm -loop-unswitch"
