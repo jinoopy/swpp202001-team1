@@ -107,7 +107,7 @@ def opt(config):
     mode = int(input())
     passes = ""
     if mode != 0 :
-        passes = config["preset-passes"][presets[i]]
+        passes = config["preset-passes"][presets[mode]]
     else:
         print("Enter custom sequences of passes")
         print("Example: -mem2reg -simplifycfg -load XXX.so")
