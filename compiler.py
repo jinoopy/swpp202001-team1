@@ -20,7 +20,7 @@ def updateConfig(config):
     print("Which config would you edit?")
     print("1. LLVM/bin directory")
     print("2. List of all passes")
-    mode = int(input())
+    mode = int(input("> "))
 
     #update configuration
     if mode == 1 :
@@ -33,7 +33,7 @@ def updateConfig(config):
                 if os.path.isdir(path) == True:
                     break
                 print("Failed: wrong path (" + path + ")")
-                path = input()
+                path = input("> ")
         config["llvm-bin-dir"] = path
         writeConfig(config)
 
