@@ -11,23 +11,26 @@ namespace optim
 
         for(auto &f : M.functions())
         {
-            if(f.getName() == "malloc") continue;
             outs() << "Start Function Loop : " << f.getName() << "\n";
+            if(f.isDeclaration()) continue;
             auto &entryBB = f.getEntryBlock();
-            for(auto I = entryBB.begin(); I != entryBB.end(); I++)
+            for(auto I = entryBB.begin(), E = entryBB.end(); I != E; I++)
             {
                 auto cI = dyn_cast<CallInst>(I);
-                outs() << "CallInst Found ! : " << cI->getCalledFunction()->getName() << "\n";
                 if(cI && cI->getCalledFunction()->getName() == "malloc")
                 {
                     outs() << "Start CheckCondition : " << cI->getName() << "\n";
                     if(CheckCondition(f, cI))
                     {
-                        AllocaInst *alloca = ReplaceWithAlloca(cI, numOfChange);
+                        AllocaInst *alloc = ReplaceWithAlloca(cI, numOfChange);
+                        numOfChange++;
+                        I = entryBB.begin();
+                        E = entryBB.end();
                     }
                 }
             }
         }
+        outs() << "end..\n";
         return PreservedAnalyses::all();
     }
 //  1. The size of malloc is constant
@@ -43,33 +46,43 @@ namespace optim
     {
         // condition 1
         if(!isa<ConstantInt>((malloc)->getArgOperand(0))) return false;
-        outs() << "CheckCondition : " << malloc->getName() << " : isConstant " << isa<ConstantInt>((malloc)->getArgOperand(0)) <<"\n";
+        outs() << malloc->getName() << " - condition1 ok\n";
         // condition 2
         ConstantInt *const_size = dyn_cast<ConstantInt>(malloc->getArgOperand(0));
         auto malloc_size = const_size->getSExtValue(); // get the size of malloc
         Instruction *real_malloc = malloc; // if bitcast instruction is used to cast the malloc variable, change our object to bitcast instruction.
-        for(auto &BB : f)
+        for(auto &u : real_malloc->uses())
         {
-            for(auto I = BB.begin(); I != BB.end(); I++)
+            auto *I = dyn_cast<Instruction>(u.getUser());
+            auto *bitCast = dyn_cast<BitCastInst>(I);
+            if(bitCast && bitCast->getOperand(0) == malloc)
             {
-                auto *bitCast = dyn_cast<BitCastInst>(&*I);
-                if(bitCast && bitCast->getOperand(0) == malloc)
-                {
-                    real_malloc = bitCast; // change from call instruction(malloc) to bitcast instruction
-                    int cast_size_bit = GetPointerSize(bitCast->getType()->getPointerTo());
-                    if(malloc_size * 8 != cast_size_bit) return false;  // If malloc size is an array, don't change it to alloca
-                }
-                // condition 3
-                auto *returnInst = dyn_cast<ReturnInst>(&*I);
-                if(returnInst && returnInst->getOperand(0) == malloc) return false;
+                real_malloc = bitCast; // change from call instruction(malloc) to bitcast instruction
+                int cast_size_bit = GetPointerSize(bitCast->getType());
+                if(malloc_size * 8 != cast_size_bit) return false;  // If malloc size is an array, don't change it to alloca
+                outs() << malloc->getName() << " - condition2 ok\n";
             }
+            // condition 3
+            auto *returnInst = dyn_cast<ReturnInst>(I);
+            if(returnInst && returnInst->getOperand(0) == malloc) return false;
         }
-
+        outs() << malloc->getName() << " - condition3 ok\n";
+        
         // condition 4
-        return IsStoredInFunction(f, real_malloc, -1);
+        if(IsStoredInFunction(f, real_malloc, -1))
+        {
+            outs() << malloc->getName() << " - last condition ok\n";
+            return true;
+        }
+        else
+        {
+            outs() << malloc->getName() << " - last condition x\n";
+            return false;
+        }
+        
     }
 
-    bool HeapToStackPass::IsStoredInFunction(Function &f, Instruction *mallocInst, int64_t argNum)
+    bool HeapToStackPass::IsStoredInFunction(Function &f, Instruction *mallocInst, int argNum)
     {
         // get the malloc value from the current function.
         Value *malloc = nullptr;
@@ -100,23 +113,34 @@ namespace optim
                 {
                     if(dyn_cast<Value>(Arg) == malloc)
                     {
-                        if(!IsStoredInFunction(*(cI->getFunction()), nullptr, argNum)) return false;
+                        if(!IsStoredInFunction(*(cI->getCalledFunction()), nullptr, argNum)) return false;
                     }
                 }
             }
         }
         return true;
     }
-
+//  This function replace malloc instruction & bitcast instruction with new alloca instruction set to original conditions.
     AllocaInst* HeapToStackPass::ReplaceWithAlloca(CallInst *malloc, int num)
     {
-        outs() << "Replace With Alloca : " << malloc->getName() << " Type : " << malloc->getType() << "\n";
-        IRBuilder<> builder(malloc);
+        outs() << "Replace alloca function start\n";
+        Instruction *real_malloc = malloc;
+        for(auto &use : malloc->uses())
+        {
+            auto *bitCast = dyn_cast<BitCastInst>(use.getUser());
+            if(bitCast && bitCast->getOperand(0) == malloc) real_malloc = bitCast;
+        }
         auto &context = malloc->getFunction()->getContext();
-        AllocaInst *alloca = builder.CreateAlloca(malloc->getType(), nullptr, malloc->getName() + "_" + std::to_string(num));
-        outs() << "alloca Type : " << alloca->getType() << "\n";
-        malloc->replaceAllUsesWith(alloca);
-        malloc->eraseFromParent();
-        return alloca;
+        IRBuilder<> builder(malloc);
+        AllocaInst *alloc = builder.CreateAlloca(dyn_cast<PointerType>(real_malloc->getType())->getElementType(), nullptr, "alloca_" + malloc->getName());
+        real_malloc->replaceAllUsesWith(alloc);
+        outs() << "replaceAllUsesWith ok\n";
+        if(real_malloc == malloc) malloc->eraseFromParent();
+        else
+        {
+            real_malloc->eraseFromParent();
+            malloc->eraseFromParent();
+        }
+        return alloc;
     }
 }

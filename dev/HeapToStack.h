@@ -37,11 +37,12 @@ public:
   // And if the variable is used to call some functions as argument, check the function too by calling this fucntion recursively
   // If this function is called initially, malloc value is call instruction 
   // but if not, it would be an argument in function. So we should know the number of arg.
-  bool IsStoredInFunction(Function &f, Instruction *mallocInst, int64_t argNum);
+  bool IsStoredInFunction(Function &f, Instruction *mallocInst, int argNum);
 
-  int GetPointerSize(PointerType *ptrType)
+  int GetPointerSize(Type *type)
   {
-    return ptrType->getScalarSizeInBits();
+    auto *ptrType = dyn_cast<PointerType>(type);
+    return ptrType->getElementType()->getScalarSizeInBits();
   }
 };
 
