@@ -3,21 +3,21 @@
     "opt-pass": {
         "vectorize": {
             "src": "VectorizeLoadStore.cpp",
-            "lib": "libVLS.so"
+            "lib": "libVLS"
         },
         "malloc2gv": {
             "src": "MallocToGV.cpp",
-            "lib": "libMTGV.so"
+            "lib": "libMTGV"
         },
         "gv2malloc": {
             "src": "GVToMalloc.cpp",
-            "lib": "libGVTM.so"
+            "lib": "libGVTM"
         }
     },
     "preset-passes": {
-        "basic-optim": "-mem2reg -ipsccp",
-        "inst-optim": "-reassociate -instcombine -scce -deadargelim -deadstoreelim -adce",
-        "loop-vectorize": "-loop-simplify -loop-rotate -lcssa -indvars -loop-unroll -gvn -load lib/libVLS.so -simplifycfg",
-        "loop-optim-1": "-loop-simplify -loop-rotate -lcssa -licm -loop-unswitch"
+        "basic-optim": ["-mem2reg", "-ipsccp"],
+        "inst-optim": ["-reassociate", "-instcombine", "-sccp", "--deadargelim", "-dse", "-adce"],
+        "loop-vectorize": ["-loop-simplify", "-loop-rotate", "-lcssa", "-indvars", "-loop-unroll", "-gvn", "VLS", "-simplifycfg"],
+        "loop-optim-1": ["-loop-simplify", "-loop-rotate", "-lcssa", "-licm", "-loop-unswitch"]
     }
 }
