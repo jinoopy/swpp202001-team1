@@ -5,6 +5,7 @@
 <b> NOT_IMPLEMENTED </b>
 
 `python3 compiler.py (input file .ll)`
+`python3 compiler.py (input file .ll) (llvm/bin directory)`
 
 emits the result in .s format of our target machine.
 
