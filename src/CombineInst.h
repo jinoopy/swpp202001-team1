@@ -24,8 +24,6 @@ class CombineInstPass : public PassInfoMixin<CombineInstPass> {
 public:
     PreservedAnalyses run(Module &, ModuleAnalysisManager &);
 
-private:
-
 };
 
 extern "C" ::llvm::PassPluginLibraryInfo
