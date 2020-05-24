@@ -175,17 +175,19 @@ else:
         sys.exit()
     
     #if llvm bin dir is given, check if exists and update config
+    config = readConfig()
     if len(sys.argv) == 3:
-        config = readConfig()
         path = sys.argv[2]
-        temp = path
-        if path[0] == '~':
-            path = os.path.expanduser('~') + path[1:]
-        if not os.path.isdir(path):
-            print("WRONG INPUT: wrong llvm/bin directory")
-            sys.exit()
-        config["llvm-bin-dir"] = temp
-        writeConfig(config)
+    else:
+        path = config["llvm-bin-dir"]
+    temp = path
+    if path[0] == '~':
+        path = os.path.expanduser('~') + path[1:]
+    if not os.path.isdir(path):
+        print("WRONG INPUT: wrong llvm/bin directory")
+        sys.exit()
+    config["llvm-bin-dir"] = temp
+    writeConfig(config)
     
     #run the compiler
     regex = re.compile(r"[\d\w_/.]+\.ll")
