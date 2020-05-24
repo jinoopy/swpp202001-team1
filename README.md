@@ -2,7 +2,8 @@
 
 ## How to use
 
-NOT_IMPLEMENTED
+<b> NOT_IMPLEMENTED </b>
+
 `python3 compiler.py (input file .ll)`
 
 emits the result in .s format of our target machine.
@@ -13,14 +14,14 @@ enters the dev mode, which we can load custom passes.
 
 ## About config.json
 
-You may change settings of config.json.
+You may change settings of config.json. This file will be hidden in further commits.
 
 `"llvm-bin-dir": "...."`
 
-Value of this field should be the llvm bin directory, i.e. llvmscript/llvm-10.0-release/bin.
+Value of this field should be the llvm bin directory, i.e. `llvmscript/llvm-10.0-release/bin.`
 
-`"opt-pass": ....
-`
+`"opt-pass": ....`
+
 This field is recommended to fix with `-dev` mode. Do not touch if necessary.
 
 `"preset-passes": ....`
