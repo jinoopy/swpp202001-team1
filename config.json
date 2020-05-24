@@ -19,5 +19,9 @@
         "inst-optim": ["-reassociate", "-instcombine", "-sccp", "--deadargelim", "-dse", "-adce"],
         "loop-vectorize": ["-loop-simplify", "-loop-rotate", "-lcssa", "-indvars", "-loop-unroll", "-gvn", "VLS", "-simplifycfg"],
         "loop-optim-1": ["-loop-simplify", "-loop-rotate", "-lcssa", "-licm", "-loop-unswitch"]
+    },
+    "run": {
+        "opt": [],
+        "backend": ""
     }
 }

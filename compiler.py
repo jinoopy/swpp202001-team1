@@ -3,7 +3,7 @@ import os
 import subprocess
 import re
 import platform
-
+import sys
 
 def readConfig():
     with open("config.json", "r") as configJSON:
@@ -128,33 +128,55 @@ def opt(config):
     print("Complete!")
 
 #def backend()
-
-#################################################
-
 HELP = r'''
 ==============================
-TEAM 1 COMPILER
+TEAM 1 COMPILER : DEV mode
 ==============================
-How the compiler.py works
 0. Do nothing
 1. Update&Rewrite config.json
-2. Build all .cpp files
+2. Build all src/XXX.cpp files
 3. Run clang/opt with existing/custom passes
 4. Run the backend(unimplemented)
 ==============================
 '''
-while True:
-    print(HELP, end = "")
-    mode = int(input("Enter the mode number(1~4).\n> "))
-    config = readConfig()
-    print("==============================")
-    if mode == 1:
-        updateConfig(config)
-    elif mode == 2:
-        build(config)
-    elif mode == 3:
-        opt(config)
-    elif mode == 4:
-        print("backend() not implemented")
-    else:
-        break
+def DEV():
+    
+    while True:
+        print(HELP, end = "")
+        mode = -1
+        while not 0 <= mode <= 4:
+            mode = int(input("Enter the mode number(1~4).\n> "))
+        config = readConfig()
+        print("==============================")
+        if mode == 1:
+            updateConfig(config)
+        elif mode == 2:
+            build(config)
+        elif mode == 3:
+            opt(config)
+        elif mode == 4:
+            print("backend() not implemented")
+        else:
+            break
+    
+
+#################################################
+
+# MAIN()
+
+if len(sys.argv) != 2:
+    print("<WRONG INPUT>")
+    print("ex) python3 compiler.py input.ll")
+    print("ex) (dev mode) python compiler.py -dev")
+    sys.exit()
+if "-dev" in sys.argv:
+    DEV()
+else:
+    inputIR = sys.argv[1]
+    regex = re.compile(r"[\d\w_/.]+\.ll")
+    if not re.fullmatch(inputIR):
+        print("WRONG INPUT")
+        print("ex) python3 compiler.py input.ll")
+        sys.exit()
+    #TODO
+    #RUN(inputIR)
