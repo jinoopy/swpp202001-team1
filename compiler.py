@@ -164,19 +164,32 @@ def DEV():
 
 # MAIN()
 
-if len(sys.argv) != 2:
-    print("<WRONG INPUT>")
-    print("ex) python3 compiler.py input.ll")
-    print("ex) (dev mode) python compiler.py -dev")
-    sys.exit()
-if "-dev" in sys.argv:
+if "-dev" in sys.argv and len(sys.argv) == 2:
     DEV()
 else:
-    inputIR = sys.argv[1]
-    regex = re.compile(r"[\d\w_/.]+\.ll")
-    if not re.fullmatch(inputIR):
+    #if wrong arg count, raise error
+    if not len(sys.argv) in [2, 3]:
         print("WRONG INPUT")
         print("ex) python3 compiler.py input.ll")
+        print("ex) python3 compiler.py ~/llvmscript/llvm/bin")
         sys.exit()
+    
+    #if llvm bin dir is given, check if exists and update config
+    if len(sys.argv) == 3:
+        config = readConfig()
+        path = sys.argv[2]
+        if path[0] == '~':
+            path = os.path.expanduser('~') + path[1:]
+        if not re.fullmatch(inputIR) or not os.path.isdir(path):
+            print("WRONG INPUT")
+            print("ex) python3 compiler.py input.ll")
+            print("ex) python3 compiler.py ~/llvmscript/llvm/bin")
+            sys.exit()
+        config["llvm-bin-dir"] = path
+        writeConfig(config)
+    
+    #run the compiler
+    regex = re.compile(r"[\d\w_/.]+\.ll")
+    inputIR = sys.argv[1]
     #TODO
     #RUN(inputIR)
