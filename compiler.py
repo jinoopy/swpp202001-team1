@@ -171,25 +171,26 @@ else:
     if not len(sys.argv) in [2, 3]:
         print("WRONG INPUT")
         print("ex) python3 compiler.py input.ll")
-        print("ex) python3 compiler.py ~/llvmscript/llvm/bin")
+        print("ex) python3 compiler.py input.ll ~/llvmscript/llvm/bin")
         sys.exit()
     
     #if llvm bin dir is given, check if exists and update config
     if len(sys.argv) == 3:
         config = readConfig()
         path = sys.argv[2]
+        temp = path
         if path[0] == '~':
             path = os.path.expanduser('~') + path[1:]
-        if not re.fullmatch(inputIR) or not os.path.isdir(path):
-            print("WRONG INPUT")
-            print("ex) python3 compiler.py input.ll")
-            print("ex) python3 compiler.py ~/llvmscript/llvm/bin")
+        if not os.path.isdir(path):
+            print("WRONG INPUT: wrong llvm/bin directory")
             sys.exit()
-        config["llvm-bin-dir"] = path
+        config["llvm-bin-dir"] = temp
         writeConfig(config)
     
     #run the compiler
     regex = re.compile(r"[\d\w_/.]+\.ll")
     inputIR = sys.argv[1]
+    if not re.fullmatch(regex, inputIR):
+        print("WRONG INPUT: wrong filename")
     #TODO
     #RUN(inputIR)

@@ -1,5 +1,5 @@
 {
-    "llvm-bin-dir": "~/llvmscript/llvm-10.0-releaseassert/bin",
+    "llvm-bin-dir": "/home/jinulee/llvmscript/llvm-10.0-release/bin",
     "opt-pass": {
         "vectorize": {
             "src": "VectorizeLoadStore.cpp",
@@ -15,10 +15,35 @@
         }
     },
     "preset-passes": {
-        "basic-optim": ["-mem2reg", "-ipsccp"],
-        "inst-optim": ["-reassociate", "-instcombine", "-sccp", "--deadargelim", "-dse", "-adce"],
-        "loop-vectorize": ["-loop-simplify", "-loop-rotate", "-lcssa", "-indvars", "-loop-unroll", "-gvn", "VLS", "-simplifycfg"],
-        "loop-optim-1": ["-loop-simplify", "-loop-rotate", "-lcssa", "-licm", "-loop-unswitch"]
+        "basic-optim": [
+            "-mem2reg",
+            "-ipsccp"
+        ],
+        "inst-optim": [
+            "-reassociate",
+            "-instcombine",
+            "-sccp",
+            "--deadargelim",
+            "-dse",
+            "-adce"
+        ],
+        "loop-vectorize": [
+            "-loop-simplify",
+            "-loop-rotate",
+            "-lcssa",
+            "-indvars",
+            "-loop-unroll",
+            "-gvn",
+            "VLS",
+            "-simplifycfg"
+        ],
+        "loop-optim-1": [
+            "-loop-simplify",
+            "-loop-rotate",
+            "-lcssa",
+            "-licm",
+            "-loop-unswitch"
+        ]
     },
     "run": {
         "opt": [],
