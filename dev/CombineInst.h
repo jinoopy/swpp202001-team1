@@ -1,3 +1,8 @@
+/*
+    CombineInstPass
+    본 pass는 InstCombinePass 직후에 실행되아야 함. (-instcombine)
+*/
+
 #ifndef COMBINE_INST_H
 #define COMBINE_INST_H
 
@@ -12,8 +17,6 @@
 #include "llvm/Passes/PassPlugin.h"
 #include "llvm/Support/raw_ostream.h"
 
-#include "llvm/Transforms/InstCombine/InstCombine.h"
-
 #include <map>
 #include <vector>
 using namespace llvm;
@@ -24,6 +27,8 @@ class CombineInstPass : public PassInfoMixin<CombineInstPass> {
 public:
     PreservedAnalyses run(Module &, ModuleAnalysisManager &);
 
+private:
+    bool isMove(Instruction &, int64_t);
 };
 
 extern "C" ::llvm::PassPluginLibraryInfo
