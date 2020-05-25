@@ -56,6 +56,8 @@ void VectorizedLoadAndStorePass::vectorize(BasicBlock& BB) {
 					continue;
 				}
 
+				cout << "Hello" << endl;
+
 				// if last_index is in current list of induction variables,
 				if(orderIndvars.find(last_index) != orderIndvars.end()) {
 					// assume same index accessing does not exist
@@ -128,6 +130,7 @@ vector<vector<Instruction *>> VectorizedLoadAndStorePass::findIndvars(BasicBlock
 	// insts will contain chain list of add instruction,
 	// which is instruction on index.
 	vector<vector<Instruction *>> insts;
+	// cout << "Basic Block: " << BB.getName().str() << endl;
 	for(Instruction &I : BB) {
 		BinaryOperator *addI = dyn_cast<BinaryOperator>(&I);
 		// to indicate whether current instruction is appeared already or not.
@@ -144,24 +147,28 @@ vector<vector<Instruction *>> VectorizedLoadAndStorePass::findIndvars(BasicBlock
 			// if op1 is constant 1,
 			if(C1 && C1->getUniqueInteger() == 1) {
 				// find a list that begins with operand(%x) and result(%y).
-				vector<Instruction *> *indvar1;
+				vector<Instruction *> *indvar1 = nullptr;
 				for(auto &it : insts) {
 					if(it.size() > 0 && it[it.size()-1] == op2) {
 						indvar1 = &it;
 					}
 				}
-				indvar1->push_back(&I);
-				firstAppear = 0;
+				if(indvar1 != nullptr) {
+					indvar1->push_back(&I);
+					firstAppear = 0;
+				}
 			} else if(C2 && C2->getUniqueInteger() == 1) { // if op2 is constant 1
 				// find a list that begins with operand(%x) and result(%y).
-				vector<Instruction *> *indvar1;
+				vector<Instruction *> *indvar1 = nullptr;
 				for(auto &it : insts) {
 					if(it.size() > 0 && it[it.size()-1] == op1) {
 						indvar1 = &it;
 					}
 				}
-				indvar1->push_back(&I);
-				firstAppear = 0;
+				if(indvar1 != nullptr) {
+					indvar1->push_back(&I);
+					firstAppear = 0;
+				}
 			}
 		}
 		if(firstAppear) {

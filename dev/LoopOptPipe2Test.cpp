@@ -1,4 +1,4 @@
-#include "VectorizedLoadAndStore.h"
+#include "LoopOptPipe2.h"
 
 #include "llvm/AsmParser/Parser.h"
 #include "llvm/Support/raw_ostream.h"
@@ -6,15 +6,13 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/IR/InstIterator.h"
 
-#include "llvm/IR/Verifier.h"
-
 #include "gtest/gtest.h"
 
 using namespace llvm;
 using namespace std;
 using namespace optim;
 
-class VectorizedLoadAndStoreTest : public testing::Test {
+class LoopOptPipe2Test : public testing::Test {
 
 protected:
     LLVMContext Context;
@@ -48,53 +46,21 @@ protected:
 
 };
 
-TEST_F(VectorizedLoadAndStoreTest, Test1) {
+TEST_F(LoopOptPipe2Test, Test1) {
     parseAssembly("test-ir/test_opt1.ll");
-    VectorizedLoadAndStorePass pass;
-	for(Function &F : *M) {
-		FunctionAnalysisManager FAM;
-   		pass.run(F, FAM);
-	}
+    LoopOptPipe2 pass;
+	pass.run(*M, MAM);
 
     M->print(outs(), nullptr);
-	cout << verifyModule(*M) << endl;
 }
 
-TEST_F(VectorizedLoadAndStoreTest, Test2) {
+TEST_F(LoopOptPipe2Test, Test2) {
     parseAssembly("test-ir/test_opt2.ll");
-	for(Function &F : *M) {
-    	VectorizedLoadAndStorePass pass;
-		FunctionAnalysisManager FAM;
-   		pass.run(F, FAM);
-	}
-
-    M->print(outs(), nullptr);
-	cout << verifyModule(*M) << endl;
-}
-
-/*
-TEST_F(VectorizedLoadAndStoreTest, Test3) {
-    parseAssembly("test-ir/input2_opt.ll");
-    VectorizedLoadAndStorePass pass;
-	for(Function &F : *M) {
-		FunctionAnalysisManager FAM;
-   		pass.run(F, FAM);
-	}
+    LoopOptPipe2 pass;
+	pass.run(*M, MAM);
 
     M->print(outs(), nullptr);
 }
-
-TEST_F(VectorizedLoadAndStoreTest, Test4) {
-    parseAssembly("test-ir/input4_opt.ll");
-    VectorizedLoadAndStorePass pass;
-	for(Function &F : *M) {
-		FunctionAnalysisManager FAM;
-   		pass.run(F, FAM);
-	}
-
-    M->print(outs(), nullptr);
-}
-*/
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
