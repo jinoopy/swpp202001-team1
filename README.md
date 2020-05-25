@@ -1,21 +1,39 @@
 # TEAM 1 Compiler
 
+---
+
 ## How to use
 
-<b> NOT_IMPLEMENTED </b>
+---
 
-`python3 compiler.py (input file .ll)`
-`python3 compiler.py (input file .ll) (llvm/bin directory)`
-
-emits the result in .s format of our target machine.
-
-#
+### Dev mode
 
 `python3 compiler.py -dev`
 
-enters the dev mode, which we can load custom passes.
+Enters the dev mode, which we can load custom passes.
+
+### Build mode
+
+`python3 compiler.py -build (-bin (llvm/bin dir))`
+
+Builds the cpp sources from /src.
+`-bin` is set to what is in config.json for default.
+
+### Run mode
+
+<b> NOT_IMPLEMENTED </b>
+
+`python3 compiler.py -run (input file .ll) (-bin (llvm/bin directory)) (-o (output file .s))`
+
+Emits the result in .s format of our target machine.
+`-bin` is set to what is in config.json for default.
+`-o`, for default, is set to a file which has the same name with the input, but only the extension is different.
+- `./test/input.ll` → `./test/input.s`
+
 
 ## About config.json
+
+---
 
 You may change settings of config.json. This file will be hidden in further commits.
 
@@ -24,6 +42,7 @@ You may change settings of config.json. This file will be hidden in further comm
 `"llvm-bin-dir": "...."`
 
 Value of this field should be the llvm bin directory, i.e. `llvmscript/llvm-10.0-release/bin.`
+This field can be updated manually, or in the `-dev` mode, or with giving the right argument to `-build` or `-run` mode.
 
 #
 
