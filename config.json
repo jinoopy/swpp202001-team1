@@ -43,7 +43,13 @@
             "-lcssa",
             "-licm",
             "-loop-unswitch"
-        ]
+		],
+		"loop-optim-2": [
+			"-loop-unroll",
+			"-unroll-count=4",
+			"-unroll-allow-partial",
+			"-unroll-runtime"
+		]
     },
     "run": {
         "opt": [],

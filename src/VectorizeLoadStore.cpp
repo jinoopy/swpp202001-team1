@@ -144,24 +144,28 @@ vector<vector<Instruction *>> VectorizeLoadStorePass::findIndvars(BasicBlock &BB
 			// if op1 is constant 1,
 			if(C1 && C1->getUniqueInteger() == 1) {
 				// find a list that begins with operand(%x) and result(%y).
-				vector<Instruction *> *indvar1;
+				vector<Instruction *> *indvar1 = nullptr;
 				for(auto &it : insts) {
 					if(it.size() > 0 && it[it.size()-1] == op2) {
 						indvar1 = &it;
 					}
 				}
-				indvar1->push_back(&I);
-				firstAppear = 0;
+				if(indvar1 != nullptr) {
+					indvar1->push_back(&I);
+					firstAppear = 0;
+				}
 			} else if(C2 && C2->getUniqueInteger() == 1) { // if op2 is constant 1
 				// find a list that begins with operand(%x) and result(%y).
-				vector<Instruction *> *indvar1;
+				vector<Instruction *> *indvar1 = nullptr;
 				for(auto &it : insts) {
 					if(it.size() > 0 && it[it.size()-1] == op1) {
 						indvar1 = &it;
 					}
 				}
-				indvar1->push_back(&I);
-				firstAppear = 0;
+				if(indvar1 != nullptr) {
+					indvar1->push_back(&I);
+					firstAppear = 0;
+				}
 			}
 		}
 		if(firstAppear) {
