@@ -1,5 +1,5 @@
 {
-    "llvm-bin-dir": "/home/jinulee/llvmscript/llvm-10.0-release/bin",
+    "llvm-bin-dir": "~/llvmscript/llvm-10.0-release/bin",
     "opt-pass": {
         "vectorize": {
             "src": "VectorizeLoadStore.cpp",

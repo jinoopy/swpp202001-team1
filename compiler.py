@@ -75,6 +75,9 @@ def build(config):
     else:
         ISYSROOT = ""
         LIBTYPE = ".so"
+
+    #Build namespace opt
+    print("Building opt pipeline...")
     LLVMCONFIG = config["llvm-bin-dir"]+"/llvm-config"
     CXXFLAGS = subprocessRun(LLVMCONFIG + " --cxxflags")
     LDFLAGS = subprocessRun(LLVMCONFIG + " --ldflags")
@@ -87,7 +90,9 @@ def build(config):
     for p in config["opt-pass"].keys():
         print("Compiling " + "./src/"+config["opt-pass"][p]["src"] + " ...\n")
         subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + " src/" + config["opt-pass"][p]["src"] + " -o " + "lib/"+config["opt-pass"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
-        print("Complete!")
+        print("Complete!\n")
+    
+    print("Building backend(TO BE DEVELOPED)...")
 
 def opt(config):
     if(platform.system() == "Darwin"):
@@ -120,11 +125,13 @@ def opt(config):
         passes = " ".join([x if x[0]=="-" else "-load-pass-plugin=./lib/lib"+x+LIBTYPE for x in config["preset-passes"][presets[mode-1]]])
     else:
         print("Enter custom sequences of passes")
-        print("MacOS Example: -mem2reg -simplifycfg -load XXX.dylib")
-        print("Other OS: -mem2reg -simplifycfg -load XXX.so")
+        print("existing passes: -mem2reg -indvars ...")
+        print("custom passes: VLS(for libVLS.so), GVTM(for libGVTM.so)...")
+        print("ex: -loop-simplify -loop-unroll VLS")
         passes = input("> ")
+        passes = " ".join([x if x[0]=="-" else "-load-pass-plugin=./lib/lib"+x+LIBTYPE for x in passes.split(" ")])
     #print(config["llvm-bin-dir"]+"/opt -S " + passes + " -o " + llvmir[:-3]+"_out.ll " + llvmir)
-    subprocessRun(config["llvm-bin-dir"]+"/opt -S " + passes + " -o " + llvmir[:-3]+"_out.ll " + llvmir)
+    print(subprocessRun(config["llvm-bin-dir"]+"/opt -S " + passes + " -o " + llvmir[:-3]+"_out.ll " + llvmir))
     print("Complete!")
 
 #def backend()
@@ -137,6 +144,7 @@ TEAM 1 COMPILER : DEV mode
 2. Build all src/XXX.cpp files
 3. Run clang/opt with existing/custom passes
 4. Run the backend(unimplemented)
+5. Run the whole compiler(unimplemented)
 ==============================
 '''
 def DEV():
@@ -156,6 +164,10 @@ def DEV():
             opt(config)
         elif mode == 4:
             print("backend() not implemented")
+        elif mode == 5:
+            inputIR = input("Enter the directory for input .ll file.\n> ")
+            outputS = input("Enter the directory for output .s file.\n> ")
+            #RUN(inputIR, outputS)
         else:
             break
     
@@ -164,35 +176,67 @@ def DEV():
 
 # MAIN()
 
-if "-dev" in sys.argv and len(sys.argv) == 2:
-    DEV()
-else:
-    #if wrong arg count, raise error
-    if not len(sys.argv) in [2, 3]:
-        print("WRONG INPUT")
-        print("ex) python3 compiler.py input.ll")
-        print("ex) python3 compiler.py input.ll ~/llvmscript/llvm/bin")
-        sys.exit()
-    
+#parse the arguments
+try:
+    mode = sys.argv[1]
+    inputIR = ""
+    if len(sys.argv)>=3:
+        inputIR = sys.argv[2]
+    outputS = inputIR[:-3] + ".s"
+    if "-o" in sys.argv:
+        outputS = sys.argv[sys.argv.index("-o") + 1]
+
     #if llvm bin dir is given, check if exists and update config
     config = readConfig()
-    if len(sys.argv) == 3:
-        path = sys.argv[2]
-    else:
-        path = config["llvm-bin-dir"]
-    temp = path
-    if path[0] == '~':
-        path = os.path.expanduser('~') + path[1:]
-    if not os.path.isdir(path):
+    binDir = config["llvm-bin-dir"]
+    temp = (binDir+".")[:-1]
+    if "-bin" in sys.argv:
+        temp = (binDir+".")[:-1]
+        binDir = sys.argv[sys.argv.index("-bin") + 1]
+    if binDir[0] == '~':
+        binDir = os.path.expanduser('~') + binDir[1:]
+    if not os.path.isdir(binDir):
         print("WRONG INPUT: wrong llvm/bin directory")
         sys.exit()
     config["llvm-bin-dir"] = temp
     writeConfig(config)
-    
-    #run the compiler
+except SystemExit:
+    sys.exit()
+except:
+    print("How to use:")
+    print("ex) python3 compiler.py -dev")
+    print("ex) python3 compiler.py -build -bin (llvm/bin dir)")
+    print("ex) python3 compiler.py -run input.ll -bin (llvm/bin dir) -o (output file)")
+    sys.exit()
+
+#run the desired mode
+if mode == "-dev":
+    DEV()
+elif mode == "-build":
+    print("llvm/bin directory : " + binDir)
+    build(config)
+elif mode == "-run":
+    if inputIR == "":
+        print("WRONG INPUT: should enter the input IR file(.ll)")
+        print("ex) python3 compiler.py -run input.ll -bin (llvm/bin dir) -o (output file)")
+        sys.exit()
+
     regex = re.compile(r"[\d\w_/.]+\.ll")
-    inputIR = sys.argv[1]
     if not re.fullmatch(regex, inputIR):
-        print("WRONG INPUT: wrong filename")
+        print("WRONG INPUT: wrong filename for input IR")
+        print("ex) python3 compiler.py -run input.ll -bin (llvm/bin dir) -o (output file)")
+        sys.exit()
+    regex = re.compile(r"[\d\w_/.]+\.s")
+    if not re.fullmatch(regex, outputS):
+        print("WRONG INPUT: wrong filename for output Assembly")
+        sys.exit()
     #TODO
-    #RUN(inputIR)
+    print("llvm/bin directory : " + binDir)
+    print("input IR : " + inputIR)
+    print("output Assembly : " + outputS)
+    #RUN(inputIR, outputS)
+else:
+    print("WRONG INPUT")
+    print("ex) python3 compiler.py -dev")
+    print("ex) python3 compiler.py -build -bin (llvm/bin dir)")
+    print("ex) python3 compiler.py -run input.ll -bin (llvm/bin dir) -o (output file)")
