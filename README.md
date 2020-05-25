@@ -13,7 +13,8 @@ Enters the dev mode, which we can load custom passes.
 `python3 compiler.py -build (-bin (llvm/bin dir))`
 
 Builds the cpp sources from /src.
-`-bin` is set to what is in config.json for default.
+
+- `-bin` is set to what is in config.json for default.
 
 ### Run mode
 
@@ -22,9 +23,10 @@ Builds the cpp sources from /src.
 `python3 compiler.py -run (input file .ll) (-bin (llvm/bin directory)) (-o (output file .s))`
 
 Emits the result in .s format of our target machine.
-`-bin` is set to what is in config.json for default.
-`-o`, for default, is set to a file which has the same name with the input, but only the extension is different.
-- `./test/input.ll` → `./test/input.s`
+
+- `-bin` is set to what is in config.json for default.
+- `-o`, for default, is set to a file which has the same name with the input, but only the extension is different.</br>
+ `./test/input.ll` → `./test/input.s`
 
 
 ## About config.json
