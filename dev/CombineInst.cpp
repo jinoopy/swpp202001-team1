@@ -24,6 +24,7 @@ PreservedAnalyses CombineInstPass::run(Module &M, ModuleAnalysisManager &MAM) {
                 Value *lhs = dyn_cast<Value>(I.getOperand(0));
                 Value *rhs = dyn_cast<Value>(I.getOperand(1));
                 ConstantInt *rhsC = dyn_cast<ConstantInt>(rhs);
+                //shift to mul,div
                 if(I.isShift() && rhsC) {
                     int64_t rhsVal = rhsC->getSExtValue();
                     if(I.getOpcode() == Instruction::Shl) {
@@ -33,11 +34,13 @@ PreservedAnalyses CombineInstPass::run(Module &M, ModuleAnalysisManager &MAM) {
                     }
                     I.eraseFromParent();
                 } 
-                else if(I.getOpcode() == Instruction::Add && rhsC && rhsC->getSExtValue() == 0) {
+                //move
+                else if(I.getOpcode() == Instruction::Add && rhsC && rhsC->getSExtValue() == 0) { 
                     Builder.CreateMul(lhs, ConstantInt::get(i32Type, 1, true));
                     I.eraseFromParent();
                 }
-                else if(I.getOpcode() == Instruction::And && res->getType()->isIntegerTy(1)) {
+                //i1 and to mul
+                else if(I.getOpcode() == Instruction::And && res->getType()->isIntegerTy(1)) { 
                     Builder.CreateMul(lhs, rhs);
                     I.eraseFromParent();
                 }
