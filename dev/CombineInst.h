@@ -28,7 +28,11 @@ public:
     PreservedAnalyses run(Module &, ModuleAnalysisManager &);
 
 private:
-    bool isMove(Instruction &, int64_t);
+    void replaceShiftWithMulDiv(IRBuilder<>, Instruction &, int64_t);
+    bool isRegMove(Instruction &, int64_t);
+    void replaceRegMoveWithMul(IRBuilder<>, Instruction &, int64_t);
+    void replaceLSBBitMaskWithRem(IRBuilder<>, Instruction &, int64_t);
+    void replace1BitAndWithMul(IRBuilder<>, Instruction &);
 };
 
 extern "C" ::llvm::PassPluginLibraryInfo
