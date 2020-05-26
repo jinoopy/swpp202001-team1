@@ -44,6 +44,8 @@ public:
     auto *ptrType = dyn_cast<PointerType>(type);
     return ptrType->getElementType()->getScalarSizeInBits();
   }
+
+  map<Value *, Function *> functions_done;
 };
 
 extern "C" ::llvm::PassPluginLibraryInfo

@@ -41,7 +41,8 @@ namespace optim
 //  4-1. The address of this variable must not be stored to any pointer variable. - Store instruction(not destination but source value)
 //  4-2. The address must not be copied by getelementptr instruction. - getelementptr instruction(operand)
 //  4-3. The two conditions above should be considered on other functions called by the current function.
-//  condition 3 will be checked on - IsStoredInFunction  
+//  5. The pointer should not be casted to int - PtrToInt instruction - because it is a way to store the address.
+//  condition 4 will be checked on - IsStoredInFunction  
     bool HeapToStackPass::CheckCondition(Function &f, CallInst *malloc)
     {
         // condition 1
@@ -51,20 +52,27 @@ namespace optim
         ConstantInt *const_size = dyn_cast<ConstantInt>(malloc->getArgOperand(0));
         auto malloc_size = const_size->getSExtValue(); // get the size of malloc
         Instruction *real_malloc = malloc; // if bitcast instruction is used to cast the malloc variable, change our object to bitcast instruction.
-        for(auto &u : real_malloc->uses())
+        for(auto &u : malloc->uses())
         {
             auto *I = dyn_cast<Instruction>(u.getUser());
             auto *bitCast = dyn_cast<BitCastInst>(I);
-            if(bitCast && bitCast->getOperand(0) == malloc)
+            if(bitCast)
             {
                 real_malloc = bitCast; // change from call instruction(malloc) to bitcast instruction
                 int cast_size_bit = GetPointerSize(bitCast->getType());
                 if(malloc_size * 8 != cast_size_bit) return false;  // If malloc size is an array, don't change it to alloca
-                outs() << malloc->getName() << " - condition2 ok\n";
+                outs() << malloc->getName() << "  malloc_ size : " << malloc_size <<" - condition2 ok\n";
             }
-            // condition 3
+        }
+        // If there is not bitcast instruction but malloc only, then check if the malloc_size is same with 8(return type of malloc function - i8*).
+        if(real_malloc == malloc && malloc_size != 1) return false;
+
+        // condition 3
+        for(auto &u : real_malloc->uses())
+        {
+            auto *I = dyn_cast<Instruction>(u.getUser());
             auto *returnInst = dyn_cast<ReturnInst>(I);
-            if(returnInst && returnInst->getOperand(0) == malloc) return false;
+            if(returnInst) return false;
         }
         outs() << malloc->getName() << " - condition3 ok\n";
         
@@ -91,6 +99,9 @@ namespace optim
         {
             malloc = f.getArg(argNum);
         }
+        // if this function is already tested on malloc's IsstoredInFunction, then return true.
+        if(functions_done.find(malloc) != functions_done.end()) return true;
+        functions_done[malloc] = &f;
 
         for(auto &use : malloc->uses())
         {
@@ -100,6 +111,8 @@ namespace optim
             if(isa<StoreInst>(I) && I->getOperand(0) == malloc) return false;
             // condition 4-2 The address must not be copied by getelementptr instruction. - getelementptr instruction(operand)
             if(isa<GetElementPtrInst>(I) && I->getOperand(0) == malloc) return false;
+            // condition 5 - PtrToInt instruction can save the address too.
+            if(isa<PtrToIntInst>(I)) return false;
         }
         // condition 4-3 The two conditions above should be considered on other functions called by the current function.
         for(auto &BB : f)
@@ -108,7 +121,7 @@ namespace optim
             {
                 auto cI = dyn_cast<CallInst>(I);
                 if(cI == nullptr) continue;
-                int64_t argNum = 0;
+                int argNum = 0;
                 for(auto *Arg = cI->arg_begin(); Arg != cI->arg_end(); Arg++, argNum++)
                 {
                     if(dyn_cast<Value>(Arg) == malloc)
@@ -128,7 +141,7 @@ namespace optim
         for(auto &use : malloc->uses())
         {
             auto *bitCast = dyn_cast<BitCastInst>(use.getUser());
-            if(bitCast && bitCast->getOperand(0) == malloc) real_malloc = bitCast;
+            if(bitCast) real_malloc = bitCast;
         }
         auto &context = malloc->getFunction()->getContext();
         IRBuilder<> builder(malloc);
