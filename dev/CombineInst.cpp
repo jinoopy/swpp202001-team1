@@ -1,6 +1,7 @@
 /*
     CombineInstPass
-    본 pass는 InstCombinePass 직후에 실행되아야 함. (-instcombine)
+    본 pass는 InstCombinePass 직전과 직후에 실행되아야 함. 
+    ( -gvn -combineinst -instcombine -combineinst )
 */
 
 #include "CombineInst.h"

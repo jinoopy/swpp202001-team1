@@ -1,5 +1,5 @@
-; ModuleID = 'dev/test/cpp/test1.cpp'
-source_filename = "dev/test/cpp/test1.cpp"
+; ModuleID = 'dev/test/cpp/test2.cpp'
+source_filename = "dev/test/cpp/test2.cpp"
 target datalayout = "e-m:o-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-apple-macosx10.15.0"
 
@@ -7,17 +7,18 @@ target triple = "x86_64-apple-macosx10.15.0"
 define i32 @_Z3fooi(i32) #0 {
   %2 = alloca i32, align 4
   %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i32, align 4
   store i32 %0, i32* %2, align 4
-  %4 = load i32, i32* %2, align 4
-  %5 = load i32, i32* %2, align 4
-  %6 = add nsw i32 %4, %5
-  store i32 %6, i32* %3, align 4
-  %7 = load i32, i32* %2, align 4
-  %8 = mul nsw i32 %7, 2
-  %9 = load i32, i32* %3, align 4
-  %10 = add nsw i32 %9, %8
-  store i32 %10, i32* %3, align 4
-  %11 = load i32, i32* %3, align 4
+  store i32 3, i32* %3, align 4
+  %6 = load i32, i32* %3, align 4
+  %7 = add nsw i32 %6, 5
+  store i32 %7, i32* %4, align 4
+  %8 = load i32, i32* %2, align 4
+  %9 = load i32, i32* %4, align 4
+  %10 = sdiv i32 %8, %9
+  store i32 %10, i32* %5, align 4
+  %11 = load i32, i32* %5, align 4
   ret i32 %11
 }
 
