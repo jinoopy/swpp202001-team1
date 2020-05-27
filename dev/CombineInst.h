@@ -1,9 +1,3 @@
-/*
-    CombineInstPass
-    본 pass는 InstCombinePass 직전과 직후에 실행되아야 함. 
-    ( -gvn -combineinst -instcombine -combineinst )
-*/
-
 #ifndef COMBINE_INST_H
 #define COMBINE_INST_H
 

@@ -10,7 +10,7 @@ clang -S -emit-llvm -o dev/test/test9.ll dev/test/cpp/test9.cpp
 clang -S -emit-llvm -o dev/test/test10.ll dev/test/cpp/test10.cpp
 clang -S -emit-llvm -o dev/test/test11.ll dev/test/cpp/test11.cpp
 clang -S -emit-llvm -o dev/test/test12.ll dev/test/cpp/test12.cpp
-clang -S -emit-llvm -o dev/test/test13.ll dev/test/cpp/test13.cpp
+#clang -S -emit-llvm -o dev/test/test13.ll dev/test/cpp/test13.cpp
 
 
 python3 compiler.py -dev
@@ -64,7 +64,7 @@ dev/test/test11.ll
 dev/test/test12.ll
 0
 -mem2reg -gvn -instcombine
-3
-dev/test/test13.ll
-0
--mem2reg -gvn -instcombine
+#3
+#dev/test/test13.ll
+#0
+#-mem2reg -gvn -instcombine
