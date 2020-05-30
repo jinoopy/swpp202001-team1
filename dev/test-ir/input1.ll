@@ -1,9 +1,10 @@
 define i32 @main() {
+  br label %entry
 entry:
   %a = call i32 @anyValue()
   %b = call i32 @anyValue()
   %c = call i32 @anyValue()
-  %cmp = icmp eq i32 %a, %b
+  %cmp = icmp eq i32 %a, %c
   br i1 %cmp, label %BB1, label %BB2
 BB1:
   %d = call i32 @anyValue()

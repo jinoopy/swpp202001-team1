@@ -32,20 +32,14 @@ void RegisterGraph::SearchAllArgInst(Module &M)
 {
     for (Function &F : M)
     {
+        if(F.isDeclaration()) continue;
         valuesInFunction[&F] = vector<Value*>();
-        /*
-        for (Argument &Arg : F.args())
-        {
-            values.push_back(&Arg);
-            valuesInFunction[&F].push_back(&Arg);
-        }
-        */
         for (BasicBlock &BB : F)
         {
             for (Instruction &I : BB)
             {
                 if (DO_NOT_CONSIDER.find(I.getOpcode())==DO_NOT_CONSIDER.end()
-                    || (SAME_CONSIDER.find(I.getOpcode())!=SAME_CONSIDER.end() && (isa<Argument>(I.getOperand(0)) || isa<AllocaInst>(I.getOperand(0))) ) )
+                    && !(SAME_CONSIDER.find(I.getOpcode())!=SAME_CONSIDER.end() && (isa<Argument>(I.getOperand(0)) || isa<AllocaInst>(I.getOperand(0))) ) )
                 {
                     values.push_back(&I);
                     valuesInFunction[&F].push_back(&I);
@@ -55,7 +49,6 @@ void RegisterGraph::SearchAllArgInst(Module &M)
     }
 }
 
-#define isArgument(V) (dyn_cast<Argument>(V) != nullptr)
 vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
 {
     //Value v is live in instruction I iff...
@@ -80,10 +73,8 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
     int i = 0;
     for (Value *V : values)
     {
-
         //'F': Function which 'V' is located.
         Function &F = *dyn_cast<Instruction>(V)->getFunction();
-        //Get the DominatorTree for 'F'.
 
         //'start': Where to start the search.
         Instruction &def = *dyn_cast<Instruction>(V);
@@ -91,8 +82,20 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
         //finds if V is live in the specific instruction.
         //recursively searches through the basic blocks and store result in live.
         for(auto& v : V->uses()) {
-            if(isa<Instruction>(v.getUser())) {
+            if(isa<PHINode>(v.getUser())) {
+                PHINode* phi = dyn_cast<PHINode>(v.getUser());
+                LivenessSearch(*(phi->getIncomingBlock(v)->getTerminator()), *V, i, live);
+            }
+            else if(isa<Instruction>(v.getUser())) {
                 LivenessSearch(*dyn_cast<Instruction>(v.getUser()), *V, i, live);
+            }
+        }
+
+        if(isa<PHINode>(V)) {
+            PHINode* phi = dyn_cast<PHINode>(V);
+            //phinodes should be live from the beginning of the function.
+            for(auto& I : phi->getParent()->phis()){
+                live[&I][i] = true;
             }
         }
         i++;
@@ -108,6 +111,23 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
             {
                 result.push_back(live[&I]);
             }
+
+            //Additionally, oprand for terminators and phi nodes should be marked
+            Instruction* term = BB.getTerminator();
+            if(term->getNumOperands() > 1){ //if branches,
+                vector<bool> PhiTerm(N);
+                //the branching condition should be live.
+                PhiTerm[findValue(term->getOperand(0))] = true;
+                for(BasicBlock* succ : successors(&BB)) {
+                    for(PHINode& phi : succ->phis()) {
+                        Value* incomeV = phi.getIncomingValueForBlock(&BB);
+                        if(incomeV != nullptr && findValue(&phi) != -1) {
+                            PhiTerm[findValue(&phi)] = true;
+                        }
+                    }
+                }
+                result.push_back(PhiTerm);
+            }
         }
     }
 
@@ -116,7 +136,6 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
 
 void RegisterGraph::LivenessSearch(Instruction &curr, Value &find, int index, map<Instruction *, vector<bool>> &live)
 {
-
     BasicBlock &BB = *(curr.getParent());
 
     bool isAlive = false;
@@ -168,7 +187,6 @@ void RegisterGraph::RegisterAdjList(vector<vector<bool>> &liveInterval)
 
 void RegisterGraph::ColorGraph()
 {
-
     for(Function& F : *M) {
         //calculates PEO for values + adjList
         auto& valueF = valuesInFunction[&F];
@@ -182,6 +200,7 @@ void RegisterGraph::ColorGraph()
         //update global color count
         numColors[&F] = colorCount;
     }
+    coallocateIfPossible();
 }
 
 vector<Value *> RegisterGraph::PerfectEliminationOrdering(vector<Value *> &values)
@@ -287,6 +306,21 @@ map<Value *, unsigned int> RegisterGraph::GreedyColoring(vector<Value *> &PEO, u
 
 }
 
+void RegisterGraph::coallocateIfPossible() {
+    for(Function& F : *M) {
+        for(auto it = inst_begin(&F); it!=inst_end(&F); ++it) {
+            Instruction& I = *it;
+            if(!I.hasOneUse() || findValue(&I) == -1) continue;
+
+            //Fetch the only user which follows right after.
+            Instruction* user = dyn_cast<Instruction>(I.use_begin()->getUser());
+            if(I.getNextNode() != user || SAME_CONSIDER.find(user->getOpcode()) == SAME_CONSIDER.end() || findValue(user) == -1) continue;
+
+            valueToColor[I.getFunction()][&I] = valueToColor[I.getFunction()][user];
+        }
+    }
+}
+
 void RegisterGraph::InverseColorMap()
 {
     for(Function& F : *M) {
@@ -298,6 +332,13 @@ void RegisterGraph::InverseColorMap()
             colorToValue[&F][p.second].push_back(p.first);
         }
     }
+}
+
+unsigned RegisterGraph::findValue(Value* V) {
+    for(int i = 0; i < values.size(); i++) {
+        if(values[i] == V) return i;
+    }
+    return -1;
 }
 
 //---------------------------------------------------------------

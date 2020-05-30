@@ -63,6 +63,8 @@ class RegisterSpillPass : public PassInfoMixin<RegisterSpillPass>
 {
   //Module which this analysis runs.
   Module* M;
+  //Register graph for the module.
+  RegisterGraph* RG;
 
 public:
 
@@ -73,14 +75,40 @@ public:
 
   //Finds the registers that need to be spilled
   //and actually spills them by adding alloca, store, and load.
+  //Requirement: MUST execute Dead Store Elimination & GVN after running this.
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
 
 private:
 
   //Searches through all functions and check if the spilling is enough.
-  bool spilledEnough(unsigned, vector<bool>, Function*, RegisterGraph&);
+  bool spilledEnough(unsigned, vector<bool>, Function*);
 
-  void spillRegister(vector<bool>, Function*);
+  //Pre-order traverses through the function's basic blocks.
+  //In this way, if a BB has a single predecessor, the register state is already calculated.
+  //Spills the registers by adding store and load instructions.
+  void spillRegister(unsigned, const vector<bool>&, const vector<AllocaInst*>&, BasicBlock&);
+
+  //Finds the most suitable color to discard from register memory.
+  //Looks forward within the BB(scope), and finds the latest-used color and discard.
+  unsigned findReplaced(unsigned, Instruction*, vector<bool>, vector<bool>, BasicBlock&);
+
+  //Inserts the load instruction and corresponding type conversions.
+  // %temp0 = load %loadFrom
+  // %temp1 = (proper type conversion from i64) %temp0
+  // %insertBefore (may be same as the target)
+  //----------------------------------------------
+  // %.. = uses %target.getUser() ..
+  //           => uses %temp1 ..
+  void insertLoad(Use& target, AllocaInst* loadFrom, Instruction* insertBefore);
+
+  //Inserts the store instruction and corresponding type conversions
+  // %storeVal = ..
+  //----------------------------------------------
+  // %temp = (proper type conversion to i64) %storeVal
+  // store %temp, %storeAt
+  // %insertBefore
+  Value* insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore);
+
 };
 
 }

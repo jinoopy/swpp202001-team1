@@ -1,13 +1,14 @@
 define dso_local i32 @main() {
-
 entry:
+  br label %header
+header:
   %r1 = phi i32 [ 0, %entry ], [ %r9, %BB4 ]
   %r2 = phi i32 [ 0, %entry ], [ %r8, %BB4 ]
   br label %BB1
 
 BB1:                                                ; preds = %1, %4
-  %r3 = phi i32 [ 0, %entry ], [ %r6, %BB2 ]
-  %r4 = phi i32 [ %r2, %entry ], [ %r5, %BB2 ]
+  %r3 = phi i32 [ 0, %header ], [ %r6, %BB2 ]
+  %r4 = phi i32 [ %r2, %header ], [ %r5, %BB2 ]
   %r5 = add nsw i32 %r4, %r3
   br label %BB2
 
