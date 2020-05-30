@@ -158,7 +158,14 @@ bool RegisterSpillPass::spilledEnough(unsigned numBuffer, vector<bool> isSpilled
 
 void RegisterSpillPass::spillRegister(unsigned numBuffer, const vector<bool>& isSpilled, const vector<AllocaInst*>& spillAlloca, BasicBlock& BB)
 {
+    //Used to skip store/type conversion instructions created by this pass.
+    set<Value*> skip;
     for(Instruction& I : BB) {
+        if(skip.find(&I) != skip.end()){
+            I.print(outs());
+            continue;
+        } 
+
         //for phi nodes,
         if(isa<PHINode>(I)) {
             PHINode& phi = *(dyn_cast<PHINode>(&I));
@@ -196,7 +203,10 @@ void RegisterSpillPass::spillRegister(unsigned numBuffer, const vector<bool>& is
             unsigned IColor = RG->getValueToColor(BB.getParent())[&I];
             if(isSpilled[IColor]) {
                 //store the result to the apparent alloca'd memory.
-                insertStore(&I, spillAlloca[IColor], I.getNextNode());
+                if(isa<PHINode>(I))
+                    skip.insert(insertStore(&I, spillAlloca[IColor], BB.getFirstNonPHI()));
+                else
+                    skip.insert(insertStore(&I, spillAlloca[IColor], I.getNextNode()));
             }
         }
     }
@@ -233,7 +243,7 @@ void RegisterSpillPass::insertLoad(Use& target, AllocaInst* loadFrom, Instructio
     target.set(typeConv);
 }
 
-void RegisterSpillPass::insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore) {
+Value* RegisterSpillPass::insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore) {
     StringRef nameStr = storeVal->getName();
 
     //Create an appropriate type conversing instruction to i64
@@ -259,7 +269,8 @@ void RegisterSpillPass::insertStore(Value* storeVal, AllocaInst* storeAt, Instru
     }
 
     //Create storeInst to store the value in appropriate alloca inst.
-    StoreInst* storeinst = new StoreInst(typeConv, storeAt, insertBefore);
+    new StoreInst(typeConv, storeAt, insertBefore);
+    return typeConv;
 }
 
 }

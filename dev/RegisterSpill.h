@@ -107,7 +107,7 @@ private:
   // %temp = (proper type conversion to i64) %storeVal
   // store %temp, %storeAt
   // %insertBefore
-  void insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore);
+  Value* insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore);
 
 };
 
