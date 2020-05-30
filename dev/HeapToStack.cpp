@@ -11,7 +11,6 @@ namespace optim
 
         for(auto &f : M.functions())
         {
-            outs() << "Start Function Loop : " << f.getName() << "\n";
             if(f.isDeclaration()) continue;
             auto &entryBB = f.getEntryBlock();
             for(auto I = entryBB.begin(), E = entryBB.end(); I != E; I++)
@@ -19,7 +18,6 @@ namespace optim
                 auto cI = dyn_cast<CallInst>(I);
                 if(cI && cI->getCalledFunction()->getName() == "malloc")
                 {
-                    outs() << "Start CheckCondition : " << cI->getName() << "\n";
                     if(CheckCondition(f, cI))
                     {
                         AllocaInst *alloc = ReplaceWithAlloca(cI, numOfChange);
@@ -30,7 +28,6 @@ namespace optim
                 }
             }
         }
-        outs() << "end..\n";
         return PreservedAnalyses::all();
     }
 //  1. The size of malloc is constant
@@ -47,7 +44,6 @@ namespace optim
     {
         // condition 1
         if(!isa<ConstantInt>((malloc)->getArgOperand(0))) return false;
-        outs() << malloc->getName() << " - condition1 ok\n";
         // condition 2
         ConstantInt *const_size = dyn_cast<ConstantInt>(malloc->getArgOperand(0));
         auto malloc_size = const_size->getSExtValue(); // get the size of malloc
@@ -61,7 +57,6 @@ namespace optim
                 real_malloc = bitCast; // change from call instruction(malloc) to bitcast instruction
                 int cast_size_bit = GetPointerSize(bitCast->getType());
                 if(malloc_size * 8 != cast_size_bit) return false;  // If malloc size is an array, don't change it to alloca
-                outs() << malloc->getName() << "  malloc_ size : " << malloc_size <<" - condition2 ok\n";
             }
         }
         // If there is not bitcast instruction but malloc only, then check if the malloc_size is same with 8(return type of malloc function - i8*).
@@ -74,17 +69,14 @@ namespace optim
             auto *returnInst = dyn_cast<ReturnInst>(I);
             if(returnInst) return false;
         }
-        outs() << malloc->getName() << " - condition3 ok\n";
         
         // condition 4
         if(IsStoredInFunction(f, real_malloc, -1))
         {
-            outs() << malloc->getName() << " - last condition ok\n";
             return true;
         }
         else
         {
-            outs() << malloc->getName() << " - last condition x\n";
             return false;
         }
         
@@ -136,7 +128,6 @@ namespace optim
 //  This function replace malloc instruction & bitcast instruction with new alloca instruction set to original conditions.
     AllocaInst* HeapToStackPass::ReplaceWithAlloca(CallInst *malloc, int num)
     {
-        outs() << "Replace alloca function start\n";
         Instruction *real_malloc = malloc;
         for(auto &use : malloc->uses())
         {
@@ -147,7 +138,6 @@ namespace optim
         IRBuilder<> builder(malloc);
         AllocaInst *alloc = builder.CreateAlloca(dyn_cast<PointerType>(real_malloc->getType())->getElementType(), nullptr, "alloca_" + malloc->getName());
         real_malloc->replaceAllUsesWith(alloc);
-        outs() << "replaceAllUsesWith ok\n";
         if(real_malloc == malloc) malloc->eraseFromParent();
         else
         {
