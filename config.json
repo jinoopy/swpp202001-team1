@@ -1,0 +1,56 @@
+{
+    "llvm-bin-dir": "~/llvmscript/llvm-10.0-releaseassert/bin",
+    "opt-pass": {
+        "vectorize": {
+            "src": "VectorizeLoadStore.cpp",
+            "lib": "libVLS"
+        },
+        "malloc2gv": {
+            "src": "MallocToGV.cpp",
+            "lib": "libMTGV"
+        },
+        "gv2malloc": {
+            "src": "GVToMalloc.cpp",
+            "lib": "libGVTM"
+        },
+        "combineinst": {
+            "src": "CombineInst.cpp",
+            "lib": "libCI"
+        }
+    },
+    "preset-passes": {
+        "basic-optim": [
+            "-mem2reg",
+            "-ipsccp"
+        ],
+        "inst-optim": [
+            "-reassociate",
+            "-instcombine",
+            "-sccp",
+            "--deadargelim",
+            "-dse",
+            "-adce"
+        ],
+        "loop-vectorize": [
+            "-loop-simplify",
+            "-loop-rotate",
+            "-lcssa",
+            "-indvars",
+            "-loop-unroll",
+            "-gvn",
+            "VLS",
+            "-simplifycfg"
+        ],
+        "loop-optim-1": [
+            "-loop-simplify",
+            "-loop-rotate",
+            "-lcssa",
+            "-licm",
+            "-loop-unswitch"
+        ]
+    },
+    "run": {
+        "opt": [],
+        "backend": ""
+    }
+}

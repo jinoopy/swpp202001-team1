@@ -1,0 +1,70 @@
+clang -S -emit-llvm -o dev/test/test1.ll dev/test/cpp/test1.cpp
+clang -S -emit-llvm -o dev/test/test2.ll dev/test/cpp/test2.cpp
+clang -S -emit-llvm -o dev/test/test3.ll dev/test/cpp/test3.cpp
+clang -S -emit-llvm -o dev/test/test4.ll dev/test/cpp/test4.cpp
+clang -S -emit-llvm -o dev/test/test5.ll dev/test/cpp/test5.cpp
+clang -S -emit-llvm -o dev/test/test6.ll dev/test/cpp/test6.cpp
+clang -S -emit-llvm -o dev/test/test7.ll dev/test/cpp/test7.cpp
+clang -S -emit-llvm -o dev/test/test8.ll dev/test/cpp/test8.cpp
+clang -S -emit-llvm -o dev/test/test9.ll dev/test/cpp/test9.cpp
+clang -S -emit-llvm -o dev/test/test10.ll dev/test/cpp/test10.cpp
+clang -S -emit-llvm -o dev/test/test11.ll dev/test/cpp/test11.cpp
+clang -S -emit-llvm -o dev/test/test12.ll dev/test/cpp/test12.cpp
+#clang -S -emit-llvm -o dev/test/test13.ll dev/test/cpp/test13.cpp
+
+
+python3 compiler.py -dev
+
+
+3
+dev/test/test1.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test2.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test3.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test4.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test5.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test6.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test7.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test8.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test9.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test10.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test11.ll
+0
+-mem2reg -gvn -instcombine
+3
+dev/test/test12.ll
+0
+-mem2reg -gvn -instcombine
+#3
+#dev/test/test13.ll
+#0
+#-mem2reg -gvn -instcombine
