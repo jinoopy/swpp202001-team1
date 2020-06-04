@@ -48,9 +48,7 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   //- entry block should not have a predecessor block.
   //   => Else, raise error.
   //- allocas and its direct uses are renamed: __st__offset__ ex) __st__8__
-  //- Stack pointer is incremented the beginning of every function.
-  //- Stack pointer is decreased before returned.
-  processAlloca(M, symbolMap);
+  map<Function*, unsigned> spOffsetMap = processAlloca(M, symbolMap);
 
   //Debug code
   if(printProcess) {
@@ -122,7 +120,10 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   return PreservedAnalyses::all();
 }
 
-void Backend::processAlloca(Module& M, SymbolMap& SM) {
+map<Function*, unsigned> Backend::processAlloca(Module& M, SymbolMap& SM) {
+
+  map<Function*, unsigned> spOffsetMap;
+
   for(Function& F : M) {
     BasicBlock& entry = F.getEntryBlock();
 
@@ -141,7 +142,11 @@ void Backend::processAlloca(Module& M, SymbolMap& SM) {
         acc += getAccessSize(alloca->getAllocatedType());
       }
     }
+
+    spOffsetMap[&F] = acc;
   }
+
+  return spOffsetMap;
 }
  
 //---------------------------------------------------------------

@@ -124,7 +124,7 @@ public:
 
   //SymbolMap initially does not mark alloca and its derivatives.
   //processing should be seperately done.
-  void processAlloca(Module& M, SymbolMap& SM);
+  map<Function*, unsigned> processAlloca(Module& M, SymbolMap& SM);
 };
 
 //Function which returns the byte size of a Type.
