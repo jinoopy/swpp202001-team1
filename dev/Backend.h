@@ -18,32 +18,67 @@ using namespace backend;
 namespace backend {
 
 //---------------------------------------------------------------
-//backend/Backend.cpp
+//backend/TargetMachine.cpp
 //---------------------------------------------------------------
 
-class Backend : public PassInfoMixin<Backend> {
-  //File to print assembly (.s).
-  string outputFile;
-  //if true, prints the intermediate steps.
-  bool printDepromotedModule;
-  //Model for the target machine of our project.
-  //Contains information about register files and 
-  TargetMachine TM;  
+class Symbol{
+protected:
+  friend TargetMachine;
+  string name;
+  Symbol() = default;
+  Symbol(string name): name(name) {}
+public:
+  string getName();
+};
+//Hardware registers
+class Register : public Symbol {
+public:
+  Register(StringRef name): Symbol(name) {}
+};
+//Memory addresses(GV, )
+class Memory : public Symbol {
+  Register* base;
+  int64_t offset;
+public:
+  Memory(Register* base, int64_t offset);
+  Register* getBase();
+  int64_t getoffset();
+};
+
+class TargetMachine {
+  Register* regfile[16];
+  Register* argfile[16];
+  Register* spreg;
+  Register* gvpreg;
 
 public:
+  //Read-only getters for the register data stored in TargetMachine object.
+  Register* reg(unsigned index);
+  Register* arg(unsigned index);
+  Register* sp();
+  Register* gvp();
 
-  Backend() : TM() {}
+  //Checks the validity of the given symbol within the machine.
+  bool valid(Symbol* symbol);
   
-  Backend(string outputFile, bool printDepromotedModule = false) :
-      outputFile(outputFile), printDepromotedModule(printDepromotedModule) {}
-  
-  //runs the backend, which emits the assembly to given .s file.
-  PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
-
-  //SymbolMap initially does not mark alloca and its derivatives.
-  //processing should be seperately done.
-  void processAlloca(Module& M, SymbolMap& SM);
+  //Initializes the target machine.
+  TargetMachine();
 };
+
+//---------------------------------------------------------------
+//backend/AssemblyEmitter.cpp
+//---------------------------------------------------------------
+
+class AssemblyEmitter {
+  raw_ostream *fout;
+public:
+  AssemblyEmitter(raw_ostream *fout) : fout(fout) {}
+  void run(Module *M);
+};
+
+//---------------------------------------------------------------
+//backend/Backend.cpp
+//---------------------------------------------------------------
 
 class SymbolMap {
   //The target module to rename.
@@ -68,68 +103,28 @@ public:
   //However, it produces an unsolvable error, so it is set public for now.
   //Do not use this function elsewhere.
   void coallocateSameValues(Value*, Symbol*);
-
-private:
-  std::set<unsigned> SAME_CONSIDER = RegisterGraph::SAME_CONSIDER;
 };
 
-//---------------------------------------------------------------
-//backend/AssemblyEmitter.cpp
-//---------------------------------------------------------------
-
-class AssemblyEmitter {
-  raw_ostream *fout;
-public:
-  AssemblyEmitter(raw_ostream *fout) : fout(fout) {}
-  void run(Module *M);
-};
-
-//---------------------------------------------------------------
-//backend/TargetMachine.cpp
-//---------------------------------------------------------------
-
-class TargetMachine {
-  Register* regfile[16];
-  Register* argfile[16];
-  Register* spreg;
-  Register* gvpreg;
+class Backend : public PassInfoMixin<Backend> {
+  //File to print assembly (.s).
+  string outputFile;
+  //if true, prints the intermediate steps.
+  bool printProcess;
+  //Model for the target machine of our project.
+  //Contains information about register files and 
+  TargetMachine TM;  
 
 public:
-  //Read-only getters for the register data stored in TargetMachine object.
-  Register* reg(unsigned index);
-  Register* arg(unsigned index);
-  Register* sp();
-  Register* gvp();
 
-  //Checks the validity of the given symbol within the machine.
-  bool valid(Symbol* symbol);
+  Backend(string outputFile, bool printProcess = false) :
+      outputFile(outputFile), printProcess(printProcess), TM() {}
   
-  //Initializes the target machine.
-  TargetMachine();
-};
+  //runs the backend, which emits the assembly to given .s file.
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
 
-class Symbol{
-protected:
-  friend TargetMachine;
-  string name;
-  Symbol() = default;
-  Symbol(string name): name(name) {}
-public:
-  string getName();
-};
-//Hardware registers
-class Register : public Symbol {
-public:
-  Register(StringRef name): Symbol(name) {}
-};
-//Memory addresses(GV, )
-class Memory : public Symbol {
-  Register* base;
-  int64_t offset;
-public:
-  Memory(Register* base, int64_t offset);
-  Register* getBase();
-  int64_t getoffset();
+  //SymbolMap initially does not mark alloca and its derivatives.
+  //processing should be seperately done.
+  void processAlloca(Module& M, SymbolMap& SM);
 };
 
 //Function which returns the byte size of a Type.

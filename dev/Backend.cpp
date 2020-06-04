@@ -15,8 +15,6 @@ using namespace llvm;
 using namespace std;
 using namespace backend;
 
-typedef backend::TargetMachine TargetMachine;
-
 namespace backend {
 
 // Return sizeof(T) in bytes.
@@ -42,7 +40,7 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   }
 
   //Build symbol table and rename all.
-  //Every values are mapped to the 
+  //Every values are mapped to the symbol table.
   SymbolMap symbolMap(&M, TM);
 
   //Process alloca, stack pointer and related instructions.
@@ -53,12 +51,43 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   //- Stack pointer is incremented the beginning of every function.
   //- Stack pointer is decreased before returned.
   processAlloca(M, symbolMap);
-  if(verifyModule(M, &errs(), nullptr)) {
-    errs() << "BUG: processAlloca created an ill-formed module!\n";
-    errs() << M;
-    exit(1);
+
+  //Debug code
+  if(printProcess) {
+    //Print GV. All GVs should be mapped.
+    for(auto& glv : M.globals()) {
+      outs() << "(" << symbolMap.get(&glv)->getName() << ")" << glv.getName() << "\n";
+    }
+
+    for(auto& F : M) {
+      //Print function & argument. All arguments should be mapped.
+      outs() << F.getName() << "(";
+      for(auto& arg : F.args()) {
+        outs() << " (" << symbolMap.get(&arg)->getName() << ")" << arg.getName();
+      }
+      outs() << " )\n";
+
+      //Print Instructions. All instructions should be mapped.
+      for(auto& BB : F) {
+        outs() << "  " << BB.getName() << "\n";
+        for(auto& I : BB) {
+          if(isa<AllocaInst>(I)) {
+            outs() << "    (" << symbolMap.get(&I)->getName() << ")" << I.getName() << "\n";
+          }
+          else if(RegisterGraph::DO_NOT_CONSIDER.find(I.getOpcode()) != RegisterGraph::DO_NOT_CONSIDER.end()) {
+            outs() << "  ";
+            I.print(outs());
+            outs() << "\n";
+          }
+          else
+            outs() << "    (" << symbolMap.get(&I)->getName() << ")" << I.getName() << "\n";
+        }
+      }
+    }
   }
 
+/*
+  TODO : features to be implemented in PR2
   //SSA is eliminated.
   //phi node is yet not deleted(assembly emitter will delete it),
   //but we ensure that every reg in phi nodes point to same registers.
@@ -66,7 +95,7 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   //  NOT) __r3__.7 = phi [%__r2__.2, %BB1], [%__r5__.0, %BB2], [%__arg0__, %BB3]
   SSAElimination();
   if (verifyModule(M, &errs(), nullptr)) {
-    errs() << "BUG: SSAElimPass created an ill-formed module!\n";
+    errs() << "BUG: SSAElimination created an ill-formed module!\n";
     errs() << M;
     exit(1);
   }
@@ -89,7 +118,7 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   Emitter.run(M);
 
   if (os != &outs()) delete os;
-
+*/
   return PreservedAnalyses::all();
 }
 
@@ -151,7 +180,7 @@ SymbolMap::SymbolMap(Module* M, TargetMachine TM) : M(M), TM(TM) {
   unsigned acc = 0; //accumulated offset from the gvp pointer
   for(Value& gv : M->globals()) {
     if(!isa<GlobalVariable>(gv)) continue;
-    unsigned size = getAccessSize(dyn_cast<GlobalVariable>(gv).getValueType());
+    unsigned size = getAccessSize(dyn_cast<GlobalVariable>(&gv)->getValueType());
     Memory* gvaddr = new Memory(TM.gvp(), acc);
     symbolTable[&gv] = gvaddr;
     coallocateSameValues(&gv, gvaddr);
@@ -172,7 +201,7 @@ void SymbolMap::coallocateSameValues(Value* value, Symbol* symbol) {
   for(User* u : value->users()) {
     Instruction* I = dyn_cast<Instruction>(u);
     //If u is an instruction && type declared in SAME_CONSIDER
-    if(I && SAME_CONSIDER.find(I->getOpcode()) != SAME_CONSIDER.end()) {
+    if(I && RegisterGraph::SAME_CONSIDER.find(I->getOpcode()) != RegisterGraph::SAME_CONSIDER.end()) {
       symbolTable[I] = symbol;
     }
   }
