@@ -29,6 +29,15 @@ unsigned getAccessSize(Type *T) {
   assert(false && "Unsupported access size type!");
 }
 
+unsigned getBitWidth(Type* T) {
+  if (isa<PointerType>(T))
+    return 64;
+  else if (isa<IntegerType>(T)) {
+    return T->getIntegerBitWidth();
+  }
+  assert(false && "Unsupported access size type!");
+}
+
 //---------------------------------------------------------------
 //class Backend
 //---------------------------------------------------------------
@@ -84,25 +93,18 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
     }
   }
 
-/*
-  TODO : features to be implemented in PR2
+  //TODO : features to be implemented in PR2
   //SSA is eliminated.
   //phi node is yet not deleted(assembly emitter will delete it),
   //but we ensure that every reg in phi nodes point to same registers.
   //  ex) __r3__.7 = phi [%__r3__.2, %BB1], [%__r3__.0, %BB2], [%__arg0__, %BB3]
   //  NOT) __r3__.7 = phi [%__r2__.2, %BB1], [%__r5__.0, %BB2], [%__arg0__, %BB3]
-  SSAElimination();
-  if (verifyModule(M, &errs(), nullptr)) {
-    errs() << "BUG: SSAElimination created an ill-formed module!\n";
-    errs() << M;
-    exit(1);
-  }
+  
+  //SSAElimination(M, symbolMap);
 
-  // For debugging, this will print the depromoted module.
-  if (printDepromotedModule)
-    M.print(outs(), nullptr);
-
-  // Now, let's emit assembly!
+  //Emits the assembly.
+  //If the outputFile is given as "-", print it in the console.
+  //Else, print it to the designated file.
   error_code EC;
   raw_ostream *os =
     outputFile == "-" ? &outs() : new raw_fd_ostream(outputFile, EC);
@@ -112,11 +114,15 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
     exit(1);
   }
 
-  AssemblyEmitter Emitter(os);
-  Emitter.run(M);
+  AssemblyEmitter Emitter(os, TM, symbolMap, spOffsetMap);
+  for(Function& F : M){
+    if(F.isDeclaration()) continue;
+    Emitter.visit(F);
+    *os << "end " << symbolMap.get(&F)->getName() << "\n";
+  }
 
   if (os != &outs()) delete os;
-*/
+
   return PreservedAnalyses::all();
 }
 
@@ -159,6 +165,10 @@ SymbolMap::SymbolMap(Module* M, TargetMachine TM) : M(M), TM(TM) {
   RegisterGraph RG(*M);
 
   for(Function& F : *M) {
+    assert(F.hasName() && "All functions in module should be named");
+    symbolTable[&F] = new Func(F.getName());
+
+    unsigned unnamedBB = 0;
 
     //Assign registers for arguments
     int i = 0;
@@ -169,15 +179,19 @@ SymbolMap::SymbolMap(Module* M, TargetMachine TM) : M(M), TM(TM) {
     }
 
     //Assign registers for instructions
-    for(auto it = inst_begin(&F); it != inst_end(&F); ++it) {
-      Instruction& I = *it;
+    for(BasicBlock& BB : F) {
 
-      //If not colored(alloca and its derivatives), do nothing.
-      if(RG.findValue(&I) == -1) continue;
+      symbolTable[&BB] = new Block(BB.hasName() ? BB.getName().str() : "_defaultBB" + to_string(unnamedBB++));
 
-      unsigned c = RG.getValueToColor(&F, &I);
-      Symbol* s = TM.reg(c);
-      symbolTable[&I] = s;
+      for(Instruction& I : BB) {
+        //If not colored(alloca and its derivatives), do nothing.
+        if(RG.findValue(&I) == -1) continue;
+
+        unsigned c = RG.getValueToColor(&F, &I);
+        Symbol* s = TM.reg(c);
+        symbolTable[&I] = s;
+
+      }
     }
   }
 

@@ -33,7 +33,7 @@ public:
 //Hardware registers
 class Register : public Symbol {
 public:
-  Register(StringRef name): Symbol(name) {}
+  Register(string name): Symbol(name) {}
 };
 //Memory addresses(GV, )
 class Memory : public Symbol {
@@ -44,6 +44,14 @@ public:
   Register* getBase();
   int64_t getoffset();
 };
+class Func : public Symbol {
+public:
+  Func(string name): Symbol(name) {}
+};
+class Block : public Symbol {
+public:
+  Block(string name): Symbol(name) {}
+};
 
 class TargetMachine {
   Register* regfile[16];
@@ -53,13 +61,13 @@ class TargetMachine {
 
 public:
   //Read-only getters for the register data stored in TargetMachine object.
-  Register* reg(unsigned index);
-  Register* arg(unsigned index);
+  Register* reg(unsigned);
+  Register* arg(unsigned);
   Register* sp();
   Register* gvp();
 
   //Checks the validity of the given symbol within the machine.
-  bool valid(Symbol* symbol);
+  bool valid(Symbol*);
   
   //Initializes the target machine.
   TargetMachine();
@@ -69,11 +77,48 @@ public:
 //backend/AssemblyEmitter.cpp
 //---------------------------------------------------------------
 
-class AssemblyEmitter {
+class AssemblyEmitter : public InstVisitor<AssemblyEmitter> {
   raw_ostream *fout;
+  TargetMachine* TM;
+
+  //Input IR characteristics
+  SymbolMap* SM;
+  map<Function*, unsigned>* spOffset;
+
+  //Current state variables
+  map<Register*, unsigned>* bandwidth;
+
+  //interface from values to string names of assigned symbols.
+  //references SM to find the assignee.
+  string name(Value&);
+
+  //updates the bandwidth and returns the value.
+  unsigned updateBandWidth(Value&);
+
 public:
-  AssemblyEmitter(raw_ostream *fout) : fout(fout) {}
-  void run(Module *M);
+  AssemblyEmitter(raw_ostream *fout, TargetMachine& TM, SymbolMap& SM, map<Function*, unsigned>& spOffset);
+
+  //Visit functions; should statically override.
+  void visit(Function&);
+  void visit(BasicBlock&);
+
+  void visitIcmpInst(ICmpInst&);
+  void visitAllocaInst(AllocaInst&);
+  void visitLoadInst(LoadInst&);
+  void visitStoreInst(StoreInst&);
+  void visitPHINode(PHINode&);
+  void visitTruncInst(TruncInst&);
+  void visitZExtInst(ZExtInst&);
+  void visitSExtInst(SExtInst&);
+  void visitPtrToIntInst(PtrToIntInst&);
+  void visitIntToPtrInst(IntToPtrInst&);
+  void visitBitCastInst(BitCastInst&);
+  void visitSelectInst(SelectInst&);
+  void visitCallInst(CallInst&);
+  void visitReturnInst(ReturnInst&);
+  void visitBranchInst(BranchInst&);
+  void visitSwitchInst(SwitchInst&);
+  void visitBinaryOperator(BinaryOperator&);
 };
 
 //---------------------------------------------------------------
@@ -130,6 +175,8 @@ public:
 //Function which returns the byte size of a Type.
 //brought from SimpleBackend(from repo swpp202001-compiler).
 unsigned getAccessSize(Type *T);
+
+unsigned getBitWidth(Type* T);
 
 } //end namespace backend
 

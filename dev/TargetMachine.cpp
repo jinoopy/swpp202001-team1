@@ -61,7 +61,7 @@ Memory::Memory(Register* base, int64_t offset) : base(base), offset(offset) {
 Register* Memory::getBase() {
     return base;
 }
-int64_t Memory::getoffset() {
+int64_t Memory::getOffset() {
     return offset;
 }
 
