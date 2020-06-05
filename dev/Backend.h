@@ -10,6 +10,8 @@
 #include "RegisterSpill.h"
 
 #include <string>
+#include <queue>
+#include <set>
 
 using namespace llvm;
 using namespace std;
@@ -125,6 +127,10 @@ public:
   //SymbolMap initially does not mark alloca and its derivatives.
   //processing should be seperately done.
   map<Function*, unsigned> processAlloca(Module& M, SymbolMap& SM);
+
+  void SSAElimination(Module &M, SymbolMap &symbolMap);
+  void addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMap, vector<vector<int>> &adjList);
+  Value *findLeastReg(unsigned i, BasicBlock &BB, SymbolMap &symbolMap);
 };
 
 //Function which returns the byte size of a Type.

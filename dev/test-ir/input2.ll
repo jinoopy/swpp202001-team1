@@ -13,7 +13,7 @@ header:                                           ; preds = %entry
 
 BB1:                                              ; preds = %BB2, %header
   %r3 = phi i32 [ 0, %header ], [ %r6, %BB2 ]
-  %r4 = phi i32 [ %r2, %header ], [ %r5, %BB2 ]
+  %r4 = phi i32 [ %r2, %header ], [ %r6, %BB2 ]
   %r5 = add nsw i32 %r4, %r3
   br label %BB2
 
@@ -27,7 +27,7 @@ BB2:                                              ; preds = %BB1
   br i1 %r7.temp.l1, label %BB1, label %BB3
 
 BB3:                                              ; preds = %BB2
-  %r8 = phi i32 [ %r5, %BB2 ]
+  %r8 = phi i32 [ %r6, %BB2 ]
   br label %BB4
 
 BB4:                                              ; preds = %BB3
@@ -38,6 +38,6 @@ BB4:                                              ; preds = %BB3
   br i1 %r10, label %header, label %BB5
 
 BB5:                                              ; preds = %BB4
-  %r11 = phi i32 [ %r8, %BB4 ]
+  %r11 = phi i32 [ %r9, %BB4 ]
   ret i32 %r11
 }
