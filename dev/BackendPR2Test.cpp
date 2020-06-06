@@ -19,7 +19,7 @@ protected:
     map<StringRef, Value*> nameToValue;
     Backend backend;
 
-    BackendTest() : backend("NOT_FOR_OUTPUT", true) {}
+    BackendTest() : backend("-", true) {}
 
     void parseAssembly(StringRef path) {
         SMDiagnostic Error;

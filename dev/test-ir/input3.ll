@@ -1,13 +1,8 @@
-@arr = global [10 x i32] zeroinitializer
-@GV = global i64 0, align 8
-@GV2 = global i64 0, align 8 
-
 define i32 @main() {
 entry:
   %r0 = alloca [10 x i32], align 16
-  %test1 = bitcast [10 x i32]* @arr to i64*
+  %test1 = bitcast [10 x i32]* %r0 to i64*
   %test2 = ptrtoint [10 x i32]* %r0 to i64
-  %test3 = bitcast i64* @GV2 to i8*
   br label %BB1
 
 BB1:                                              ; preds = %BB3, %entry
