@@ -71,7 +71,7 @@ public:
   //Register file size of the target machine.
   //static const unsigned REGISTER_CAP = 16;
   //FIXME: Testing purposes(Most conventional level programs fall in 16 regs)
-  static const unsigned REGISTER_CAP = 4;
+  static const unsigned REGISTER_CAP = 16;
 
   //Finds the registers that need to be spilled
   //and actually spills them by adding alloca, store, and load.
