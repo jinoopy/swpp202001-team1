@@ -1,4 +1,6 @@
-@gv = global i32 0
+@gv = global i32 5
+@gv2 = global i64 186
+@gv3 = global i8 -5
 
 define i32 @main(i32 %arg) {
 entry:

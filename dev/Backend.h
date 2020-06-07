@@ -2,6 +2,7 @@
 #define BACKEND_H
 
 #include "llvm/IR/PassManager.h"
+#include "llvm/IR/InstVisitor.h"
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Passes/PassPlugin.h"
 #include "llvm/Support/raw_ostream.h"
@@ -25,34 +26,38 @@ namespace backend {
 
 class Symbol{
 protected:
-  friend TargetMachine;
   string name;
   Symbol() = default;
+  virtual ~Symbol() = default;
   Symbol(string name): name(name) {}
 public:
   string getName();
 };
 //Hardware registers
-class Register : public Symbol {
+class Register : public virtual Symbol {
 public:
   Register(string name): Symbol(name) {}
+  ~Register() {}
 };
 //Memory addresses(GV, )
-class Memory : public Symbol {
+class Memory : public virtual Symbol {
   Register* base;
   int64_t offset;
 public:
   Memory(Register* base, int64_t offset);
+  ~Memory() {}
   Register* getBase();
-  int64_t getoffset();
+  int64_t getOffset();
 };
 class Func : public Symbol {
 public:
   Func(string name): Symbol(name) {}
+  ~Func() {}
 };
 class Block : public Symbol {
 public:
   Block(string name): Symbol(name) {}
+  ~Block() {}
 };
 
 class TargetMachine {
@@ -79,32 +84,35 @@ public:
 //backend/AssemblyEmitter.cpp
 //---------------------------------------------------------------
 
+class SymbolMap;
 class AssemblyEmitter : public InstVisitor<AssemblyEmitter> {
   raw_ostream *fout;
   TargetMachine* TM;
 
   //Input IR characteristics
   SymbolMap* SM;
-  map<Function*, unsigned>* spOffset;
-
-  //Current state variables
-  map<Register*, unsigned>* bandwidth;
+  map<Function*, unsigned> spOffset;
 
   //interface from values to string names of assigned symbols.
   //references SM to find the assignee.
-  string name(Value&);
+  string name(Value*);
+
+  //functions that emit assembly
+  string emitInst(vector<string>);
+  string emitBinary(Instruction*, string, string, string);
+  string emitCopy(Instruction*, Value*);
 
   //updates the bandwidth and returns the value.
-  unsigned updateBandWidth(Value&);
+  string stringBandWidth(Value*);
 
 public:
   AssemblyEmitter(raw_ostream *fout, TargetMachine& TM, SymbolMap& SM, map<Function*, unsigned>& spOffset);
 
   //Visit functions; should statically override.
-  void visit(Function&);
-  void visit(BasicBlock&);
+  void visitFunction(Function&);
+  void visitBasicBlock(BasicBlock&);
 
-  void visitIcmpInst(ICmpInst&);
+  void visitICmpInst(ICmpInst&);
   void visitAllocaInst(AllocaInst&);
   void visitLoadInst(LoadInst&);
   void visitStoreInst(StoreInst&);

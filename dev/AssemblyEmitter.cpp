@@ -6,8 +6,16 @@ using namespace backend;
 
 namespace backend {
 
+string AssemblyEmitter::name(Value* v) {
+    if(isa<ConstantInt>(v)) {
+        //return the value itself.
+        return to_string(dyn_cast<ConstantInt>(v)->getZExtValue());
+    }
+    return SM->get(v)->getName();
+}
+
 //static functions for emitting common formats.
-string emitInst(vector<string> printlist) {
+string AssemblyEmitter::emitInst(vector<string> printlist) {
     string str = "  ";
     for(string s : printlist) {
         str += s + " ";
@@ -15,54 +23,53 @@ string emitInst(vector<string> printlist) {
     str += "\n";
     return str;
 }
-string emitBinary(Instruction& v, string opcode, string op1, string op2) {
-    return emitInst({name(v), "=", opcode, op1, op2, getBitWidth(v.getType())});
+string AssemblyEmitter::emitBinary(Instruction* v, string opcode, string op1, string op2) {
+    return emitInst({name(v), "=", opcode, op1, op2, stringBandWidth(v)});
 }
-string emitCopy(Instruction& v, Value& op) {
+string AssemblyEmitter::emitCopy(Instruction* v, Value* op) {
     return emitBinary(v, "mul", name(op), "1");
 }
 
-string AssemblyEmitter::name(Value& v) {
-    if(isa<ConstantInt>(v)) {
-        //return the value itself.
-        return to_string(dyn_cast<ConstantInt>(v).getZExtValue());
+string AssemblyEmitter::stringBandWidth(Value* v) {
+    if(isa<Function>(v) || isa<BasicBlock>(v)) {
+        assert(false && "v should be a digit-typed value");
     }
-    return SM.get(&v)->getName();
+    return to_string(getBitWidth(v->getType()));
 }
 
-string AssemblyEmitter::updateBandWidth(Value& v) {
-    bandwidth[SM.get(v)] = getBitWidth(v.getType());
-    return to_string(bandwidth[SM.get(v)]);
-}
+AssemblyEmitter::AssemblyEmitter(raw_ostream *fout, TargetMachine& TM, SymbolMap& SM, map<Function*, unsigned>& spOffset) :
+            fout(fout), TM(&TM), SM(&SM), spOffset(spOffset) {}
 
-AssemblyEmitter(raw_ostream *fout, TargetMachine& TM, SymbolMap& SM, map<Function*, unsigned& spOffset) :
-            fout(fout), TM(&TM), SM(&SM), spOffset(&spOffset) {
-
-    for(unsigned i = 0 ; i < 16; i++) {
-        bandwidth[TM.reg(i)] = 0;
-        bandwidth[TM.arg(i)] = 0;
-    }
-
-}
-
-void AssemblyEmitter::visit(Function& F) {
+void AssemblyEmitter::visitFunction(Function& F) {
     //print the starting code.
     //finishing code will be printed outside the AssemblyEmitter.
-    *fout << "start " << name(F) << " " << F.arg_size() << ":\n";
-    *fout << emitInst({"sp = sub sp",to_string(spOffset[&F]),"64"});
-
-    //if main, import GV within.
-    //this code should happen only if GV array was in the initial program.
-    //GV values are all lowered into alloca + calls
-    //TODO: 좀 나중에 하겠습니다...
+    *fout << "start " << name(&F) <<*" " << F.arg_size() << ":\n";
 }
-void AssemblyEmitter::visit(BasicBlock& BB) {
-    *fout << "." << name(BB) << ":\n";
+void AssemblyEmitter::visitBasicBlock(BasicBlock& BB) {
+    *fout << "." << name(&BB) << ":\n";
+
+    //If entry block, modify SP.
+    if(&(BB.getParent()->getEntryBlock()) == &BB) {
+        //if main, import GV within.
+        //this code should happen only if GV array was in the initial program.
+        //GV values are all lowered into alloca + calls
+        if(BB.getParent()->getName() == "main") {
+            *fout << "  ; Init global variables";
+            for(auto& gv : BB.getModule()->globals()) {
+                //temporarily stores the GV pointer.
+                *fout << emitInst({"r0 = malloc", to_string(getAccessSize(gv.getType()))});
+                if(!gv.getInitializer()->isZeroValue())
+                    *fout << emitInst({"store", name(gv.getInitializer()), to_string(getAccessSize(gv.getType())), "r0 0"});
+            }
+        }
+        *fout << "  ; Init stack pointer"l
+        *fout << emitInst({"sp = sub sp",to_string(spOffset[BB.getParent()]),"64"});
+    }
 }
 
 //Compare insts.
-void AssemblyEmitter::visitIcmpInst(ICmpInst& I) {
-    *fout << emitInst({name(I),"= icmp", I.getPredicateName(), name(I.getOperand(0)), name(I.getOperand(1)), updateBandWidth(I)});
+void AssemblyEmitter::visitICmpInst(ICmpInst& I) {
+    *fout << emitInst({name(&I),"=*icmp", I.getPredicateName(I.getPredicate()), name(I.getOperand(0)), name(I.getOperand(1)), stringBandWidth(&I)});
 }
 
 //Alloca inst.
@@ -72,49 +79,47 @@ void AssemblyEmitter::visitAllocaInst(AllocaInst& I) {
 
 //Memory Access insts.
 void AssemblyEmitter::visitLoadInst(LoadInst& I) {
-    Value& ptr = I.getPointerOperand();
+    Value* ptr = I.getPointerOperand();
     //bytes to load
-    string size = to_string(getAccessSize(dyn_cast<PointerType>(ptr.getType())->getElementType()));
-    Symbol* symbol = SM.get(&ptr);
+    string size = to_string(getAccessSize(dyn_cast<PointerType>(ptr->getType())->getElementType()));
+    Symbol* symbol = SM->get(ptr);
     //if pointer operand is a memory value(GV or alloca),
-    if(Memory* mem = static_cast<Memory>(symbol)) {
-        if(mem->getBase() == TM.sp()) {
-            *fout << emitInst({name(I), "= load", size ,"sp", mem->getOffset()});
+    if(Memory* mem = dynamic_cast<Memory*>(symbol)) {
+        if(mem->getBase() == TM->sp()) {
+            *fout << emitInst({name(&I), "= load", size ,"sp", to_string(mem->getOffset())});
         }
-        else if(mem->getBase() == TM.gvp()) {
-            *fout << emitInst({name(I), "= load", size, "20480", mem->getOffset()});
+        else if(mem->getBase() == TM->gvp()) {
+            *fout << emitInst({name(&I), "= load", size, "20480", to_string(mem->getOffset())});
         }
         else assert(false && "base of memory pointers should be sp or gvp");
     }
     //else a pointer stored in register,
-    else if(Register* reg = static_cast<Register>(Symbol)) {
-        *fout << emitInst({name(I), "= load", size, reg->getName(), "0"});
+    else if(Register* reg = dynamic_cast<Register*>(symbol)) {
+        *fout << emitInst({name(&I), "= load", size, reg->getName(), "0"});
     }
     else assert(false && "pointer of a memory operation should have an appropriate symbol assigned");
-    updateBandWidth(I);
 }
 void AssemblyEmitter::visitStoreInst(StoreInst& I) {
-    Value& ptr = I.getPointerOperand();
+    Value* ptr = I.getPointerOperand();
     //bytes to load
-    string size = to_string(getAccessSize(dyn_cast<PointerType>(ptr.getType())->getElementType()));
-    Value& val = I.getValueOperand();
-    Symbol* symbol = SM.get(&ptr);
+    string size = to_string(getAccessSize(dyn_cast<PointerType>(ptr->getType())->getElementType()));
+    Value* val = I.getValueOperand();
+    Symbol* symbol = SM->get(ptr);
     //if pointer operand is a memory value(GV or alloca),
-    if(Memory* mem = static_cast<Memory>(symbol)) {
-        if(mem->getBase() == TM.sp()) {
-            *fout << emitInst({"store", name(val), size ,"sp", mem->getOffset()});
+    if(Memory* mem = dynamic_cast<Memory*>(symbol)) {
+        if(mem->getBase() == TM->sp()) {
+            *fout << emitInst({"store", name(val), size ,"sp", to_string(mem->getOffset())});
         }
-        else if(mem->getBase() == TM.gvp()) {
-            *fout << emitInst({"store", name(val), size, "20480", mem->getOffset()});
+        else if(mem->getBase() == TM->gvp()) {
+            *fout << emitInst({"store", name(val), size, "20480", to_string(mem->getOffset())});
         }
         else assert(false && "base of memory pointers should be sp or gvp");
     }
     //else a pointer stored in register,
-    else if(Register* reg = static_cast<Register>(Symbol)) {
-        *fout << emitInst({"store", name(val), size, reg->getName(), "0"});
+    else if(Register* reg = dynamic_cast<Register*>(symbol)) {
+        *fout << emitInst({"store", name(val),size, reg->getName(), "0"});
     }
     else assert(false && "pointer of a memory operation should have an appropriate symbol assigned");
-    updateBandWidth(I);
 }
 
 //PHI Node inst.
@@ -126,18 +131,16 @@ void AssemblyEmitter::visitPHINode(PHINode& I) {
 void AssemblyEmitter::visitTruncInst(TruncInst& I) {
     //If coallocated to the same registers, do nothing.
     //Else, copy the value.
-    if(SM.get(I) != SM.get(I.getOperand(0))) {
-        *fout << emitCopy(I, I.getOperand(0));
+    if(SM->get(&I) != SM->get(I.getOperand(0))) {
+        *fout << emitCopy(&I, I.getOperand(0));
     }
-    updateBandWidth(I);
 }
 void AssemblyEmitter::visitZExtInst(ZExtInst& I) {
     //If coallocated to the same registers, do nothing.
     //Else, copy the value.
-    if(SM.get(I) != SM.get(I.getOperand(0))) {
-        *fout << emitCopy(I, I.getOperand(0));
+    if(SM->get(&I) != SM->get(I.getOperand(0))) {
+        *fout << emitCopy(&I, I.getOperand(0));
     }
-    updateBandWidth(I);
 }
 void AssemblyEmitter::visitSExtInst(SExtInst& I) {
     //Do nothing.
@@ -145,48 +148,45 @@ void AssemblyEmitter::visitSExtInst(SExtInst& I) {
     //swpp202001-compiler: treated as no-op => is this a correct implementation?
 }
 void AssemblyEmitter::visitPtrToIntInst(PtrToIntInst& I) {
-    Value& ptr = I.getPointerOperand();
-    Symbol* symbol = SM.get(&ptr);
+    Value* ptr = I.getPointerOperand();
+    Symbol* symbol = SM->get(ptr);
     //if pointer operand is a memory value(GV or alloca),
-    if(Memory* mem = static_cast<Memory>(symbol)) {
-        if(mem->getBase() == TM.sp()) {
-            *fout << emitBinary(I, "add", "sp", to_string(mem->getoffset()));
+    if(Memory* mem = dynamic_cast<Memory*>(symbol)) {
+        if(mem->getBase() == TM->sp()) {
+            *fout << emitBinary(&I, "add", "sp", to_string(mem->getOffset()));
         }
-        else if(mem->getBase() == TM.gvp()) {
-            *fout << emitBinary(I, "add", "20480", to_string(mem->getoffset()));
+        else if(mem->getBase() == TM->gvp()) {
+            *fout << emitBinary(&I, "add", "20480", to_string(mem->getOffset()));
         }
         else assert(false && "base of memory pointers should be sp or gvp");
     }
     //else a pointer stored in register,
-    else if(Register* reg = static_cast<Register>(Symbol)) {
+    else if(Register* reg = dynamic_cast<Register*>(symbol)) {
         //if from and to values are stored in a different source, copy.
-        if(SM.get(I) != SM.get(I.getOperand(0))) {
-            *fout << emitCopy(I, I.getOperand(0));
+        if(SM->get(&I) != SM->get(I.getOperand(0))) {
+            *fout << emitCopy(&I, I.getOperand(0));
         }
     }
     else assert(false && "pointer of a memory operation should have an appropriate symbol assigned");
-    updateBandWidth(I);
 }
 void AssemblyEmitter::visitIntToPtrInst(IntToPtrInst& I) {
     //If coallocated to the same registers, do nothing.
     //Else, copy the value.
-    if(SM.get(I) != SM.get(I.getOperand(0))) {
-        *fout << emitCopy(I, I.getOperand(0));
+    if(SM->get(&I) != SM->get(I.getOperand(0))) {
+        *fout << emitCopy(&I, I.getOperand(0));
     }
-    updateBandWidth(I);
 }
 void AssemblyEmitter::visitBitCastInst(BitCastInst& I) {
     //If coallocated to the same registers, do nothing.
     //Else, copy the value.
-    if(SM.get(I) != SM.get(I.getOperand(0))) {
-        *fout << emitCopy(I, I.getOperand(0));
+    if(SM->get(&I) != SM->get(I.getOperand(0))) {
+        *fout << emitCopy(&I, I.getOperand(0));
     }
-    updateBandWidth(I);
 }
 
 //Select inst.
 void AssemblyEmitter::visitSelectInst(SelectInst& I) {
-    *fout << emitInst({name(I), "= select", name(I.getCondition()), name(I.getTrueValue()), name(I.getFalseValue()), updateBandWidth(I)})
+    *fout << emitInst({name(&I), "= select", name(I.getCondition()), name(I.getTrueValue()), name(I.getFalseValue()), stringBandWidth(&I)});
 }
 
 void AssemblyEmitter::visitCallInst(CallInst& I) {
@@ -196,20 +196,20 @@ void AssemblyEmitter::visitCallInst(CallInst& I) {
     
     //Collect all arguments
     vector<string> args;
-    for(Value& arg : I.args()) {
-        args.push_back(name(arg));
+    for(Use& arg : I.args()) {
+        args.push_back(name(arg.get()));
     }
-    if(name == "malloc") {
+    if(Fname == "malloc") {
         assert(args.size()==1 && "argument of malloc() should be 1");
-        *fout << emitInst({name(I), "= malloc", name(arg[0])});
+        *fout << emitInst({name(&I), "= malloc", name(I.getArgOperand(0))});
     }
-    else if(name == "free") {
+    else if(Fname == "free") {
         assert(args.size()==1 && "argument of free() should be 1");
-        *fout << emitInst({name(I), "= free", name(arg[0])});
+        *fout << emitInst({name(&I), "= free", name(I.getArgOperand(0))});
     }
     //ordinary function calls.
     else {
-        vector<string> printlist = {name(I), "= malloc", name(arg[0])};
+        vector<string> printlist = {name(&I), "= call", Fname};
         printlist.insert(printlist.end(), args.begin(), args.end());
         *fout << emitInst(printlist);
     }
@@ -225,11 +225,11 @@ void AssemblyEmitter::visitReturnInst(ReturnInst& I) {
 void AssemblyEmitter::visitBranchInst(BranchInst& I) {
     if(I.isConditional()) {
         assert(I.getNumSuccessors() == 2 && "conditional branches must have 2 successors");
-        *fout << emitInst("br", name(I.getCondition()), name(I.getSuccessor(0)), name(I.getSuccessor(1)));
+        *fout << emitInst({"br", name(I.getCondition()), name(I.getSuccessor(0)), name(I.getSuccessor(1))});
     }
     else {
         assert(I.getNumSuccessors() == 1 && "unconditional branches must have 1 successor");
-        *fout << emitInst("br", name(I.getSuccessor(0)));
+        *fout << emitInst({"br", name(I.getSuccessor(0))});
     }
 }
 void AssemblyEmitter::visitSwitchInst(SwitchInst& I) {
@@ -237,7 +237,7 @@ void AssemblyEmitter::visitSwitchInst(SwitchInst& I) {
 }
 void AssemblyEmitter::visitBinaryOperator(BinaryOperator& I) {
     string opcode = "";
-    switch(BO.getOpcode()) {
+    switch(I.getOpcode()) {
     case Instruction::UDiv: opcode = "udiv"; break;
     case Instruction::SDiv: opcode = "sdiv"; break;
     case Instruction::URem: opcode = "urem"; break;
@@ -254,6 +254,7 @@ void AssemblyEmitter::visitBinaryOperator(BinaryOperator& I) {
     default: assert(false && "undefined binary operation");
     }
 
-    *fout << emitBinary(I, opcode, name(I.getOperand(0)), name(I.getOperand(1)));
+    *fout << emitBinary(&I, opcode, name(I.getOperand(0)), name(I.getOperand(1)));
 }
+
 }
