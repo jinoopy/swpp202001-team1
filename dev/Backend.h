@@ -129,8 +129,8 @@ public:
   map<Function*, unsigned> processAlloca(Module& M, SymbolMap& SM);
 
   void SSAElimination(Module &, SymbolMap &, RegisterGraph &);
-  void addEdges(BasicBlock &, BasicBlock &, SymbolMap &, vector<vector<int>> &);
-  Value *findLeastReg(unsigned, BasicBlock &, SymbolMap &);
+  void addEdges(BasicBlock &, BasicBlock &, SymbolMap &, vector<vector<Symbol *>> &);
+  Value *findLeastReg(Symbol *, BasicBlock &, SymbolMap &);
 };
 
 //Function which returns the byte size of a Type.
