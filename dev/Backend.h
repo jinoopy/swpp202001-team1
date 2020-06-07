@@ -10,6 +10,8 @@
 #include "RegisterSpill.h"
 
 #include <string>
+#include <queue>
+#include <set>
 
 using namespace llvm;
 using namespace std;
@@ -137,7 +139,7 @@ public:
   //Initializes the symbolTable.
   //Every register/memory stored values(GV, insts, args) are mapped to register.
   //Allocas are allocated a bit after.
-  SymbolMap(Module*, TargetMachine);
+  SymbolMap(Module*, TargetMachine&, RegisterGraph&);
 
   //interface for indirect access to symbolTable.
   void set(Value*, Symbol*);
@@ -170,6 +172,10 @@ public:
   //SymbolMap initially does not mark alloca and its derivatives.
   //processing should be seperately done.
   map<Function*, unsigned> processAlloca(Module& M, SymbolMap& SM);
+
+  void SSAElimination(Module &, SymbolMap &, RegisterGraph &);
+  void addEdges(BasicBlock &, BasicBlock &, SymbolMap &, vector<vector<Symbol *>> &);
+  Value *findLeastReg(Symbol *, BasicBlock &, SymbolMap &);
 };
 
 //Function which returns the byte size of a Type.

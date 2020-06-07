@@ -19,7 +19,7 @@ protected:
     map<StringRef, Value*> nameToValue;
     Backend backend;
 
-    BackendTest() : backend("-", true) {}
+    BackendTest() : backend("-", false) {}
 
     void parseAssembly(StringRef path) {
         SMDiagnostic Error;
@@ -76,6 +76,15 @@ TEST_F(BackendTest, Test3) {
 
 TEST_F(BackendTest, Test4) {
     parseAssembly("test-ir/input4.ll");
+    
+    RegisterGraph RG(*M);
+    ModuleAnalysisManager MAM;
+
+    backend.run(*M, MAM);
+}
+
+TEST_F(BackendTest, Test5) {
+    parseAssembly("test-ir/input5.ll");
     
     RegisterGraph RG(*M);
     ModuleAnalysisManager MAM;
