@@ -38,10 +38,12 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
     errs() << "Syntax error: Input module is not syntactically correct";
     exit(1);
   }
+  
+  RegisterGraph RG(M);
 
   //Build symbol table and rename all.
   //Every values are mapped to the symbol table.
-  SymbolMap symbolMap(&M, TM);
+  SymbolMap symbolMap(&M, TM, RG);
 
   //Process alloca, stack pointer and related instructions.
   //- Allocas should reside only on the entry block.
@@ -50,6 +52,25 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   //- allocas and its direct uses are renamed: __st__offset__ ex) __st__8__
   map<Function*, unsigned> spOffsetMap = processAlloca(M, symbolMap);
 
+/*
+  TODO : features to be implemented in PR2
+  //SSA is eliminated.
+  //phi node is yet not deleted(assembly emitter will delete it),
+  //but we ensure that every reg in phi nodes point to same registers.
+  //  ex) __r3__.7 = phi [%__r3__.2, %BB1], [%__r3__.0, %BB2], [%__arg0__, %BB3]
+  //  NOT) __r3__.7 = phi [%__r2__.2, %BB1], [%__r5__.0, %BB2], [%__arg0__, %BB3]
+  */
+  SSAElimination(M, symbolMap, RG);
+  
+  if (verifyModule(M, &errs(), nullptr)) {
+    errs() << "BUG: SSAElimination created an ill-formed module!\n";
+    errs() << M;
+    exit(1);
+  }
+/*
+  // For debugging, this will print the depromoted module.
+  if (printDepromotedModule)*/
+    M.print(outs(), nullptr);
   //Debug code
   if(printProcess) {
     //Print GV. All GVs should be mapped.
@@ -83,27 +104,8 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
       }
     }
   }
-
-/*
-  TODO : features to be implemented in PR2
-  //SSA is eliminated.
-  //phi node is yet not deleted(assembly emitter will delete it),
-  //but we ensure that every reg in phi nodes point to same registers.
-  //  ex) __r3__.7 = phi [%__r3__.2, %BB1], [%__r3__.0, %BB2], [%__arg0__, %BB3]
-  //  NOT) __r3__.7 = phi [%__r2__.2, %BB1], [%__r5__.0, %BB2], [%__arg0__, %BB3]
-  */
-  SSAElimination(M, symbolMap);
-  
-  if (verifyModule(M, &errs(), nullptr)) {
-    errs() << "BUG: SSAElimination created an ill-formed module!\n";
-    errs() << M;
-    exit(1);
-  }
-/*
-  // For debugging, this will print the depromoted module.
-  if (printDepromotedModule)*/
-    M.print(outs(), nullptr);/*
-
+	
+  /*
   // Now, let's emit assembly!
   error_code EC;
   raw_ostream *os =
@@ -118,7 +120,7 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   Emitter.run(M);
 
   if (os != &outs()) delete os;
-*/
+  */
   return PreservedAnalyses::all();
 }
 
@@ -133,7 +135,7 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
 //        move values.
 //   (ii) Otherwise, just repeat (xor)swapping two registers.
 // Following function implements above explanation.
-void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
+void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG) {
 	LLVMContext &Context = M.getContext();
 	for(Function &F : M) {
 		if(F.isDeclaration()) {
@@ -155,6 +157,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 			// To store the number of incoming edge.
 			// If there is u -> v edge in graph, it means the value of register v
 			// should move to register u.
+			
 			vector<unsigned> indegree(16, 0);
 			set<int> unused;
 			for(unsigned i = 0; i < 16; i++) {
@@ -162,7 +165,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 					indegree[there]++;
 				}
 				// If a register has no outgoing edge, store and use as temporary register.
-				if(adjList[i].size() == 0) {
+				if(i >= RG.getNumColors(&F)) {
 					unused.insert(i);
 				}
 			}
@@ -196,11 +199,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 					ptoi->insertBefore(BB.getTerminator());
 					symbolMap.set(ptoi, TM.reg(curReg));
 
-					Instruction *moveInst = BinaryOperator::CreateMul(ptoi, ConstantInt::get(Context, APInt(64, 1)));
-					moveInst->insertBefore(BB.getTerminator());
-					symbolMap.set(moveInst, TM.reg(curReg));
-
-					Instruction *itop = CastInst::CreateBitOrPointerCast(moveInst, value->getType());
+					Instruction *itop = CastInst::CreateBitOrPointerCast(ptoi, value->getType());
 					itop->insertBefore(BB.getTerminator());
 					symbolMap.set(itop, TM.reg(curReg));
 				} else {
@@ -231,11 +230,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 							ptoi->insertBefore(BB.getTerminator());
 							symbolMap.set(ptoi, TM.reg(registerNum));
 
-							moveToTemp = BinaryOperator::CreateMul(ptoi, ConstantInt::get(Context, APInt(64, 1)));
-							moveToTemp->insertBefore(BB.getTerminator());
-							symbolMap.set(moveToTemp, TM.reg(registerNum));
-
-							Instruction *itop = CastInst::CreateBitOrPointerCast(moveToTemp, value->getType());
+							Instruction *itop = CastInst::CreateBitOrPointerCast(ptoi, value->getType());
 							itop->insertBefore(BB.getTerminator());
 							symbolMap.set(itop, TM.reg(registerNum));
 						} else {
@@ -259,15 +254,12 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 								ptoi->insertBefore(BB.getTerminator());
 								symbolMap.set(ptoi, TM.reg(curReg));
 
-								Instruction *moveInst = BinaryOperator::CreateMul(ptoi, ConstantInt::get(Context, APInt(64, 1)));
-								moveInst->insertBefore(BB.getTerminator());
-								symbolMap.set(moveInst, TM.reg(curReg));
-
-								Instruction *itop = CastInst::CreateBitOrPointerCast(moveInst, nextValue->getType());
+								Instruction *itop = CastInst::CreateBitOrPointerCast(ptoi, nextValue->getType());
 								itop->insertBefore(BB.getTerminator());
 								symbolMap.set(itop, TM.reg(curReg));
 							} else {
-								Instruction *moveInst = BinaryOperator::CreateMul(nextValue, ConstantInt::get(Context, APInt(value->getType()->getIntegerBitWidth(), 1)));
+								outs() << value->getName() << " " << nextValue->getName();
+								Instruction *moveInst = BinaryOperator::CreateMul(nextValue, ConstantInt::get(Context, APInt(nextValue->getType()->getIntegerBitWidth(), 1)));
 								moveInst->insertBefore(BB.getTerminator());
 								symbolMap.set(moveInst, TM.reg(curReg));
 							}
@@ -383,7 +375,7 @@ Value *Backend::findLeastReg(unsigned regNum, BasicBlock &BB, SymbolMap &symbolM
 				}
 				Value *value = phi->getIncomingValue(j);
 				Symbol *symbol = symbolMap.get(value);
-				if(symbol && symbol->getName().substr(1) == itostr(regNum)) {
+				if(symbol && symbol->getName() == "r"+itostr(regNum)) {
 					return value;
 				}
 			}
@@ -417,6 +409,7 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 				continue;
 			}
 			string instName = instSymbol->getName();
+			outs() << instName << "\n";
 			int instNum = stoi(instName.substr(1));
 			// phiNum == instNum -> self loop, ignore it (because it is useless)
 			if(phiNum == instNum) {
@@ -432,6 +425,7 @@ map<Function*, unsigned> Backend::processAlloca(Module& M, SymbolMap& SM) {
   map<Function*, unsigned> spOffsetMap;
 
   for(Function& F : M) {
+	if(F.isDeclaration()) continue;
     BasicBlock& entry = F.getEntryBlock();
 
     //Process alloca instructions which are only in the entry block.
@@ -460,10 +454,8 @@ map<Function*, unsigned> Backend::processAlloca(Module& M, SymbolMap& SM) {
 //class SymbolMap
 //---------------------------------------------------------------
 
-SymbolMap::SymbolMap(Module* M, TargetMachine TM) : M(M), TM(TM) {
+SymbolMap::SymbolMap(Module* M, TargetMachine& TM, RegisterGraph& RG) : M(M), TM(TM) {
   //Initiate Machine symbols.
-
-  RegisterGraph RG(*M);
 
   for(Function& F : *M) {
 
