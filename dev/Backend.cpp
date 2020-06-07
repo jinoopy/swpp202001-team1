@@ -183,7 +183,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 					q.push(i);
 				}
 			}
-
+			outs() << "debug point 1\n";
 			while(!q.empty()) {
 				unsigned curReg = q.front();
 				q.pop();
@@ -215,7 +215,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 					q.push(stoi(adjList[curReg][0]->getName().substr(1)));
 				}
 			}
-
+			outs() << "debug point 2\n";
 			// countRest is under 1 if graph has no loop or only one self loop.
 			if(countRest <= 1) {
 				continue;
@@ -233,6 +233,8 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 							ptoi->insertBefore(BB.getTerminator());
 							symbolMap.set(ptoi, TM.reg(registerNum));
 
+							moveToTemp = ptoi;
+
 							Instruction *itop = CastInst::CreateBitOrPointerCast(ptoi, value->getType());
 							itop->insertBefore(BB.getTerminator());
 							symbolMap.set(itop, TM.reg(registerNum));
@@ -243,6 +245,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 						}
 						unsigned lastQueue;
 						// Move the value in the loop.
+						outs() << "debug point 3\n";
 						while(!q.empty()) {
 							unsigned curReg = q.front();
 							q.pop();
@@ -253,18 +256,23 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 							}
 							Value *nextValue = findLeastReg(adjList[curReg][0], BB, symbolMap);
 							if(nextValue->getType()->isPointerTy()) {
+								outs() << "debug point 3-1\n";
 								Instruction *ptoi = CastInst::CreateBitOrPointerCast(nextValue, IntegerType::getInt64Ty(Context));
 								ptoi->insertBefore(BB.getTerminator());
 								symbolMap.set(ptoi, TM.reg(curReg));
 
+								moveToTemp = ptoi;
+
 								Instruction *itop = CastInst::CreateBitOrPointerCast(ptoi, nextValue->getType());
 								itop->insertBefore(BB.getTerminator());
 								symbolMap.set(itop, TM.reg(curReg));
+								outs() << "debug point 3-1 complete\n";
 							} else {
-								outs() << value->getName() << " " << nextValue->getName();
+								outs() << "debug point 3-2\n";
 								Instruction *moveInst = BinaryOperator::CreateMul(nextValue, ConstantInt::get(Context, APInt(nextValue->getType()->getIntegerBitWidth(), 1)));
 								moveInst->insertBefore(BB.getTerminator());
 								symbolMap.set(moveInst, TM.reg(curReg));
+								outs() << "debug point 3-2 complete\n";
 							}
 
 							if(adjList[curReg][0]->getName().substr(0, 1) == "r"
@@ -274,20 +282,23 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 						}
 						// At the end, move a value of temporary register to a register before register i.
 						Instruction *moveFromTemp = BinaryOperator::CreateMul(moveToTemp, ConstantInt::get(Context, APInt(moveToTemp->getType()->getIntegerBitWidth(), 1)));
+						outs() << "debug point 3-3\n";
 						moveFromTemp->insertBefore(BB.getTerminator());
 						symbolMap.set(moveFromTemp, TM.reg(lastQueue));
-
+						outs() << "debug point 3-3 halfway\n";
 						if(value->getType()->isPointerTy()) {
 							Instruction *itop = CastInst::CreateBitOrPointerCast(moveFromTemp, value->getType());
 							itop->insertBefore(BB.getTerminator());
 							symbolMap.set(itop, TM.reg(lastQueue));
 						}
+						outs() << "debug point 3-3 complete\n";
 
 						// Cause the graph can have at most 2 loops, so continue to traverse.
 					}
 				}
 			} else {
 				// Swap two adjacent registers.
+				outs() << "debug point 4\n";
 				for(unsigned i = 0; i < 16; i++) {
 					if(indegree[i] > 0) {
 						q.push(i);
