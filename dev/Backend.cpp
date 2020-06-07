@@ -134,12 +134,12 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
 //   (ii) Otherwise, just repeat (xor)swapping two registers.
 // Following function implements above explanation.
 void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
+	LLVMContext &Context = M.getContext();
 	for(Function &F : M) {
 		if(F.isDeclaration()) {
 			continue;
 		}
 		for(BasicBlock &BB : F) {
-			LLVMContext &Context = BB.getContext();
 			// To represent graph, following vector(adjacent list) is used.
 			vector<vector<int>> adjList(16);
 			BranchInst *brInst = dyn_cast<BranchInst>(BB.getTerminator());
@@ -171,7 +171,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 			// but this is useless (until now).
 			int countRest = 16 - (int)unused.size();
 
-			// Use queue to traverse graph (but not so necessary)
+			// Use queue to traverse graph
 			queue<unsigned> q;
 			for(unsigned i = 0; i < 16; i++) {
 				if(!indegree[i] && unused.find(i) == unused.end()) {
@@ -184,16 +184,30 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 				q.pop();
 				countRest--;
 				if(adjList[curReg].empty()) {
-					break;
+					continue;
 				}
 				// findLeastReg() finds endmost register which is allocated to r(adjList[curReg][0]). 
 				Value *value = findLeastReg(adjList[curReg][0], BB, symbolMap);
 				
 				// Create new Mul instruction to move value to curReg.
 				// TODO: Fix below APInt(32, 1) to proper data type.
-				Instruction *moveInst = BinaryOperator::CreateMul(value, ConstantInt::get(Context, APInt(32, 1)));
-				moveInst->insertBefore(BB.getTerminator());
-				symbolMap.set(dyn_cast<Value>(moveInst), TM.reg(curReg));
+				if(value->getType()->isPointerTy()) {
+					Instruction *ptoi = CastInst::CreateBitOrPointerCast(value, IntegerType::getInt64Ty(Context));
+					ptoi->insertBefore(BB.getTerminator());
+					symbolMap.set(ptoi, TM.reg(curReg));
+
+					Instruction *moveInst = BinaryOperator::CreateMul(ptoi, ConstantInt::get(Context, APInt(64, 1)));
+					moveInst->insertBefore(BB.getTerminator());
+					symbolMap.set(moveInst, TM.reg(curReg));
+
+					Instruction *itop = CastInst::CreateBitOrPointerCast(moveInst, value->getType());
+					itop->insertBefore(BB.getTerminator());
+					symbolMap.set(itop, TM.reg(curReg));
+				} else {
+					Instruction *moveInst = BinaryOperator::CreateMul(value, ConstantInt::get(Context, APInt(value->getType()->getIntegerBitWidth(), 1)));
+					moveInst->insertBefore(BB.getTerminator());
+					symbolMap.set(moveInst, TM.reg(curReg));
+				}
 				
 				if(!--indegree[adjList[curReg][0]]) {
 					q.push(adjList[curReg][0]);
@@ -211,9 +225,24 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 						// Move the value of register i to temporary register.
 						q.push(i);
 						Value *value = findLeastReg(i, BB, symbolMap);
-						Instruction *moveToTemp = BinaryOperator::CreateMul(value, ConstantInt::get(Context, APInt(32, 1)));
-						moveToTemp->insertBefore(BB.getTerminator());
-						symbolMap.set(dyn_cast<Value>(moveToTemp), TM.reg(registerNum));
+						Instruction *moveToTemp;
+						if(value->getType()->isPointerTy()) {
+							Instruction *ptoi = CastInst::CreatePointerCast(value, IntegerType::getInt64Ty(Context));
+							ptoi->insertBefore(BB.getTerminator());
+							symbolMap.set(ptoi, TM.reg(registerNum));
+
+							moveToTemp = BinaryOperator::CreateMul(ptoi, ConstantInt::get(Context, APInt(64, 1)));
+							moveToTemp->insertBefore(BB.getTerminator());
+							symbolMap.set(moveToTemp, TM.reg(registerNum));
+
+							Instruction *itop = CastInst::CreateBitOrPointerCast(moveToTemp, value->getType());
+							itop->insertBefore(BB.getTerminator());
+							symbolMap.set(itop, TM.reg(registerNum));
+						} else {
+							moveToTemp = BinaryOperator::CreateMul(value, ConstantInt::get(Context, APInt(value->getType()->getIntegerBitWidth(), 1)));
+							moveToTemp->insertBefore(BB.getTerminator());
+							symbolMap.set(moveToTemp, TM.reg(registerNum));
+						}
 						unsigned lastQueue;
 						// Move the value in the loop.
 						while(!q.empty()) {
@@ -225,17 +254,38 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 								break;
 							}
 							Value *nextValue = findLeastReg(adjList[curReg][0], BB, symbolMap);
-							Instruction *moveInst = BinaryOperator::CreateMul(nextValue, ConstantInt::get(Context, APInt(32, 1)));
-							moveInst->insertBefore(BB.getTerminator());
-							symbolMap.set(dyn_cast<Value>(moveInst), TM.reg(curReg));
+							if(nextValue->getType()->isPointerTy()) {
+								Instruction *ptoi = CastInst::CreateBitOrPointerCast(nextValue, IntegerType::getInt64Ty(Context));
+								ptoi->insertBefore(BB.getTerminator());
+								symbolMap.set(ptoi, TM.reg(curReg));
+
+								Instruction *moveInst = BinaryOperator::CreateMul(ptoi, ConstantInt::get(Context, APInt(64, 1)));
+								moveInst->insertBefore(BB.getTerminator());
+								symbolMap.set(moveInst, TM.reg(curReg));
+
+								Instruction *itop = CastInst::CreateBitOrPointerCast(moveInst, nextValue->getType());
+								itop->insertBefore(BB.getTerminator());
+								symbolMap.set(itop, TM.reg(curReg));
+							} else {
+								Instruction *moveInst = BinaryOperator::CreateMul(nextValue, ConstantInt::get(Context, APInt(value->getType()->getIntegerBitWidth(), 1)));
+								moveInst->insertBefore(BB.getTerminator());
+								symbolMap.set(moveInst, TM.reg(curReg));
+							}
+
 							if(!--indegree[adjList[curReg][0]]) {
 								q.push(adjList[curReg][0]);
 							}
 						}
 						// At the end, move a value of temporary register to a register before register i.
-						Instruction *moveFromTemp = BinaryOperator::CreateMul(dyn_cast<Value>(moveToTemp), ConstantInt::get(Context, APInt(64, 1)));
+						Instruction *moveFromTemp = BinaryOperator::CreateMul(moveToTemp, ConstantInt::get(Context, APInt(moveToTemp->getType()->getIntegerBitWidth(), 1)));
 						moveFromTemp->insertBefore(BB.getTerminator());
-						symbolMap.set(dyn_cast<Value>(moveFromTemp), TM.reg(lastQueue));
+						symbolMap.set(moveFromTemp, TM.reg(lastQueue));
+
+						if(value->getType()->isPointerTy()) {
+							Instruction *itop = CastInst::CreateBitOrPointerCast(moveFromTemp, value->getType());
+							itop->insertBefore(BB.getTerminator());
+							symbolMap.set(itop, TM.reg(lastQueue));
+						}
 
 						// Cause the graph can have at most 2 loops, so continue to traverse.
 					}
@@ -256,22 +306,55 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 
 							Value *nextValue = findLeastReg(adjList[curReg][0], BB, symbolMap);
 
-							// XOR swapping
-							Instruction *xor1 = BinaryOperator::CreateXor(startValue, nextValue);
-							xor1->insertBefore(BB.getTerminator());
-							symbolMap.set(dyn_cast<Value>(xor1), TM.reg(adjList[curReg][0]));
+							if(startValue->getType()->isPointerTy()) {
+								Instruction *ptoi1 = CastInst::CreateBitOrPointerCast(startValue, IntegerType::getInt64Ty(Context));
+								ptoi1->insertBefore(BB.getTerminator());
+								symbolMap.set(ptoi1, TM.reg(curReg));
 
-							Instruction *xor2 = BinaryOperator::CreateXor(startValue, dyn_cast<Value>(xor1));
-							xor2->insertBefore(BB.getTerminator());
-							symbolMap.set(dyn_cast<Value>(xor2), TM.reg(curReg));
+								Instruction *ptoi2 = CastInst::CreateBitOrPointerCast(nextValue, IntegerType::getInt64Ty(Context));
+								ptoi2->insertBefore(BB.getTerminator());
+								symbolMap.set(ptoi2, TM.reg(adjList[curReg][0]));
 
-							Instruction *xor3 = BinaryOperator::CreateXor(dyn_cast<Value>(xor1), dyn_cast<Value>(xor2));
-							xor3->insertBefore(BB.getTerminator());
-							symbolMap.set(dyn_cast<Value>(xor3), TM.reg(adjList[curReg][0]));
+								Instruction *xor1 = BinaryOperator::CreateXor(ptoi1, ptoi2);
+								xor1->insertBefore(BB.getTerminator());
+								symbolMap.set(xor1, TM.reg(adjList[curReg][0]));
 
-							if(!--indegree[adjList[curReg][0]]) {
+								Instruction *xor2 = BinaryOperator::CreateXor(ptoi1, xor1);
+								xor2->insertBefore(BB.getTerminator());
+								symbolMap.set(xor2, TM.reg(curReg));
+
+								Instruction *xor3 = BinaryOperator::CreateXor(xor1, xor2);
+								xor3->insertBefore(BB.getTerminator());
+								symbolMap.set(xor3, TM.reg(adjList[curReg][0]));
+
+								Instruction *itop1 = CastInst::CreateBitOrPointerCast(xor2, startValue->getType());
+								itop1->insertBefore(BB.getTerminator());
+								symbolMap.set(itop1, TM.reg(curReg));
+
+								Instruction *itop2 = CastInst::CreateBitOrPointerCast(xor3, nextValue->getType());
+								itop2->insertBefore(BB.getTerminator());
+								symbolMap.set(itop2, TM.reg(curReg));
+
+								startValue = itop2;
+							} else {
+								// XOR swapping
+								Instruction *xor1 = BinaryOperator::CreateXor(startValue, nextValue);
+								xor1->insertBefore(BB.getTerminator());
+								symbolMap.set(xor1, TM.reg(adjList[curReg][0]));
+
+								Instruction *xor2 = BinaryOperator::CreateXor(startValue, xor1);
+								xor2->insertBefore(BB.getTerminator());
+								symbolMap.set(xor2, TM.reg(curReg));
+
+								Instruction *xor3 = BinaryOperator::CreateXor(xor1, xor2);
+								xor3->insertBefore(BB.getTerminator());
+								symbolMap.set(xor3, TM.reg(adjList[curReg][0]));
+
+								startValue = xor3;
+							}
+
+							if(!--indegree[adjList[curReg][0]] && adjList[curReg][0] != i) {
 								q.push(adjList[curReg][0]);
-								startValue = dyn_cast<Value>(xor3);
 							}
 						}
 					}
@@ -304,9 +387,7 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 		// Only phi nodes
 		bool findSrc = false;
 		Symbol *phiSymbol = symbolMap.get(dyn_cast<Value>(&I));
-		if(phiSymbol == nullptr) {
-			continue;
-		}
+		assert(phiSymbol && "Error: Symbol of phi doen not exist");
 		string phiName = phiSymbol->getName();
 		// phiName = "r{i}" -> stoi(substr(1)) = i
 		int phiNum = stoi(phiName.substr(1));
