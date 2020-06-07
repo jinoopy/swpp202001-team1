@@ -365,16 +365,31 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap) {
 }
 
 // This function finds endmost register which is allocated to register i. 
-Value *Backend::findLeastReg(unsigned i, BasicBlock &BB, SymbolMap &symbolMap) {
-	Value *returnValue = nullptr;
-	for(Instruction &I : BB) {
-		Symbol *symbol = symbolMap.get(dyn_cast<Value>(&I));
-		// "r" + itostr(i) == "r{i}"
-		if(symbol && symbol->getName() == "r" + itostr(i)) {
-			returnValue = dyn_cast<Value>(&I);
+Value *Backend::findLeastReg(unsigned regNum, BasicBlock &BB, SymbolMap &symbolMap) {
+	Instruction *brInst = dyn_cast<BranchInst>(BB.getTerminator());
+	if(brInst == nullptr) {
+		return nullptr;
+	}
+	for(unsigned i = 0; i < brInst->getNumSuccessors(); i++) {
+		BasicBlock *dstBB = brInst->getSuccessor(i);
+		for(Instruction &I : *dstBB) {
+			PHINode *phi = dyn_cast<PHINode>(&I);
+			if(phi == nullptr) {
+				continue;
+			}
+			for(unsigned j = 0; j < phi->getNumIncomingValues(); j++) {
+				if(phi->getIncomingBlock(j) != &BB) {
+					continue;
+				}
+				Value *value = phi->getIncomingValue(j);
+				Symbol *symbol = symbolMap.get(value);
+				if(symbol && symbol->getName().substr(1) == itostr(regNum)) {
+					return value;
+				}
+			}
 		}
 	}
-	return returnValue;
+	return nullptr;
 }
 
 // This function finds edges between two basic blocks(srcBB, dstBB).
@@ -387,7 +402,7 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 		// Only phi nodes
 		bool findSrc = false;
 		Symbol *phiSymbol = symbolMap.get(dyn_cast<Value>(&I));
-		assert(phiSymbol && "Error: Symbol of phi doen not exist");
+		assert(phiSymbol && "Error: Symbol of phi does not exist");
 		string phiName = phiSymbol->getName();
 		// phiName = "r{i}" -> stoi(substr(1)) = i
 		int phiNum = stoi(phiName.substr(1));
@@ -396,7 +411,6 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 			if(&srcBB != from) {
 				continue;
 			}
-			// Only srcBB
 			findSrc = true;
 			Symbol *instSymbol = symbolMap.get(phi->getIncomingValue(i));
 			if(instSymbol == nullptr) {
