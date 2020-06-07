@@ -1,16 +1,16 @@
-define i32 @main() {
+@gv = global i32 0
+
+define i32 @main(i32 %arg) {
 entry:
-    %a = alloca i32
-    %b = add i32 1, 1
+    %b = load i32, i32* @gv
     %c = add i64 1, 1
-    %d = add i32 1, 1
     br label %BB1
 
 BB1:
-    %e = phi i32 [%d, %entry], [%k, %BB2]
+    %e = phi i32 [%arg, %entry], [%k, %BB2]
     %f = phi i64 [%c, %entry], [%l, %BB2]
     %g = phi i32 [%b, %entry], [%i, %BB2]
-    %h = phi i32* [%a, %entry], [%j, %BB2]
+    %h = phi i32* [@gv, %entry], [%j, %BB2]
     br label %BB2
 
 BB2:
