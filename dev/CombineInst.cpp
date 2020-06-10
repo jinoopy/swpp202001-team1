@@ -36,11 +36,13 @@ PreservedAnalyses CombineInstPass::run(Module &M, ModuleAnalysisManager &MAM) {
 
 void CombineInstPass::replaceShiftWithMulDiv(IRBuilder<> Builder, Instruction &I, int64_t rhsVal) {
     if(I.isShift()) {
+        Value* res;
         if(I.getOpcode() == Instruction::Shl) {
-            Builder.CreateMul(I.getOperand(0), ConstantInt::get(I.getType(), 1<<rhsVal, true));
+            res = Builder.CreateMul(I.getOperand(0), ConstantInt::get(I.getType(), 1<<rhsVal, true));
         } else {
-            Builder.CreateSDiv(I.getOperand(0), ConstantInt::get(I.getType(), 1<<rhsVal, true));
+            res = Builder.CreateSDiv(I.getOperand(0), ConstantInt::get(I.getType(), 1<<rhsVal, true));
         }
+        I.replaceAllUsesWith(res);
         I.eraseFromParent();
     }
 }
@@ -56,21 +58,24 @@ bool CombineInstPass::isRegMove(Instruction &I, int64_t rhsVal) {
 
 void CombineInstPass::replaceRegMoveWithMul(IRBuilder<> Builder, Instruction &I, int64_t rhsVal) {
     if(isRegMove(I, rhsVal)) {
-        Builder.CreateMul(I.getOperand(0), ConstantInt::get(I.getType(), 1, true));
+        Value* res = Builder.CreateMul(I.getOperand(0), ConstantInt::get(I.getType(), 1, true));
+        I.replaceAllUsesWith(res);
         I.eraseFromParent();
     }
 }
 
 void CombineInstPass::replace1BitAndWithMul(IRBuilder<> Builder, Instruction &I) {
     if(I.getOpcode() == Instruction::And && I.getType()->isIntegerTy(1)) {
-        Builder.CreateMul(I.getOperand(0), I.getOperand(1));
+        Value* res = Builder.CreateMul(I.getOperand(0), I.getOperand(1));
+        I.replaceAllUsesWith(res);
         I.eraseFromParent();
     }
 }
 
 void CombineInstPass::replaceLSBBitMaskWithRem(IRBuilder<> Builder, Instruction &I, int64_t rhsVal) {
     if(I.getOpcode() == Instruction::And && (rhsVal & (rhsVal+1)) == 0) { 
-        Builder.CreateSRem(I.getOperand(0),  ConstantInt::get(I.getType(), rhsVal+1, true));
+        Value* res = Builder.CreateSRem(I.getOperand(0),  ConstantInt::get(I.getType(), rhsVal+1, true));
+        I.replaceAllUsesWith(res);
         I.eraseFromParent();
     }
 } //(rhsVal == -1)인 경우는 replaceRegMoveWithMul에서 처리됨.
