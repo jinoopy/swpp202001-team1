@@ -22,18 +22,18 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
             Value* ptrOp = GI->getPointerOperand();
             Type* curr = dyn_cast<Type>(ptrOp);
 
-            uint64_t offset = 0;
+            Value* pti = Builder.CreatePtrToInt(ptrOp, IntegerType::getInt64Ty(Context));
+            
+            Value* sum = pti;
             for(auto opIt = GI->idx_begin(); opIt!=GI->idx_end(); ++opIt) {
                 Value *op = *opIt;
-                unsigned int opSize = getAccessSize(curr);
-                int64_t opVal = dyn_cast<ConstantInt>(op)->getSExtValue();
-                offset += opVal * opSize;
+                unsigned int size = getAccessSize(curr);
+                Value* mul = Builder.CreateMul(op, ConstantInt::get(IntegerType::getInt64Ty(Context), size, true));
+                sum = Builder.CreateAdd(sum, mul);
                 if(curr->isArrayTy()) curr = curr->getArrayElementType();
             }
-            
-            Value* pti = Builder.CreatePtrToInt(ptrOp, IntegerType::getInt64Ty(Context));
-            Value* add = Builder.CreateAdd(pti, ConstantInt::get(IntegerType::getInt64Ty(Context), offset, true));
-            Value* itp = Builder.CreateIntToPtr(add, ptrOp->getType());
+
+            Value* itp = Builder.CreateIntToPtr(sum, ptrOp->getType());
             I.eraseFromParent();
         }
     }
