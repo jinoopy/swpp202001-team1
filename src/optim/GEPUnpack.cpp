@@ -21,6 +21,7 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
 
             Value* ptrOp = GI->getPointerOperand();
             Type* curr = dyn_cast<Type>(ptrOp);
+            curr = curr->getPointerElementType();
 
             Value* pti = Builder.CreatePtrToInt(ptrOp, IntegerType::getInt64Ty(Context));
             
@@ -34,6 +35,7 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
             }
 
             Value* itp = Builder.CreateIntToPtr(sum, ptrOp->getType());
+            I.replaceAllUsesWith(itp);
             I.eraseFromParent();
         }
     }
