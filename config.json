@@ -24,8 +24,8 @@
     },
     "preset-passes": {
         "basic-optim": [
-            "-mem2reg",
-            "-ipsccp"
+            "mem2reg",
+            "ipsccp"
         ],
         "inst-optim": [
             "reassociate",
