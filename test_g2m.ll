@@ -16,6 +16,18 @@ define i32 @foo() #0 {
   ret i32 %2
 }
 
+define i32 @poo() #0 {
+  %1 = load i32, i32* @GV2, align 4
+  %2 = mul nsw i32 2, %1
+  ret i32 %2
+}
+
+define i32 @too() #0 {
+  %1 = load i32, i32* @GV, align 4
+  %2 = mul nsw i32 2, %1
+  ret i32 %2
+}
+
 declare i8* @malloc(i64)
 
 declare i64 @read(...) #2
