@@ -46,11 +46,11 @@ llvmGetPassPluginInfo()
         LLVM_PLUGIN_API_VERSION, "VectorizeLoadStorePass", "v0.1",
         [](PassBuilder &PB) {
             PB.registerPipelineParsingCallback(
-                [](StringRef Name, ModulePassManager &MPM,
+                [](StringRef Name, FunctionPassManager &FPM,
                    ArrayRef<PassBuilder::PipelineElement>) {
                     if (Name == "vectorize")
                     {
-                        MPM.addPass(VectorizeLoadStorePass());
+                        FPM.addPass(VectorizeLoadStorePass());
                         return true;
                     }
                     return false;
