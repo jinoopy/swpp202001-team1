@@ -103,9 +103,9 @@ def opt(config):
     mode = input("> ")
 
     if mode == "all":
-        passes = config["preset-passes"][presets[0]]
-        for i in range(len(config["preset-passes"].keys())-1):
-            passes.extend(config["preset-passes"][presets[i+1]])
+        passes = []
+        for i in config["run"]["opt"]:
+            passes.extend(config["preset-passes"][presets[i]])
         print(passes)
     else:
         mode = int(mode)
@@ -125,7 +125,8 @@ def opt(config):
             arg += "-passes=\"" + p + "\" "
         else:
             arg = "--" + p + " "
-        print("now running: <" + p +">", subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outir + llvmir))
+        print("now running: <" + p +">")
+        subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outir + llvmir)
         llvmir = outir
 
     print("Complete!")

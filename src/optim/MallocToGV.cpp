@@ -32,7 +32,7 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
 
             //Save instruction which stores the initial value.
             StoreInst *stI = getMallocInitVal(malloc);
-            Constant *initVal = stI != nullptr ? dyn_cast<Constant>(stI->getValueOperand()) : nullptr;
+            Constant *initVal = stI != nullptr ? dyn_cast<Constant>(stI->getValueOperand()) : Constant::getNullValue(T->getElementType());
             if(stI != nullptr) stI->eraseFromParent();
 
             //create corresponding GV

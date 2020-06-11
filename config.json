@@ -24,9 +24,9 @@
     },
     "preset-passes": {
         "global-optim": [
-            "ipsccp",
-            "globalopt",
             "globaldce",
+            "globalopt",
+            "ipsccp",
             "gv2malloc",
             "mem2reg",
             "gvn"
@@ -37,29 +37,39 @@
             "inline"
         ],
         "memory-optim": [
-            "vectorize",
             "heap2stack",
-            "malloc2gv",
             "deadargelim",
+            "malloc2gv",
             "mem2reg"
         ],
         "inst-optim": [
             "reassociate",
             "constprop",
+            "power-reduc",
             "instcombine",
+            "power-reduc",
             "sink",
             "sccp",
             "simplifycfg"
         ],
-        "loop-optim": [
+        "loop-optim-1": [
             "reassociate",
             "loop-simplify",
             "lcssa",
-            "licm"
+            "licm",
+            "loop-rotate",
+            "loop-unswitch"
+        ],
+        "loop-optim-2": [
+            "reassociate",
+            "loop-simplify",
+            "indvars",
+            "loop-unroll",
+            "vectorize"
         ]
     },
     "run": {
-        "opt": [],
+        "opt": [0, 1, 3, 2, 3, 4, 3, 5, 3],
         "backend": ""
     }
 }

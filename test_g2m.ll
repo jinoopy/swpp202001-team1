@@ -15,3 +15,9 @@ define i32 @foo() #0 {
   %2 = mul nsw i32 2, %1
   ret i32 %2
 }
+
+declare i8* @malloc(i64)
+
+declare i64 @read(...) #2
+
+declare void @write(i64) #2
