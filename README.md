@@ -37,6 +37,7 @@ You may change settings of config.json. This file will be hidden in further comm
 
 Value of this field should be the llvm bin directory, i.e. `llvmscript/llvm-10.0-release/bin.`
 This field can be updated manually, or in the `-dev` mode, or with giving the right argument to `-build` or `-run` mode.
+We recommend to use `release` build for the compatibility.
 
 > `"opt-pass": ....`
 

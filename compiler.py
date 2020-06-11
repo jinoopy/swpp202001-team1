@@ -63,7 +63,7 @@ def build(config):
     LIBS = subprocessRun(LLVMCONFIG + " --libs core irreader bitreader passes support analysis asmparser --system-libs")
     SRCROOT = subprocessRun(LLVMCONFIG + " --src-root")
     CXX = config["llvm-bin-dir"] + "/clang++"
-    LDFLAGS = LDFLAGS + " -rpath," + subprocessRun(LLVMCONFIG + " --libdir")
+    LDFLAGS = LDFLAGS + "-W1,-rpath," + subprocessRun(LLVMCONFIG + " --libdir")
     CXXFLAGS= CXXFLAGS + " -std=c++17 -I \"" + SRCROOT + "/include\""
     
     for p in config["opt-pass"].keys():
@@ -124,7 +124,7 @@ def opt(config):
             arg = "-load-pass-plugin=./lib/"+config["opt-pass"][p]["lib"]+LIBTYPE + " "
             arg += "-passes=\"" + p + "\" "
         else:
-            arg = "-passes=\"" + p + "\" "
+            arg = "--" + p + " "
         print(arg)
         print("now running: <" + p +">", subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outir + llvmir))
         llvmir = outir
