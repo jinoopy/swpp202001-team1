@@ -6,6 +6,9 @@
 #include "llvm/IR/PatternMatch.h"
 #include "llvm/IR/Instructions.h"
 
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
+
 #include <map>
 #include <set>
 #include <algorithm>
@@ -35,6 +38,25 @@ private:
 	void vectorizeLoads(GetElementPtrInst *, GetElementPtrInst *, LoadInst *, LoadInst *, BasicBlock &, unsigned int);
 	void vectorizeStores(GetElementPtrInst *, GetElementPtrInst *, StoreInst *, StoreInst *, BasicBlock &, unsigned int);
 };
+
+extern "C" ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo()
+{
+    return {
+        LLVM_PLUGIN_API_VERSION, "VectorizeLoadStorePass", "v0.1",
+        [](PassBuilder &PB) {
+            PB.registerPipelineParsingCallback(
+                [](StringRef Name, ModulePassManager &MPM,
+                   ArrayRef<PassBuilder::PipelineElement>) {
+                    if (Name == "vectorize")
+                    {
+                        MPM.addPass(VectorizeLoadStorePass());
+                        return true;
+                    }
+                    return false;
+                });
+        }};
+}
 
 }
 
