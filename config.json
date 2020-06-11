@@ -27,6 +27,9 @@
             "mem2reg",
             "ipsccp"
         ],
+        "gv2malloc": [
+            "gv2malloc"
+        ],
         "inst-optim": [
             "reassociate",
             "power-reduc",
@@ -36,6 +39,13 @@
             "deadargelim",
             "dse",
             "adce"
+        ],
+        "loop-optim-1": [
+            "loop-simplify",
+            "loop-rotate",
+            "lcssa",
+            "licm",
+            "loop-unswitch"
         ],
         "loop-vectorize": [
             "loop-simplify",
@@ -47,18 +57,14 @@
             "vectorize",
             "simplifycfg"
         ],
-        "loop-optim-1": [
-            "loop-simplify",
-            "loop-rotate",
-            "lcssa",
-            "licm",
-            "loop-unswitch"
-        ],
         "loop-optim-2": [
             "loop-unroll",
             "unroll-count=4",
             "unroll-allow-partial",
             "unroll-runtime"
+        ],
+        "heap2stack": [
+            "heap2stack"
         ]
     },
     "run": {

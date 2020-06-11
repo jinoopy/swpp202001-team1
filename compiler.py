@@ -79,11 +79,12 @@ def opt(config):
     else:
         LIBTYPE = ".so"
 
-    print("Enter the directory for .ll file.")
-    llvmir = input("> ")
     
-    regex = re.compile(r"[\d\w_/.]+\.ll")
     while True:
+        print("Enter the directory for .ll file.")
+        llvmir = input("> ")
+        
+        regex = re.compile(r"[\d\w_/.]+\.ll")
         if not re.fullmatch(regex, llvmir):
             print("Invalid input")
             continue
