@@ -99,17 +99,24 @@ def opt(config):
         passes = " ".join(config["preset-passes"][presets[i]])
         print("  " + passes)
     print("Enter which pipeline you would like to apply")
-    print("1 ~ " + str(len(config["preset-passes"].keys())) + ", or enter 0 for custom execution")
-    mode = int(input("> "))
+    print("1 ~ " + str(len(config["preset-passes"].keys())) + ", or enter 0 for custom execution, or enter all for all passes.")
+    mode = input("> ")
 
-    if mode != 0:
-        passes = config["preset-passes"][presets[mode-1]]
+    if mode == "all":
+        passes = config["preset-passes"][presets[0]]
+        for i in range(len(config["preset-passes"].keys())-1):
+            passes.extend(config["preset-passes"][presets[i+1]])
+        print(passes)
     else:
-        print("Enter custom sequences of passes")
-        print("existing passes: mem2reg indvars ...")
-        print("custom passes: (refer to keys of config.json::opt-pass)")
-        print("ex: loop-simplify loop-unroll vectorize")
-        passes = input("> ").split(" ")
+        mode = int(mode)
+        if mode != 0:
+            passes = config["preset-passes"][presets[mode-1]]
+        else:
+            print("Enter custom sequences of passes")
+            print("existing passes: mem2reg indvars ...")
+            print("custom passes: (refer to keys of config.json::opt-pass)")
+            print("ex: loop-simplify loop-unroll vectorize")
+            passes = input("> ").split(" ")
     
     outir = llvmir[:-3]+"_out.ll "
     for p in passes:

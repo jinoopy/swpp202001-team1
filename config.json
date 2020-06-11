@@ -1,5 +1,5 @@
 {
-    "llvm-bin-dir": "~/llvmscript/llvm-10.0-release/bin",
+    "llvm-bin-dir": "/mnt/c/Users/aaa/2020-1/\uc18c\uac1c\uc6d0\uc2e4/buildllvm/llvmscript/llvm-10.0-releaseassert/bin",
     "opt-pass": {
         "vectorize": {
             "src": "optim/VectorizeLoadStore.cpp",
@@ -23,48 +23,39 @@
         }
     },
     "preset-passes": {
-        "basic-optim": [
+        "global-optim": [
+            "ipsccp",
+            "globalopt",
+            "globaldce",
+            "gv2malloc",
             "mem2reg",
-            "ipsccp"
+            "gvn"
         ],
-        "gv2malloc": [
-            "gv2malloc"
+        "function-optim": [
+            "mergefunc",
+            "tailcallelim",
+            "inline"
+        ],
+        "memory-optim": [
+            "vectorize",
+            "heap2stack",
+            "malloc2gv",
+            "deadargelim",
+            "mem2reg"
         ],
         "inst-optim": [
             "reassociate",
-            "power-reduc",
+            "constprop",
             "instcombine",
-            "power-reduc",
+            "sink",
             "sccp",
-            "deadargelim",
-            "dse",
-            "adce"
-        ],
-        "loop-optim-1": [
-            "loop-simplify",
-            "loop-rotate",
-            "lcssa",
-            "licm",
-            "loop-unswitch"
-        ],
-        "loop-vectorize": [
-            "loop-simplify",
-            "loop-rotate",
-            "lcssa",
-            "indvars",
-            "loop-unroll",
-            "gvn",
-            "vectorize",
             "simplifycfg"
         ],
-        "loop-optim-2": [
-            "loop-unroll",
-            "unroll-count=4",
-            "unroll-allow-partial",
-            "unroll-runtime"
-        ],
-        "heap2stack": [
-            "heap2stack"
+        "loop-optim": [
+            "reassociate",
+            "loop-simplify",
+            "lcssa",
+            "licm"
         ]
     },
     "run": {
