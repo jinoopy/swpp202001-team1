@@ -125,7 +125,6 @@ def opt(config):
             arg += "-passes=\"" + p + "\" "
         else:
             arg = "--" + p + " "
-        print(arg)
         print("now running: <" + p +">", subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outir + llvmir))
         llvmir = outir
 
