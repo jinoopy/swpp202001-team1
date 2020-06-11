@@ -5,7 +5,7 @@
     (ex. -gvn -combineinst -instcombine -combineinst )
 */
 
-#include "CombineInst.h"
+#include "PowerReduction.h"
 
 using namespace llvm;
 using namespace std;

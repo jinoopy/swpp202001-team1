@@ -1,5 +1,5 @@
-#ifndef COMBINE_INST_H
-#define COMBINE_INST_H
+#ifndef POWER_REDUC_H
+#define POWER_REDUC_H
 
 #include "llvm/IR/Function.h"
 #include "llvm/IR/BasicBlock.h"
@@ -34,12 +34,12 @@ extern "C" ::llvm::PassPluginLibraryInfo
 llvmGetPassPluginInfo()
 {
     return {
-        LLVM_PLUGIN_API_VERSION, "CombineInstPass", "v0.1",
+        LLVM_PLUGIN_API_VERSION, "PowerReductionPass", "v0.1",
         [](PassBuilder &PB) {
             PB.registerPipelineParsingCallback(
                 [](StringRef Name, ModulePassManager &MPM,
                    ArrayRef<PassBuilder::PipelineElement>) {
-                    if (Name == "combine-inst")
+                    if (Name == "power-reduc")
                     {
                         MPM.addPass(CombineInstPass());
                         return true;

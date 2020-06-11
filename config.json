@@ -2,16 +2,24 @@
     "llvm-bin-dir": "~/llvmscript/llvm-10.0-release/bin",
     "opt-pass": {
         "vectorize": {
-            "src": "VectorizeLoadStore.cpp",
+            "src": "optim/VectorizeLoadStore.cpp",
             "lib": "libVLS"
         },
         "malloc2gv": {
-            "src": "MallocToGV.cpp",
+            "src": "optim/MallocToGV.cpp",
             "lib": "libMTGV"
         },
         "gv2malloc": {
-            "src": "GVToMalloc.cpp",
+            "src": "optim/GVToMalloc.cpp",
             "lib": "libGVTM"
+        },
+        "heap2stack": {
+            "src": "optim/HeapToStack.cpp",
+            "lib": "libHTS"
+        },
+        "power-reduc": {
+            "src": "optim/PowerReduction.cpp",
+            "lib": "libPR"
         }
     },
     "preset-passes": {
@@ -20,36 +28,38 @@
             "-ipsccp"
         ],
         "inst-optim": [
-            "-reassociate",
-            "-instcombine",
-            "-sccp",
-            "--deadargelim",
-            "-dse",
-            "-adce"
+            "reassociate",
+            "power-reduc",
+            "instcombine",
+            "power-reduc",
+            "sccp",
+            "deadargelim",
+            "dse",
+            "adce"
         ],
         "loop-vectorize": [
-            "-loop-simplify",
-            "-loop-rotate",
-            "-lcssa",
-            "-indvars",
-            "-loop-unroll",
-            "-gvn",
-            "VLS",
-            "-simplifycfg"
+            "loop-simplify",
+            "loop-rotate",
+            "lcssa",
+            "indvars",
+            "loop-unroll",
+            "gvn",
+            "vectorize",
+            "simplifycfg"
         ],
         "loop-optim-1": [
-            "-loop-simplify",
-            "-loop-rotate",
-            "-lcssa",
-            "-licm",
-            "-loop-unswitch"
-		],
-		"loop-optim-2": [
-			"-loop-unroll",
-			"-unroll-count=4",
-			"-unroll-allow-partial",
-			"-unroll-runtime"
-		]
+            "loop-simplify",
+            "loop-rotate",
+            "lcssa",
+            "licm",
+            "loop-unswitch"
+        ],
+        "loop-optim-2": [
+            "loop-unroll",
+            "unroll-count=4",
+            "unroll-allow-partial",
+            "unroll-runtime"
+        ]
     },
     "run": {
         "opt": [],

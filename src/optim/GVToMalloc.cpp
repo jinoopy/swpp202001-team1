@@ -16,8 +16,6 @@ namespace optim
         auto *MallocFTy = FunctionType::get(Type::getInt8PtrTy(Context), {Type::getInt64Ty(Context)}, false); // make malloc function
         Function *MallocF = Function::Create(MallocFTy, Function::ExternalLinkage,
                                              "malloc", M);
-        MallocF->addFnAttr(Attribute::OptimizeNone);
-        MallocF->addFnAttr(Attribute::NoInline);
 
         for (auto gv = GVs.begin(); gv != GVs.end(); gv++)
         {
@@ -34,8 +32,7 @@ namespace optim
         map<Function *, Function *> fMap; // By using fMap, we can call the new function(arguments changed function).
         for (auto &f : M.functions())
         {
-            //if(f.getLinkage() == Function::ExternalLinkage)
-            //if(f.getFnAttribute(Attribute::OptimizeNone) != nullptr){
+            if(f.isDeclaration()) continue;
             if (DO_NOT_CONSIDER.find(f.getName()) == DO_NOT_CONSIDER.end())
             {
                 old_functions.push_back(&f);
@@ -95,7 +92,7 @@ namespace optim
 
     Value *GVToMallocPass::MakeNewMalloc(Module &M, LLVMContext &Context, Function *MallocF, Type *type, llvm::Constant *value, int m_index)
     {
-        auto size = type->getScalarSizeInBits();
+        auto size = (type->getScalarSizeInBits())/8;
 
         auto main = M.getFunction("main"); // get main function for inserting malloc instruction.
         BasicBlock &Entry = main->getEntryBlock();

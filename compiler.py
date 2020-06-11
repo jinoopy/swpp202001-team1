@@ -19,7 +19,7 @@ def subprocessRun(command):
 def updateConfig(config):
     print("Which config would you edit?")
     print("1. LLVM/bin directory")
-    print("2. List of all passes")
+    print("2. Add new pipeline")
     mode = int(input("> "))
 
     #update configuration
@@ -36,37 +36,16 @@ def updateConfig(config):
                 path = input("> ")
         config["llvm-bin-dir"] = path
         writeConfig(config)
-
-    elif mode == 2 :
-        print("Current loaded files:")
-        for name in config["opt-pass"].keys():
-            print("  " + name)
-        print("Write the name of the new pass file.")
-        print("Format : lowers/numbers")
-        print("Example: mem2reg, instcombine")
-        while True:
-            passName = input("> ")
-            if not passName.isalnum() or passName in config["opt-pass"].keys():
-                print("Invalid input")
-                continue
-            break
-        
-        print("Write the file name(src/*.cpp) of the new pass file.")
-        print("Example: src/XXX.cpp -> XXX.cpp")
-        fileName = input("> ")
-        regex = re.compile(r"[\d\w_]+\.cpp")
-        while True:
-            if not re.fullmatch(regex, fileName):
-                print("Invalid input")
-                continue
-            break
-
-        outputName = "".join(ch for ch in fileName if ch.isupper() or ch.isdigit())
-        outputName = "lib" + outputName
-
-        config["opt-pass"][passName] = {"src" : fileName, "lib" : outputName}
+    elif mode == 2:
+        print("Write the name of the pipeline.")
+        pipename = input("> ")
+        print("Enter custom sequences of passes")
+        print("existing passes: mem2reg indvars ...")
+        print("custom passes: (refer to keys of config.json::opt-pass)")
+        print("ex: loop-simplify loop-unroll vectorize")
+        passes = input("> ").split(" ")
+        config["preset-passes"][pipename] = passes
         writeConfig(config)
-    
 
 def build(config):
     if(platform.system() == "Darwin"):
@@ -76,7 +55,7 @@ def build(config):
         ISYSROOT = ""
         LIBTYPE = ".so"
 
-    #Build namespace opt
+    #Build namespace optim
     print("Building opt pipeline...")
     LLVMCONFIG = config["llvm-bin-dir"]+"/llvm-config"
     CXXFLAGS = subprocessRun(LLVMCONFIG + " --cxxflags")
@@ -84,7 +63,7 @@ def build(config):
     LIBS = subprocessRun(LLVMCONFIG + " --libs core irreader bitreader passes support analysis asmparser --system-libs")
     SRCROOT = subprocessRun(LLVMCONFIG + " --src-root")
     CXX = config["llvm-bin-dir"] + "/clang++"
-    #LDFLAGS = LDFLAGS + " -W1,-rpath," + subprocessRun(LLVMCONFIG + " --libdir")
+    LDFLAGS = LDFLAGS + " -W1,-rpath," + subprocessRun(LLVMCONFIG + " --libdir")
     CXXFLAGS= CXXFLAGS + "-std=c++17 -I \"" + SRCROOT + "/include\""
     
     for p in config["opt-pass"].keys():
@@ -116,22 +95,31 @@ def opt(config):
     presets = list(config["preset-passes"].keys())
     for i, pipe in enumerate(presets):
         print(str(i+1) + " : " + pipe)
-        passes = " ".join([x if x[0]=="-" else "-load lib/lib"+x+LIBTYPE for x in config["preset-passes"][presets[i]]])
+        passes = " ".join(config["preset-passes"][presets[i]])
         print("  " + passes)
     print("Enter which pipeline you would like to apply")
     print("1 ~ " + str(len(config["preset-passes"].keys())) + ", or enter 0 for custom execution")
     mode = int(input("> "))
-    if mode != 0 :
-        passes = " ".join([x if x[0]=="-" else "-load-pass-plugin=./lib/lib"+x+LIBTYPE for x in config["preset-passes"][presets[mode-1]]])
+
+    if mode != 0:
+        passes = config["preset-passes"][presets[mode-1]]
     else:
         print("Enter custom sequences of passes")
-        print("existing passes: -mem2reg -indvars ...")
-        print("custom passes: VLS(for libVLS.so), GVTM(for libGVTM.so)...")
-        print("ex: -loop-simplify -loop-unroll VLS")
-        passes = input("> ")
-        passes = " ".join([x if x[0]=="-" else "-load-pass-plugin=./lib/lib"+x+LIBTYPE for x in passes.split(" ")])
-    #print(config["llvm-bin-dir"]+"/opt -S " + passes + " -o " + llvmir[:-3]+"_out.ll " + llvmir)
-    print(subprocessRun(config["llvm-bin-dir"]+"/opt -S " + passes + " -o " + llvmir[:-3]+"_out.ll " + llvmir))
+        print("existing passes: mem2reg indvars ...")
+        print("custom passes: (refer to keys of config.json::opt-pass)")
+        print("ex: loop-simplify loop-unroll vectorize")
+        passes = input("> ").split(" ")
+    
+    outir = llvmir[:-3]+"_out.ll "
+    for p in passes:
+        arg = ""
+        if p in config["opt-pass"].keys():
+            arg = "-load-pass-plugin=./lib/"+config["opt-pass"][p]["lib"]+LIBTYPE + " "
+        arg += "-passes=\"" + p + "\" "
+        print(arg)
+        print("now running: <" + p +">", subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outir + llvmir))
+        llvmir = outir
+
     print("Complete!")
 
 #def backend()

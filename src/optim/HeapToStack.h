@@ -56,7 +56,7 @@ llvmGetPassPluginInfo() {
       PB.registerPipelineParsingCallback(
         [](StringRef Name, ModulePassManager &MPM,
            ArrayRef<PassBuilder::PipelineElement>) {
-          if (Name == "heap-stack") {
+          if (Name == "heap2stack") {
             MPM.addPass(HeapToStackPass());
             return true;
           }
