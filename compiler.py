@@ -63,8 +63,8 @@ def build(config):
     LIBS = subprocessRun(LLVMCONFIG + " --libs core irreader bitreader passes support analysis asmparser --system-libs")
     SRCROOT = subprocessRun(LLVMCONFIG + " --src-root")
     CXX = config["llvm-bin-dir"] + "/clang++"
-    LDFLAGS = LDFLAGS + " -W1,-rpath," + subprocessRun(LLVMCONFIG + " --libdir")
-    CXXFLAGS= CXXFLAGS + "-std=c++17 -I \"" + SRCROOT + "/include\""
+    LDFLAGS = LDFLAGS + " -rpath," + subprocessRun(LLVMCONFIG + " --libdir")
+    CXXFLAGS= CXXFLAGS + " -std=c++17 -I \"" + SRCROOT + "/include\""
     
     for p in config["opt-pass"].keys():
         print("Compiling " + "./src/"+config["opt-pass"][p]["src"] + " ...\n")
@@ -120,10 +120,11 @@ def opt(config):
     
     outir = llvmir[:-3]+"_out.ll "
     for p in passes:
-        arg = ""
         if p in config["opt-pass"].keys():
             arg = "-load-pass-plugin=./lib/"+config["opt-pass"][p]["lib"]+LIBTYPE + " "
-        arg += "-passes=\"" + p + "\" "
+            arg += "-passes=\"" + p + "\" "
+        else:
+            arg = "-passes=\"" + p + "\" "
         print(arg)
         print("now running: <" + p +">", subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outir + llvmir))
         llvmir = outir
@@ -175,6 +176,12 @@ def DEV():
 #parse the arguments
 try:
     mode = sys.argv[1]
+    
+    #run the desired mode
+    if mode == "-dev":
+        DEV()
+        sys.exit()
+
     inputIR = ""
     if len(sys.argv)>=3:
         inputIR = sys.argv[2]
@@ -205,10 +212,7 @@ except:
     print("ex) python3 compiler.py -run input.ll -bin (llvm/bin dir) -o (output file)")
     sys.exit()
 
-#run the desired mode
-if mode == "-dev":
-    DEV()
-elif mode == "-build":
+if mode == "-build":
     print("llvm/bin directory : " + binDir)
     build(config)
 elif mode == "-run":

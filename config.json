@@ -1,5 +1,5 @@
 {
-    "llvm-bin-dir": "/mnt/c/Users/aaa/2020-1/\uc18c\uac1c\uc6d0\uc2e4/buildllvm/llvmscript/llvm-10.0-releaseassert/bin",
+    "llvm-bin-dir": "~/llvmscript/llvm-10.0-releaseassert/bin",
     "opt-pass": {
         "vectorize": {
             "src": "optim/VectorizeLoadStore.cpp",
