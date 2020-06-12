@@ -104,9 +104,8 @@ def opt(config):
 
     if mode == "all":
         passes = []
-        for i in config["run"]["opt"]:
-            passes.extend(config["preset-passes"][presets[i]])
-        print(passes)
+        for pipename in config["run"]["opt"]:
+            passes.extend(config["preset-passes"][pipename])
     else:
         mode = int(mode)
         if mode != 0:
