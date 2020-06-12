@@ -23,52 +23,63 @@
         }
     },
     "preset-passes": {
-        "basic-optim": [
+        "global-optim": [
+            "globaldce",
+            "globalopt",
+            "ipsccp",
+            "gv2malloc",
             "mem2reg",
-            "ipsccp"
+            "gvn"
         ],
-        "gv2malloc": [
-            "gv2malloc"
+        "function-optim": [
+            "mergefunc",
+            "tailcallelim",
+            "inline"
+        ],
+        "memory-optim": [
+            "heap2stack",
+            "deadargelim",
+            "malloc2gv",
+            "mem2reg"
         ],
         "inst-optim": [
             "reassociate",
+            "constprop",
             "power-reduc",
             "instcombine",
             "power-reduc",
+            "sink",
             "sccp",
-            "deadargelim",
-            "dse",
-            "adce"
-        ],
-        "loop-optim-1": [
-            "loop-simplify",
-            "loop-rotate",
-            "lcssa",
-            "licm",
-            "loop-unswitch"
-        ],
-        "loop-vectorize": [
-            "loop-simplify",
-            "loop-rotate",
-            "lcssa",
-            "indvars",
-            "loop-unroll",
-            "gvn",
-            "vectorize",
             "simplifycfg"
         ],
-        "loop-optim-2": [
-            "loop-unroll",
-            "unroll-count=4",
-            "unroll-allow-partial",
-            "unroll-runtime"
+        "loop-optim-1": [
+            "reassociate",
+            "loop-simplify",
+            "lcssa",
+            "licm",
+            "loop-rotate",
+            "loop-unswitch"
         ],
-        "heap2stack": [
-            "heap2stack"
+        "loop-optim-2": [
+            "reassociate",
+            "loop-simplify",
+            "indvars",
+            "loop-unroll",
+            "vectorize"
         ]
     },
     "run": {
-        "opt": [],
+        "opt": [
+            0,
+            1,
+            3,
+            2,
+            3,
+            4,
+            3,
+            5,
+            3
+        ],
         "backend": ""
     }
 }

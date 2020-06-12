@@ -18,16 +18,16 @@ using namespace llvm;
 using namespace std;
 
 namespace optim {
-class CombineInstPass : public PassInfoMixin<CombineInstPass> {
+class PowerReductionPass : public PassInfoMixin<PowerReductionPass> {
 public:
     PreservedAnalyses run(Module &, ModuleAnalysisManager &);
 
 private:
-    void replaceShiftWithMulDiv(IRBuilder<>, Instruction &, int64_t);
+    BasicBlock::iterator replaceShiftWithMulDiv(BasicBlock::iterator, int64_t);
     bool isRegMove(Instruction &, int64_t);
-    void replaceRegMoveWithMul(IRBuilder<>, Instruction &, int64_t);
-    void replaceLSBBitMaskWithRem(IRBuilder<>, Instruction &, int64_t);
-    void replace1BitAndWithMul(IRBuilder<>, Instruction &);
+    BasicBlock::iterator replaceRegMoveWithMul(BasicBlock::iterator, int64_t);
+    BasicBlock::iterator replaceLSBBitMaskWithRem(BasicBlock::iterator, int64_t);
+    BasicBlock::iterator replace1BitAndWithMul(BasicBlock::iterator);
 };
 
 extern "C" ::llvm::PassPluginLibraryInfo
@@ -41,7 +41,7 @@ llvmGetPassPluginInfo()
                    ArrayRef<PassBuilder::PipelineElement>) {
                     if (Name == "power-reduc")
                     {
-                        MPM.addPass(CombineInstPass());
+                        MPM.addPass(PowerReductionPass());
                         return true;
                     }
                     return false;
