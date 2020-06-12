@@ -8,7 +8,9 @@ namespace optim {
 
 // This function returns allocated memory area of Value V.
 AllocType getBlockType(const Value *V) {
-	if(auto *CI = dyn_cast<CallInst>(V)) {
+	if(isa<GlobalValue>(V)) {
+		return HEAP;
+	} else if(auto *CI = dyn_cast<CallInst>(V)) {
 		if(CI->getCalledFunction()->getName() == "malloc") {
 			return HEAP;
 		}
@@ -18,6 +20,10 @@ AllocType getBlockType(const Value *V) {
 		return getBlockType(BI->getOperand(0));
 	} else if(auto *GI = dyn_cast<GetElementPtrInst>(V)) {
 		return getBlockType(GI->getPointerOperand());
+	} else if(auto *ITOP = dyn_cast<IntToPtrInst>(V)) {
+		return getBlockType(ITOP->getOperand(0));
+	} else if(auto *PTOI = dyn_cast<PtrToIntInst>(V)) {
+		return getBlockType(PTOI->getOperand(0));
 	}
 	return UNKNOWN;
 }
@@ -26,6 +32,10 @@ PreservedAnalyses StackHeapAccessGroupPass::run(Function &F, FunctionAnalysisMan
 	if(F.isDeclaration()) {
 		return PreservedAnalyses::all();
 	}
+	PassBuilder PB;
+	PB.registerFunctionAnalyses(FAM);
+	auto AARes = FAM.getResult<BasicAA>(F);
+	AAQueryInfo EmptyInfo;
 	// Store last accessed memory area for each basic block.
 	map<BasicBlock *, AllocType> lastAccessType;
 	DominatorTree DT(F);
@@ -70,7 +80,13 @@ PreservedAnalyses StackHeapAccessGroupPass::run(Function &F, FunctionAnalysisMan
 					}
 					// Make edge between LoadInst and StoreInst if two have same pointer operand.
 					if(auto *SI = dyn_cast<StoreInst>(&I2)) {
+						/*
 						if(SI->getPointerOperand() != LI->getPointerOperand()) {
+							continue;
+						}
+						*/
+						if(AARes.alias(MemoryLocation(LI->getPointerOperand()), 
+									   MemoryLocation(SI->getPointerOperand()), EmptyInfo) == AliasResult::NoAlias) {
 							continue;
 						}
 						indegree[&I1]++;
@@ -83,7 +99,24 @@ PreservedAnalyses StackHeapAccessGroupPass::run(Function &F, FunctionAnalysisMan
 						break;
 					}
 					if(auto *LI = dyn_cast<LoadInst>(&I2)) {
+						/*if(SI->getPointerOperand() != LI->getPointerOperand()) {
+							continue;
+						}
+						*/
+						if(AARes.alias(MemoryLocation(LI->getPointerOperand()), 
+									   MemoryLocation(SI->getPointerOperand()), EmptyInfo) == AliasResult::NoAlias) {
+							continue;
+						}
+						indegree[&I1]++;
+						adjacentList[&I2].push_back(&I1);
+					} else if(auto *SI2 = dyn_cast<StoreInst>(&I2)) {
+						/*
 						if(SI->getPointerOperand() != LI->getPointerOperand()) {
+							continue;
+						}
+						*/
+						if(AARes.alias(MemoryLocation(SI2->getPointerOperand()), 
+									   MemoryLocation(SI->getPointerOperand()), EmptyInfo) == AliasResult::NoAlias) {
 							continue;
 						}
 						indegree[&I1]++;
