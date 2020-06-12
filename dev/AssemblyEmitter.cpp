@@ -43,7 +43,7 @@ AssemblyEmitter::AssemblyEmitter(raw_ostream *fout, TargetMachine& TM, SymbolMap
 void AssemblyEmitter::visitFunction(Function& F) {
     //print the starting code.
     //finishing code will be printed outside the AssemblyEmitter.
-    *fout << "start " << name(&F) <<*" " << F.arg_size() << ":\n";
+    *fout << "start " << name(&F) << " " << F.arg_size() << ":\n";
 }
 void AssemblyEmitter::visitBasicBlock(BasicBlock& BB) {
     *fout << "." << name(&BB) << ":\n";
@@ -53,8 +53,8 @@ void AssemblyEmitter::visitBasicBlock(BasicBlock& BB) {
         //if main, import GV within.
         //this code should happen only if GV array was in the initial program.
         //GV values are all lowered into alloca + calls
-        if(BB.getParent()->getName() == "main") {
-            *fout << "  ; Init global variables";
+        if(BB.getParent()->getName() == "main" && BB.getModule()->getGlobalList().size()!=0) {
+            *fout << "  ; Init global variables\n";
             for(auto& gv : BB.getModule()->globals()) {
                 //temporarily stores the GV pointer.
                 *fout << emitInst({"r0 = malloc", to_string(getAccessSize(gv.getType()))});
@@ -62,14 +62,16 @@ void AssemblyEmitter::visitBasicBlock(BasicBlock& BB) {
                     *fout << emitInst({"store", name(gv.getInitializer()), to_string(getAccessSize(gv.getType())), "r0 0"});
             }
         }
-        *fout << "  ; Init stack pointer"l
-        *fout << emitInst({"sp = sub sp",to_string(spOffset[BB.getParent()]),"64"});
+        if(spOffset[BB.getParent()] != 0) {
+            *fout << "  ; Init stack pointer\n";
+            *fout << emitInst({"sp = sub sp",to_string(spOffset[BB.getParent()]),"64"});
+        }
     }
 }
 
 //Compare insts.
 void AssemblyEmitter::visitICmpInst(ICmpInst& I) {
-    *fout << emitInst({name(&I),"=*icmp", I.getPredicateName(I.getPredicate()), name(I.getOperand(0)), name(I.getOperand(1)), stringBandWidth(&I)});
+    *fout << emitInst({name(&I),"= icmp", I.getPredicateName(I.getPredicate()), name(I.getOperand(0)), name(I.getOperand(1)), stringBandWidth(I.getOperand(0))});
 }
 
 //Alloca inst.
@@ -191,7 +193,7 @@ void AssemblyEmitter::visitSelectInst(SelectInst& I) {
 
 void AssemblyEmitter::visitCallInst(CallInst& I) {
     //Process malloc()&free() from other plain call insts.
-    Function* F = I.getFunction();
+    Function* F = I.getCalledFunction();
     string Fname = F->getName();
     
     //Collect all arguments
