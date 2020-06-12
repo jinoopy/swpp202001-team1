@@ -3,15 +3,12 @@ source_filename = "collatz/src/collatz.c"
 target datalayout = "e-m:o-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-apple-macosx10.15.0"
 
-@GV = global i32 0, align 4
-
 ; Function Attrs: nounwind ssp uwtable
 define i32 @collatz(i16* %iter, i32 %n) #0 {
 entry:
   %conv = zext i32 %n to i64
   call void @write(i64 %conv)
   %cmp = icmp ule i32 %n, 1
-  store i32 10, i32* @GV, align 4
   br i1 %cmp, label %if.then, label %if.end
 
 if.then:                                          ; preds = %entry
