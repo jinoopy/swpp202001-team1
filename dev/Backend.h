@@ -179,8 +179,7 @@ public:
 
   //SymbolMap initially does not mark alloca and its derivatives.
   //processing should be seperately done.
-  map<Function*, unsigned> processAlloca(Module& M, SymbolMap& SM);
-
+  map<Function*, unsigned> processAlloca(Module&, SymbolMap&);
   void SSAElimination(Module &, SymbolMap &, RegisterGraph &);
   void addEdges(BasicBlock &, BasicBlock &, SymbolMap &, vector<vector<Symbol *>> &);
   Value *findLeastReg(Symbol *, BasicBlock &, SymbolMap &);

@@ -7,6 +7,9 @@ using namespace backend;
 namespace backend {
 
 string AssemblyEmitter::name(Value* v) {
+    if(!v || isa<ConstantPointerNull>(v) || v->getType()->isVoidTy()) {
+        return "0";
+    }
     if(isa<ConstantInt>(v)) {
         //return the value itself.
         return to_string(dyn_cast<ConstantInt>(v)->getZExtValue());
@@ -58,8 +61,9 @@ void AssemblyEmitter::visitBasicBlock(BasicBlock& BB) {
             for(auto& gv : BB.getModule()->globals()) {
                 //temporarily stores the GV pointer.
                 *fout << emitInst({"r0 = malloc", to_string(getAccessSize(gv.getType()))});
-                if(!gv.getInitializer()->isZeroValue())
+                if(gv.hasInitializer() && !gv.getInitializer()->isZeroValue()) {
                     *fout << emitInst({"store", name(gv.getInitializer()), to_string(getAccessSize(gv.getType())), "r0 0"});
+                }
             }
         }
         if(spOffset[BB.getParent()] != 0) {
