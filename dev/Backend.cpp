@@ -413,13 +413,13 @@ Value *Backend::findLeastReg(Symbol *reg, BasicBlock &BB, SymbolMap &symbolMap) 
 
 // This function finds edges between two basic blocks(srcBB, dstBB).
 void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMap, vector<vector<Symbol *>> &adjList) {
+	LLVMContext &Context = srcBB.getParent()->getParent()->getContext();
 	for(Instruction &I : dstBB) {
 		PHINode *phi = dyn_cast<PHINode>(&I);
 		if(phi == nullptr) {
 			continue;
 		}
 		// Only phi nodes
-		bool findSrc = false;
 		Symbol *phiSymbol = symbolMap.get(dyn_cast<Value>(&I));
 		assert(phiSymbol && "Error: Symbol of phi does not exist");
 		string phiName = phiSymbol->getName();
@@ -430,8 +430,15 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 			if(&srcBB != from) {
 				continue;
 			}
-			findSrc = true;
-			Symbol *instSymbol = symbolMap.get(phi->getIncomingValue(i));
+			Value *value = phi->getIncomingValue(i);
+			if(auto *CI = dyn_cast<ConstantInt>(value)) {
+				Instruction *constToPhi = BinaryOperator::CreateMul(value, ConstantInt::get(Context,
+										  APInt(value->getType()->getIntegerBitWidth(), 1)));
+				constToPhi->insertBefore(from->getTerminator());
+				symbolMap.set(constToPhi, phiSymbol);
+				continue;
+			}
+			Symbol *instSymbol = symbolMap.get(value);
 			if(instSymbol == nullptr || phiSymbol == instSymbol) {
 				continue;
 			}

@@ -1,0 +1,30 @@
+start main 1:
+.entry:
+  ; Init global variables
+  r0 = malloc 8 
+  store 5 8 r0 0 
+  r0 = malloc 8 
+  store 186 8 r0 0 
+  r0 = malloc 8 
+  store 251 8 r0 0 
+  r1 = load 4 20480 0 
+  r0 = add 1 1 64 
+  r2 = mul r0 1 64 
+  r3 = mul arg0 1 32 
+  r0 = add 20480 0 64 
+  br BB1 
+.BB1:
+  br BB2 
+.BB2:
+  r2 = add 2 2 32 
+  r1 = call pointer 
+  r0 = add 2 2 32 
+  r3 = add 2 2 64 
+  r4 = mul r0 1 32 
+  r0 = mul r1 1 64 
+  r1 = mul r2 1 32 
+  r2 = mul r3 1 64 
+  r3 = mul r0 1 64 
+  br BB1 
+end main
+
