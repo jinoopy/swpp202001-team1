@@ -2,57 +2,84 @@
     "llvm-bin-dir": "~/llvmscript/llvm-10.0-release/bin",
     "opt-pass": {
         "vectorize": {
-            "src": "VectorizeLoadStore.cpp",
+            "src": "optim/VectorizeLoadStore.cpp",
             "lib": "libVLS"
         },
         "malloc2gv": {
-            "src": "MallocToGV.cpp",
+            "src": "optim/MallocToGV.cpp",
             "lib": "libMTGV"
         },
         "gv2malloc": {
-            "src": "GVToMalloc.cpp",
+            "src": "optim/GVToMalloc.cpp",
             "lib": "libGVTM"
+        },
+        "heap2stack": {
+            "src": "optim/HeapToStack.cpp",
+            "lib": "libHTS"
+        },
+        "power-reduc": {
+            "src": "optim/PowerReduction.cpp",
+            "lib": "libPR"
         }
     },
     "preset-passes": {
-        "basic-optim": [
-            "-mem2reg",
-            "-ipsccp"
+        "global-optim": [
+            "globaldce",
+            "globalopt",
+            "ipsccp",
+            "gv2malloc",
+            "mem2reg",
+            "gvn"
+        ],
+        "function-optim": [
+            "mergefunc",
+            "tailcallelim",
+            "inline"
+        ],
+        "memory-optim": [
+            "heap2stack",
+            "deadargelim",
+            "malloc2gv",
+            "mem2reg"
         ],
         "inst-optim": [
-            "-reassociate",
-            "-instcombine",
-            "-sccp",
-            "--deadargelim",
-            "-dse",
-            "-adce"
-        ],
-        "loop-vectorize": [
-            "-loop-simplify",
-            "-loop-rotate",
-            "-lcssa",
-            "-indvars",
-            "-loop-unroll",
-            "-gvn",
-            "VLS",
-            "-simplifycfg"
+            "reassociate",
+            "constprop",
+            "power-reduc",
+            "instcombine",
+            "power-reduc",
+            "sink",
+            "sccp",
+            "simplifycfg"
         ],
         "loop-optim-1": [
-            "-loop-simplify",
-            "-loop-rotate",
-            "-lcssa",
-            "-licm",
-            "-loop-unswitch"
-		],
-		"loop-optim-2": [
-			"-loop-unroll",
-			"-unroll-count=4",
-			"-unroll-allow-partial",
-			"-unroll-runtime"
-		]
+            "reassociate",
+            "loop-simplify",
+            "lcssa",
+            "licm",
+            "loop-rotate",
+            "loop-unswitch"
+        ],
+        "loop-optim-2": [
+            "reassociate",
+            "loop-simplify",
+            "indvars",
+            "loop-unroll",
+            "vectorize"
+        ]
     },
     "run": {
-        "opt": [],
+        "opt": [
+            0,
+            1,
+            3,
+            2,
+            3,
+            4,
+            3,
+            5,
+            3
+        ],
         "backend": ""
     }
 }

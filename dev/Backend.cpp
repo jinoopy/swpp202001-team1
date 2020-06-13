@@ -28,7 +28,7 @@ unsigned getAccessSize(Type *T) {
   }
   assert(false && "Unsupported access size type!");
 }
-
+/*
 unsigned getBitWidth(Type* T) {
   if (isa<PointerType>(T))
     return 64;
@@ -60,15 +60,6 @@ PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
   //   => Else, raise error.
   //- allocas and its direct uses are renamed: __st__offset__ ex) __st__8__
   map<Function*, unsigned> spOffsetMap = processAlloca(M, symbolMap);
-
-/*
-  TODO : features to be implemented in PR2
-  //SSA is eliminated.
-  //phi node is yet not deleted(assembly emitter will delete it),
-  //but we ensure that every reg in phi nodes point to same registers.
-  //  ex) __r3__.7 = phi [%__r3__.2, %BB1], [%__r3__.0, %BB2], [%__arg0__, %BB3]
-  //  NOT) __r3__.7 = phi [%__r2__.2, %BB1], [%__r5__.0, %BB2], [%__arg0__, %BB3]
-  */
   SSAElimination(M, symbolMap, RG);
   
   if (verifyModule(M, &errs(), nullptr)) {
@@ -436,16 +427,6 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 				continue;
 			}
 			adjList[phiNum].push_back(instSymbol);
-			/*
-			string instName = instSymbol->getName();
-			outs() << instName << "\n";
-			int instNum = stoi(instName.substr(1));
-			// phiNum == instNum -> self loop, ignore it (because it is useless)
-			if(phiNum == instNum) {
-				continue;
-			}
-			adjList[phiNum].push_back(instNum);
-			*/
 		}
 	}
 }
@@ -548,5 +529,5 @@ void SymbolMap::coallocateSameValues(Value* value, Symbol* symbol) {
     }
   }
 }
-
+*/
 } //end namespace backend

@@ -1,43 +1,34 @@
-define dso_local i32 @main(i32 %argn, i8** %argv) {
-entry:
-  %color3 = alloca i64
-  %color2 = alloca i64
-  br label %header
+; ModuleID = 'src/optim/test-ir/input2.cpp'
+source_filename = "src/optim/test-ir/input2.cpp"
+target datalayout = "e-m:o-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-apple-macosx10.15.0"
 
-header:                                           ; preds = %entry
-  %r1 = phi i32 [ 0, %entry ], [ %r9, %BB4 ]
-  %r2 = phi i32 [ 0, %entry ], [ %r8, %BB4 ]
-  %r1.temp.s = zext i32 %r1 to i64
-  store i64 %r1.temp.s, i64* %color2
-  br label %BB1
-
-BB1:                                              ; preds = %BB2, %header
-  %r3 = phi i32 [ 0, %header ], [ %r6, %BB2 ]
-  %r4 = phi i32 [ %r2, %header ], [ %r5, %BB2 ]
-  %r5 = add nsw i32 %r4, %r3
-  br label %BB2
-
-BB2:                                              ; preds = %BB1
-  %r6 = add nsw i32 %r3, 1
-  %r7 = icmp slt i32 %r6, 100
-  %r7.temp.s = zext i1 %r7 to i64
-  store i64 %r7.temp.s, i64* %color3
-  %r7.temp.l = load i64, i64* %color3
-  %r7.temp.l1 = trunc i64 %r7.temp.l to i1
-  br i1 %r7.temp.l1, label %BB1, label %BB3
-
-BB3:                                              ; preds = %BB2
-  %r8 = phi i32 [ %r5, %BB2 ]
-  br label %BB4
-
-BB4:                                              ; preds = %BB3
-  %r1.temp.l = load i64, i64* %color2
-  %r1.temp.l2 = trunc i64 %r1.temp.l to i32
-  %r9 = add nsw i32 %r1.temp.l2, 1
-  %r10 = icmp slt i32 %r9, 100
-  br i1 %r10, label %header, label %BB5
-
-BB5:                                              ; preds = %BB4
-  %r11 = phi i32 [ %r8, %BB4 ]
-  ret i32 %r11
+; Function Attrs: noinline nounwind  ssp uwtable
+define i32 @_Z3fooiiPPi(i32, i32, i32**) #0 {
+  %4 = alloca i32, align 4
+  %5 = alloca i32, align 4
+  %6 = alloca i32**, align 8
+  store i32 %0, i32* %4, align 4
+  store i32 %1, i32* %5, align 4
+  store i32** %2, i32*** %6, align 8
+  %7 = load i32**, i32*** %6, align 8
+  %8 = load i32, i32* %4, align 4
+  %9 = sext i32 %8 to i64
+  %10 = getelementptr inbounds i32*, i32** %7, i64 %9
+  %11 = load i32*, i32** %10, align 8
+  %12 = load i32, i32* %5, align 4
+  %13 = sext i32 %12 to i64
+  %14 = getelementptr inbounds i32, i32* %11, i64 %13
+  %15 = load i32, i32* %14, align 4
+  ret i32 %15
 }
+
+attributes #0 = { noinline nounwind  ssp uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "darwin-stkchk-strong-link" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "probe-stack"="___chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+cx8,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+
+!llvm.module.flags = !{!0, !1, !2}
+!llvm.ident = !{!3}
+
+!0 = !{i32 2, !"SDK Version", [3 x i32] [i32 10, i32 15, i32 4]}
+!1 = !{i32 1, !"wchar_size", i32 4}
+!2 = !{i32 7, !"PIC Level", i32 2}
+!3 = !{!"Apple clang version 11.0.3 (clang-1103.0.32.62)"}

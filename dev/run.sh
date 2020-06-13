@@ -31,13 +31,13 @@ if [[ "$1" == "build" || "$1" == "all" ]]; then
   CXXFLAGS="$CXXFLAGS -I."
   set -e
 
-  $CXX $ISYSROOT $CXXFLAGS $LDFLAGS -frtti $LIBS Backend.cpp TargetMachine.cpp BackendPR2Test.cpp AssemblyEmitter.cpp ../src/backend/LivenessAnalysis.cpp -lpthread -lm \
+  $CXX $ISYSROOT $CXXFLAGS $LDFLAGS $LIBS GEPUnpack.cpp GEPUnpackTest.cpp Backend.cpp -lpthread -lm \
        $SRCROOT/utils/unittest/googletest/src/gtest-all.cc \
-       -o runPR2
+       -o run
 fi
 
 if [[ "$1" == "run" || "$1" == "all" ]]; then
   echo "----- run -----"
   set +e
-  ./runPR2
+  ./run
 fi

@@ -63,7 +63,7 @@ llvmGetPassPluginInfo()
             PB.registerPipelineParsingCallback(
                 [](StringRef Name, ModulePassManager &MPM,
                    ArrayRef<PassBuilder::PipelineElement>) {
-                    if (Name == "malloc-gv")
+                    if (Name == "malloc2gv")
                     {
                         MPM.addPass(MallocToGVPass());
                         return true;

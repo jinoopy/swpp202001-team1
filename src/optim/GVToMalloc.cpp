@@ -13,12 +13,14 @@ namespace optim
         int m_index = 0;
         vector<Value *> malloc;
 
-        auto *MallocFTy = FunctionType::get(Type::getInt8PtrTy(Context), {Type::getInt64Ty(Context)}, false); // make malloc function
-        Function *MallocF = Function::Create(MallocFTy, Function::ExternalLinkage,
+        Function *MallocF = M.getFunction("malloc");
+        if(MallocF == nullptr)
+        {
+            auto *MallocFTy = FunctionType::get(Type::getInt8PtrTy(Context), {Type::getInt64Ty(Context)}, false); // make malloc function
+            MallocF = Function::Create(MallocFTy, Function::ExternalLinkage,
                                              "malloc", M);
-        MallocF->addFnAttr(Attribute::OptimizeNone);
-        MallocF->addFnAttr(Attribute::NoInline);
-
+        }
+        
         for (auto gv = GVs.begin(); gv != GVs.end(); gv++)
         {
             auto type = gv->getValueType();
@@ -29,13 +31,14 @@ namespace optim
         }
         // replace call instruction with new arguments.
 
+        if(m_index==0) return PreservedAnalyses::all();
+
         vector<Function *> old_functions;
         vector<Function *> new_functions;
         map<Function *, Function *> fMap; // By using fMap, we can call the new function(arguments changed function).
         for (auto &f : M.functions())
         {
-            //if(f.getLinkage() == Function::ExternalLinkage)
-            //if(f.getFnAttribute(Attribute::OptimizeNone) != nullptr){
+            if(f.isDeclaration()) continue;
             if (DO_NOT_CONSIDER.find(f.getName()) == DO_NOT_CONSIDER.end())
             {
                 old_functions.push_back(&f);
@@ -63,9 +66,10 @@ namespace optim
         }
         for (auto gv = GVs.begin(); gv != GVs.end(); gv++, i++) // every gv,
         {
-            if(gv->getValueType()->getTypeID() != 11) continue;
+            if(gv->getValueType()->getTypeID() != 11 || gv->use_empty()) continue;
             for (Function &F : M)
             {
+                if(F.isDeclaration()) continue;
                 auto isWithinFn = [&](Use &u) {
                     return dyn_cast<Instruction>(u.getUser())->getFunction() == &F;
                 };
@@ -95,7 +99,7 @@ namespace optim
 
     Value *GVToMallocPass::MakeNewMalloc(Module &M, LLVMContext &Context, Function *MallocF, Type *type, llvm::Constant *value, int m_index)
     {
-        auto size = type->getScalarSizeInBits();
+        auto size = (type->getScalarSizeInBits())/8;
 
         auto main = M.getFunction("main"); // get main function for inserting malloc instruction.
         BasicBlock &Entry = main->getEntryBlock();
@@ -163,7 +167,7 @@ namespace optim
                 CallInst *cI = dyn_cast<CallInst>(&*I);
                 if (cI != nullptr)
                 {
-                    if (DO_NOT_CONSIDER.find(cI->getCalledFunction()->getName()) != DO_NOT_CONSIDER.end())
+                    if (DO_NOT_CONSIDER.find(cI->getCalledFunction()->getName()) != DO_NOT_CONSIDER.end() || fMap.find(cI->getCalledFunction()) == fMap.end())
                     {
                         ++I;
                         continue;
