@@ -107,6 +107,25 @@ private:
 
 };
 
+extern "C" ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo() {
+  return {
+    LLVM_PLUGIN_API_VERSION, "RegisterSpillPass", "v0.1",
+    [](PassBuilder &PB) {
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, ModulePassManager &MPM,
+           ArrayRef<PassBuilder::PipelineElement>) {
+          if (Name == "regspill") {
+            MPM.addPass(RegisterSpillPass());
+            return true;
+          }
+          return false;
+        }
+      );
+    }
+  };
+}
+
 }
 
 #endif

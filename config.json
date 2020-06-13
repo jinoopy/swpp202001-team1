@@ -54,10 +54,10 @@
     ],
     "preset-passes": {
         "global-optim": [
+            "gv2malloc",
             "globaldce",
             "globalopt",
             "ipsccp",
-            "gv2malloc",
             "mem2reg",
             "gvn"
         ],
@@ -97,15 +97,6 @@
             "indvars",
             "loop-unroll",
             "vectorize"
-        ],
-        "backend": [
-            "gep-unpack",
-            "power-reduc",
-            "instcombine",
-            "power-reduc",
-            "register-spill",
-            "deadstoreelim",
-            "translate"
         ]
     },
     "run": {
@@ -118,8 +109,14 @@
             "loop-optim-1",
             "inst-optim",
             "loop-optim-2",
-            "inst-optim",
-            "backend"
+            "inst-optim"
+        ],
+        "backend": [
+            "power-reduc",
+            "instcombine",
+            "power-reduc",
+            "regspill",
+            "dse"
         ]
     }
 }

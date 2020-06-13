@@ -70,7 +70,7 @@ def build(config):
     for p in config["passes"].keys():
         if config["passes"][p]["root"] != "optim":
             continue
-        print("  Compiling <" + p + "> ...\n")
+        print("  Compiling <" + p + "> ...")
         SRC = "".join([" src/" + config["passes"][p]["root"] + "/" + cpp for cpp in config["passes"][p]["src"]])
         subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
         print("  Complete!\n")
@@ -80,35 +80,31 @@ def build(config):
     for p in config["passes"].keys():
         if config["passes"][p]["root"] != "backend":
             continue
-        print("  Compiling <" + p + "> ...\n")
+        print("  Compiling <" + p + "> ...")
         SRC = "".join([" src/" + config["passes"][p]["root"] + "/" + cpp for cpp in config["passes"][p]["src"]])
         subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
         print("  Complete!\n")
     
-    print("  Compiling <translator> ...\n")
+    print("  Compiling <translator> ...")
     SRC = "".join([" src/backend/" + cpp for cpp in config["translator"]])
     subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o obj/backend.o -shared -fPIC -frtti", shell=True)
     print("  Complete!\n")
 
 def opt(config):
-    if(platform.system() == "Darwin"):
-        LIBTYPE = ".dylib"
-    else:
-        LIBTYPE = ".so"
 
-    
     while True:
         print("Enter the directory for .ll file.")
-        llvmir = input("> ")
+        inputIR = input("> ")
         
-        regex = re.compile(r"[\d\w_-/.]+\.ll")
-        if not re.fullmatch(regex, llvmir):
+        regex = re.compile(r"[\d\w_\-/.]+\.ll")
+        if not re.fullmatch(regex, inputIR):
             print("Invalid input")
             continue
-        if not os.path.isfile(llvmir):
+        if not os.path.isfile(inputIR):
             print("File does not exist")
             continue
         break
+
     print("Current Available Pass pipelines:")
     presets = list(config["preset-passes"].keys())
     for i, pipe in enumerate(presets):
@@ -117,16 +113,16 @@ def opt(config):
         print("  " + passes)
     print("Enter which pipeline you would like to apply")
     print("1 ~ " + str(len(config["preset-passes"].keys())) + ", or enter 0 for custom execution, or enter all for all passes.")
-    mode = input("> ")
+    preset = input("> ")
 
-    if mode == "all":
+    if preset == "all":
         passes = []
         for pipename in config["run"]["opt"]:
             passes.extend(config["preset-passes"][pipename])
     else:
-        mode = int(mode)
-        if mode != 0:
-            passes = config["preset-passes"][presets[mode-1]]
+        preset = int(preset)
+        if preset != 0:
+            passes = config["preset-passes"][presets[preset-1]]
         else:
             print("Enter custom sequences of passes")
             print("existing passes: mem2reg indvars ...")
@@ -134,7 +130,14 @@ def opt(config):
             print("ex: loop-simplify loop-unroll vectorize")
             passes = input("> ").split(" ")
     
-    outir = llvmir[:-3]+"_out.ll "
+    outputIR = inputIR[:-3]+"_out.ll "
+    runPass(config, inputIR, outputIR, passes)
+
+def runPass(config, inputIR, outputIR, passes):
+    if(platform.system() == "Darwin"):
+        LIBTYPE = ".dylib"
+    else:
+        LIBTYPE = ".so"
     for p in passes:
         if p in config["passes"].keys():
             arg = "-load-pass-plugin=./lib/"+config["passes"][p]["lib"]+LIBTYPE + " "
@@ -142,12 +145,21 @@ def opt(config):
         else:
             arg = "--" + p + " "
         print("now running: <" + p +">")
-        subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outir + llvmir)
-        llvmir = outir
+        subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outputIR + inputIR)
+        inputIR = outputIR
 
     print("Complete!")
 
-#def backend()
+def backend(config, inputIR, outputS):
+    outputIR = inputIR[:-3]+"_backend.ll "
+    passes = config["run"]["backend"]
+    runPass(config, inputIR, outputIR, passes)
+
+    print("now running: <translator>")
+    subprocessRun("./obj/backend.o "+inputIR + " -o " + outputS)
+
+    print("Complete!")
+
 HELP = r'''
 ==============================
 TEAM 1 COMPILER : DEV mode
@@ -165,7 +177,7 @@ def DEV():
     while True:
         print(HELP, end = "")
         mode = -1
-        while not 0 <= mode <= 4:
+        while not 0 <= mode <= 5:
             mode = int(input("Enter the mode number(1~4).\n> "))
         config = readConfig()
         print("==============================")
@@ -176,14 +188,27 @@ def DEV():
         elif mode == 3:
             opt(config)
         elif mode == 4:
-            print("backend() not implemented")
+            inputIR = input("Enter the directory for input .ll file.\n> ")
+            outputS = input("Enter the directory for output .s file.\n> ")
+            backend(config, inputIR, outputS)
         elif mode == 5:
             inputIR = input("Enter the directory for input .ll file.\n> ")
             outputS = input("Enter the directory for output .s file.\n> ")
-            #RUN(inputIR, outputS)
+            RUN(inputIR, outputS)
         else:
             break
     
+
+def RUN(inputIR, outputS):
+    config = readConfig()
+    outputIR = inputIR[:-3]+"_out.ll "
+    passes = []
+    for pipename in config["run"]["opt"]:
+        passes.extend(config["preset-passes"][pipename])
+    print("<optim>")
+    runPass(config, inputIR, outputIR, passes)
+    print("<backend>")
+    backend(config, outputIR, outputS)
 
 #################################################
 
@@ -228,6 +253,7 @@ except:
     print("ex) python3 compiler.py -run input.ll -bin (llvm/bin dir) -o (output file)")
     sys.exit()
 
+#run the desired mode
 if mode == "-build":
     print("llvm/bin directory : " + binDir)
     build(config)
@@ -250,7 +276,7 @@ elif mode == "-run":
     print("llvm/bin directory : " + binDir)
     print("input IR : " + inputIR)
     print("output Assembly : " + outputS)
-    #RUN(inputIR, outputS)
+    RUN(inputIR, outputS)
 else:
     print("WRONG INPUT")
     print("ex) python3 compiler.py -dev")
