@@ -1,5 +1,5 @@
 {
-    "llvm-bin-dir": "~/llvmscript/llvm-10.0-releaseassert/bin",
+    "llvm-bin-dir": "~/llvmscript/llvm-10.0-release/bin",
     "opt-pass": {
         "vectorize": {
             "src": "VectorizeLoadStore.cpp",
@@ -43,13 +43,13 @@
             "-lcssa",
             "-licm",
             "-loop-unswitch"
-        ],
-        "loop-optim-2": [
-            "-loop-unroll",
-            "-unroll-count=4",
-            "-unroll-allow-partial",
-            "-unroll-runtime"
-        ]
+		],
+		"loop-optim-2": [
+			"-loop-unroll",
+			"-unroll-count=4",
+			"-unroll-allow-partial",
+			"-unroll-runtime"
+		]
     },
     "run": {
         "opt": [],
