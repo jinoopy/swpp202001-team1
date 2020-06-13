@@ -92,6 +92,15 @@ TEST_F(BackendTest, Test5) {
     backend.run(*M, MAM);
 }
 
+TEST_F(BackendTest, Test6) {
+    parseAssembly("test-ir/input6.ll");
+    
+    RegisterGraph RG(*M);
+    ModuleAnalysisManager MAM;
+
+    backend.run(*M, MAM);
+}
+
 int main(int argc, char **argv) {
     outs() << "===============================\n";
     ::testing::InitGoogleTest(&argc, argv);

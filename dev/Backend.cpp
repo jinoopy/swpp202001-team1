@@ -370,6 +370,21 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 				}
 			}
 		}
+		for(BasicBlock &BB : F) {
+			for(Instruction &I : BB) {
+				if(auto *phi = dyn_cast<PHINode>(&I)) {
+					for(unsigned i = 0; i < phi->getNumIncomingValues(); i++) {
+						Value *value = phi->getIncomingValue(i);
+						BasicBlock *block = phi->getIncomingBlock(i);
+						if(isa<ConstantInt>(value)) {
+							Instruction *ctoi = BinaryOperator::CreateMul(value, ConstantInt::get(Context, APInt(value->getType()->getIntegerBitWidth(), 1)));
+							ctoi->insertBefore(block->getTerminator());
+							symbolMap.set(ctoi, symbolMap.get(phi));
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -431,13 +446,6 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 				continue;
 			}
 			Value *value = phi->getIncomingValue(i);
-			if(auto *CI = dyn_cast<ConstantInt>(value)) {
-				Instruction *constToPhi = BinaryOperator::CreateMul(value, ConstantInt::get(Context,
-										  APInt(value->getType()->getIntegerBitWidth(), 1)));
-				constToPhi->insertBefore(from->getTerminator());
-				symbolMap.set(constToPhi, phiSymbol);
-				continue;
-			}
 			Symbol *instSymbol = symbolMap.get(value);
 			if(instSymbol == nullptr || phiSymbol == instSymbol) {
 				continue;
