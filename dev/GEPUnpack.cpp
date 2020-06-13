@@ -12,6 +12,7 @@ namespace optim {
 PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
     LLVMContext &Context = M.getContext();
     for(Function &F : M) {
+		set<Instruction *> s;
         for(auto it = inst_begin(&F); it!=inst_end(&F); ++it) {
             Instruction &I = *it;
             if(I.getOpcode() != Instruction::GetElementPtr) continue;
@@ -34,10 +35,13 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
                 if(curr->isArrayTy()) curr = curr->getArrayElementType();
             }
 
-            Value* itp = Builder.CreateIntToPtr(sum, ptrOp->getType());
+            Value* itp = Builder.CreateIntToPtr(sum, I.getType());
             I.replaceAllUsesWith(itp);
-            I.eraseFromParent();
+			s.insert(&I);
         }
+		for(auto &I : s) {
+			I->eraseFromParent();
+		}
     }
 
     return PreservedAnalyses::all();
