@@ -23,7 +23,7 @@ Register* TargetMachine::gvp() {
     return gvpreg;
 }
 bool TargetMachine::valid(Symbol* symbol) {
-    if(static_cast<Register*>(symbol)) {
+    if(dynamic_cast<Register*>(symbol)) {
         for(int i = 0; i < 16; i++) {
         if(regfile[i] == symbol) return true;
         if(argfile[i] == symbol) return true;
@@ -32,8 +32,8 @@ bool TargetMachine::valid(Symbol* symbol) {
         if(gvpreg == symbol) return true;
     }
     //Every implicit memory addresses are expressed as a base register(sp, gvp) and offset.
-    else if(static_cast<Memory*>(symbol)) {
-        return valid(static_cast<Memory*>(symbol)->getBase());
+    else if(dynamic_cast<Memory*>(symbol)) {
+        return valid(dynamic_cast<Memory*>(symbol)->getBase());
     }
     return false;
 }
@@ -61,7 +61,7 @@ Memory::Memory(Register* base, int64_t offset) : base(base), offset(offset) {
 Register* Memory::getBase() {
     return base;
 }
-int64_t Memory::getoffset() {
+int64_t Memory::getOffset() {
     return offset;
 }
 
