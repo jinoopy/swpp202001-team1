@@ -1,0 +1,533 @@
+
+#include "Backend.h"
+
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/InstVisitor.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Verifier.h"
+#include "llvm/Support/raw_os_ostream.h"
+#include <string>
+#include <sstream>
+
+using namespace llvm;
+using namespace std;
+using namespace backend;
+
+namespace backend {
+
+// Return sizeof(T) in bytes.
+unsigned getAccessSize(Type *T) {
+  if (isa<PointerType>(T))
+    return 8;
+  else if (isa<IntegerType>(T)) {
+    return T->getIntegerBitWidth() == 1 ? 1 : (T->getIntegerBitWidth() / 8);
+  } else if (isa<ArrayType>(T)) {
+    return getAccessSize(T->getArrayElementType()) * T->getArrayNumElements();
+  }
+  assert(false && "Unsupported access size type!");
+}
+/*
+unsigned getBitWidth(Type* T) {
+  if (isa<PointerType>(T))
+    return 64;
+  else if (isa<IntegerType>(T)) {
+    return T->getIntegerBitWidth();
+  }
+  assert(false && "Unsupported access size type!");
+}
+
+//---------------------------------------------------------------
+//class Backend
+//---------------------------------------------------------------
+
+PreservedAnalyses Backend::run(Module &M, ModuleAnalysisManager &MAM) {
+  if (verifyModule(M, &errs(), nullptr)) {
+    errs() << "Syntax error: Input module is not syntactically correct";
+    exit(1);
+  }
+  
+  RegisterGraph RG(M);
+
+  //Build symbol table and rename all.
+  //Every values are mapped to the symbol table.
+  SymbolMap symbolMap(&M, TM, RG);
+
+  //Process alloca, stack pointer and related instructions.
+  //- Allocas should reside only on the entry block.
+  //- entry block should not have a predecessor block.
+  //   => Else, raise error.
+  //- allocas and its direct uses are renamed: __st__offset__ ex) __st__8__
+  map<Function*, unsigned> spOffsetMap = processAlloca(M, symbolMap);
+  SSAElimination(M, symbolMap, RG);
+  
+  if (verifyModule(M, &errs(), nullptr)) {
+    errs() << "BUG: SSAElimination created an ill-formed module!\n";
+    errs() << M;
+    exit(1);
+  }
+
+  //Debug code
+  if(printProcess) {
+    //Print GV. All GVs should be mapped.
+    for(auto& glv : M.globals()) {
+      outs() << "(" << symbolMap.get(&glv)->getName() << ")" << glv.getName() << "\n";
+    }
+
+    for(auto& F : M) {
+      //Print function & argument. All arguments should be mapped.
+      outs() << F.getName() << "(";
+      for(auto& arg : F.args()) {
+        outs() << " (" << symbolMap.get(&arg)->getName() << ")" << arg.getName();
+      }
+      outs() << " )\n";
+
+      //Print Instructions. All instructions should be mapped.
+      for(auto& BB : F) {
+        outs() << "  " << BB.getName() << "\n";
+        for(auto& I : BB) {
+          if(isa<AllocaInst>(I)) {
+            outs() << "    (" << symbolMap.get(&I)->getName() << ")" << I.getName() << "\n";
+          }
+          else if(RegisterGraph::DO_NOT_CONSIDER.find(I.getOpcode()) != RegisterGraph::DO_NOT_CONSIDER.end()) {
+            outs() << "  ";
+            I.print(outs());
+            outs() << "\n";
+          }
+          else
+            outs() << "    (" << symbolMap.get(&I)->getName() << ")" << I.getName() << "\n";
+        }
+      }
+    }
+    M.print(outs(), nullptr);
+  }
+	
+  
+  // Now, let's emit assembly!
+  error_code EC;
+  raw_ostream *os =
+    outputFile == "-" ? &outs() : new raw_fd_ostream(outputFile, EC);
+
+  if (EC) {
+    errs() << "Cannot open file: " << outputFile << "\n";
+    exit(1);
+  }
+
+  AssemblyEmitter Emitter(os, TM, symbolMap, spOffsetMap);
+  for(Function& F : M){
+    if(F.isDeclaration()) continue;
+    Emitter.visit(F);
+    *os << "end " << symbolMap.get(&F)->getName() << "\n\n";
+  }
+
+  if (os != &outs()) delete os;
+  
+  return PreservedAnalyses::all();
+}
+
+// Author: Deokin Jeong (Code style may be different)
+// For each basic block, construct a directed graph from branch instruction and phi nodes.
+// If we reverse direction of all edges in graph, then graph forms a functional graph.
+// Cause every vertex of functional graph has only one outgoing edge, it is easier to 
+// traverse graph.
+// Graph traverse starts from vertex without an incoming edge, and ends to loop.
+// If we detect a loop, there are two options for this.
+//   (i)  If there is not used (physical) register, then use it as temporary register to 
+//        move values.
+//   (ii) Otherwise, just repeat (xor)swapping two registers.
+// Following function implements above explanation.
+void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG) {
+	LLVMContext &Context = M.getContext();
+	for(Function &F : M) {
+		if(F.isDeclaration()) {
+			continue;
+		}
+		for(BasicBlock &BB : F) {
+			// To represent graph, following vector(adjacent list) is used.
+			vector<vector<Symbol *>> adjList(16);
+			BranchInst *brInst = dyn_cast<BranchInst>(BB.getTerminator());
+			// If terminator is return statement, then pass it.
+			if(brInst == nullptr) {
+				continue;
+			}
+			// For every successor, find phi nodes from BB and construct graph.
+			for(unsigned i = 0; i < brInst->getNumSuccessors(); i++) {
+				addEdges(BB, *(brInst->getSuccessor(i)), symbolMap, adjList);
+			}
+
+			// To store the number of incoming edge.
+			// If there is u -> v edge in graph, it means the value of register v
+			// should move to register u.
+			
+			vector<unsigned> indegree(16, 0);
+			set<int> unused;
+			for(unsigned i = 0; i < 16; i++) {
+				for(auto &there : adjList[i]) {
+					if(there->getName().substr(0, 1) == "r") {
+						indegree[stoi(there->getName().substr(1))]++;
+					}
+				}
+				// If a register has no outgoing edge, store and use as temporary register.
+				if(i >= RG.getNumColors(&F)) {
+					unused.insert(i);
+				}
+			}
+			
+			// countRest represents the number of untracked vertices, 
+			// but this is useless (until now).
+			int countRest = 16 - (int)unused.size();
+
+			// Use queue to traverse graph
+			queue<unsigned> q;
+			for(unsigned i = 0; i < 16; i++) {
+				if(!indegree[i] && unused.find(i) == unused.end()) {
+					q.push(i);
+				}
+			}
+			while(!q.empty()) {
+				unsigned curReg = q.front();
+				q.pop();
+				countRest--;
+				if(adjList[curReg].empty()) {
+					continue;
+				}
+				// findLeastReg() finds endmost register which is allocated to r(adjList[curReg][0]). 
+				Value *value = findLeastReg(adjList[curReg][0], BB, symbolMap);
+				
+				// Create new Mul instruction to move value to curReg.
+				// TODO: Fix below APInt(32, 1) to proper data type.
+				if(value->getType()->isPointerTy()) {
+					Instruction *ptoi = CastInst::CreateBitOrPointerCast(value, IntegerType::getInt64Ty(Context));
+					ptoi->insertBefore(BB.getTerminator());
+					symbolMap.set(ptoi, TM.reg(curReg));
+
+					Instruction *itop = CastInst::CreateBitOrPointerCast(ptoi, value->getType());
+					itop->insertBefore(BB.getTerminator());
+					symbolMap.set(itop, TM.reg(curReg));
+				} else {
+					Instruction *moveInst = BinaryOperator::CreateMul(value, ConstantInt::get(Context, APInt(value->getType()->getIntegerBitWidth(), 1)));
+					moveInst->insertBefore(BB.getTerminator());
+					symbolMap.set(moveInst, TM.reg(curReg));
+				}
+				
+				if(adjList[curReg][0]->getName().substr(0, 1) == "r"
+				&& !--indegree[stoi(adjList[curReg][0]->getName().substr(1))]) {
+					q.push(stoi(adjList[curReg][0]->getName().substr(1)));
+				}
+			}
+			// countRest is under 1 if graph has no loop or only one self loop.
+			if(countRest <= 1) {
+				continue;
+			} else if(unused.size() > 0) { // There is an extra register to use.
+				int registerNum = *unused.begin();
+				for(unsigned i = 0; i < 16; i++) {
+					// indegree[i] > 0 means register i is part of the loop.
+					if(indegree[i] > 0) {
+						// Move the value of register i to temporary register.
+						q.push(i);
+						Value *value = findLeastReg(TM.reg(i), BB, symbolMap);
+						Instruction *moveToTemp;
+						if(value->getType()->isPointerTy()) {
+							Instruction *ptoi = CastInst::CreatePointerCast(value, IntegerType::getInt64Ty(Context));
+							ptoi->insertBefore(BB.getTerminator());
+							symbolMap.set(ptoi, TM.reg(registerNum));
+
+							moveToTemp = ptoi;
+
+							Instruction *itop = CastInst::CreateBitOrPointerCast(ptoi, value->getType());
+							itop->insertBefore(BB.getTerminator());
+							symbolMap.set(itop, TM.reg(registerNum));
+						} else {
+							moveToTemp = BinaryOperator::CreateMul(value, ConstantInt::get(Context, APInt(value->getType()->getIntegerBitWidth(), 1)));
+							moveToTemp->insertBefore(BB.getTerminator());
+							symbolMap.set(moveToTemp, TM.reg(registerNum));
+						}
+						unsigned lastQueue;
+						// Move the value in the loop.
+						while(!q.empty()) {
+							unsigned curReg = q.front();
+							q.pop();
+							countRest--;
+							if(adjList[curReg][0]->getName() == "r" + itostr(i)) {
+								lastQueue = curReg;
+								break;
+							}
+							Value *nextValue = findLeastReg(adjList[curReg][0], BB, symbolMap);
+							if(nextValue->getType()->isPointerTy()) {
+								Instruction *ptoi = CastInst::CreateBitOrPointerCast(nextValue, IntegerType::getInt64Ty(Context));
+								ptoi->insertBefore(BB.getTerminator());
+								symbolMap.set(ptoi, TM.reg(curReg));
+
+								moveToTemp = ptoi;
+
+								Instruction *itop = CastInst::CreateBitOrPointerCast(ptoi, nextValue->getType());
+								itop->insertBefore(BB.getTerminator());
+								symbolMap.set(itop, TM.reg(curReg));
+							} else {
+								Instruction *moveInst = BinaryOperator::CreateMul(nextValue, ConstantInt::get(Context, APInt(nextValue->getType()->getIntegerBitWidth(), 1)));
+								moveInst->insertBefore(BB.getTerminator());
+								symbolMap.set(moveInst, TM.reg(curReg));
+							}
+
+							if(adjList[curReg][0]->getName().substr(0, 1) == "r"
+							&& !--indegree[stoi(adjList[curReg][0]->getName().substr(1))]) {
+								q.push(stoi(adjList[curReg][0]->getName().substr(1)));
+							}
+						}
+						// At the end, move a value of temporary register to a register before register i.
+						Instruction *moveFromTemp = BinaryOperator::CreateMul(moveToTemp, ConstantInt::get(Context, APInt(moveToTemp->getType()->getIntegerBitWidth(), 1)));
+						moveFromTemp->insertBefore(BB.getTerminator());
+						symbolMap.set(moveFromTemp, TM.reg(lastQueue));
+						if(value->getType()->isPointerTy()) {
+							Instruction *itop = CastInst::CreateBitOrPointerCast(moveFromTemp, value->getType());
+							itop->insertBefore(BB.getTerminator());
+							symbolMap.set(itop, TM.reg(lastQueue));
+						}
+
+						// Cause the graph can have at most 2 loops, so continue to traverse.
+					}
+				}
+			} else {
+				// Swap two adjacent registers.
+				for(unsigned i = 0; i < 16; i++) {
+					if(indegree[i] > 0) {
+						q.push(i);
+						Value *startValue = findLeastReg(TM.reg(i), BB, symbolMap);
+						while(!q.empty()) {
+							unsigned curReg = q.front();
+							q.pop();
+
+							if(adjList[curReg].empty() || adjList[curReg][0]->getName() == "r" + itostr(i)) {
+								break;
+							}
+
+							Value *nextValue = findLeastReg(adjList[curReg][0], BB, symbolMap);
+
+							if(startValue->getType()->isPointerTy()) {
+								Instruction *ptoi1 = CastInst::CreateBitOrPointerCast(startValue, IntegerType::getInt64Ty(Context));
+								ptoi1->insertBefore(BB.getTerminator());
+								symbolMap.set(ptoi1, TM.reg(curReg));
+
+								Instruction *ptoi2 = CastInst::CreateBitOrPointerCast(nextValue, IntegerType::getInt64Ty(Context));
+								ptoi2->insertBefore(BB.getTerminator());
+								symbolMap.set(ptoi2, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+
+								Instruction *xor1 = BinaryOperator::CreateXor(ptoi1, ptoi2);
+								xor1->insertBefore(BB.getTerminator());
+								symbolMap.set(xor1, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+
+								Instruction *xor2 = BinaryOperator::CreateXor(ptoi1, xor1);
+								xor2->insertBefore(BB.getTerminator());
+								symbolMap.set(xor2, TM.reg(curReg));
+
+								Instruction *xor3 = BinaryOperator::CreateXor(xor1, xor2);
+								xor3->insertBefore(BB.getTerminator());
+								symbolMap.set(xor3, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+
+								Instruction *itop1 = CastInst::CreateBitOrPointerCast(xor2, startValue->getType());
+								itop1->insertBefore(BB.getTerminator());
+								symbolMap.set(itop1, TM.reg(curReg));
+
+								Instruction *itop2 = CastInst::CreateBitOrPointerCast(xor3, nextValue->getType());
+								itop2->insertBefore(BB.getTerminator());
+								symbolMap.set(itop2, TM.reg(curReg));
+
+								startValue = itop2;
+							} else {
+								// XOR swapping
+								Instruction *xor1 = BinaryOperator::CreateXor(startValue, nextValue);
+								xor1->insertBefore(BB.getTerminator());
+								symbolMap.set(xor1, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+
+								Instruction *xor2 = BinaryOperator::CreateXor(startValue, xor1);
+								xor2->insertBefore(BB.getTerminator());
+								symbolMap.set(xor2, TM.reg(curReg));
+
+								Instruction *xor3 = BinaryOperator::CreateXor(xor1, xor2);
+								xor3->insertBefore(BB.getTerminator());
+								symbolMap.set(xor3, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+
+								startValue = xor3;
+							}
+
+							if(adjList[curReg][0]->getName().substr(0, 1) == "r"
+							&& !--indegree[stoi(adjList[curReg][0]->getName().substr(1))]
+							&& adjList[curReg][0]->getName() != "r" + itostr(i)) {
+								q.push(stoi(adjList[curReg][0]->getName().substr(1)));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// This function finds endmost register which is allocated to register i. 
+Value *Backend::findLeastReg(Symbol *reg, BasicBlock &BB, SymbolMap &symbolMap) {
+	if(reg->getName().substr(0, 3) == "arg") {
+		return BB.getParent()->getArg(stoi(reg->getName().substr(3)));
+	} else if(reg->getName().substr(0, 3) == "gvp") {
+		for(auto &G : BB.getParent()->getParent()->globals()) {
+			if(symbolMap.get(&G)->getName() == reg->getName()) {
+				return &G;
+			}
+		}
+	}
+	Instruction *brInst = dyn_cast<BranchInst>(BB.getTerminator());
+	if(brInst == nullptr) {
+		return nullptr;
+	}
+	for(unsigned i = 0; i < brInst->getNumSuccessors(); i++) {
+		BasicBlock *dstBB = brInst->getSuccessor(i);
+		for(Instruction &I : *dstBB) {
+			PHINode *phi = dyn_cast<PHINode>(&I);
+			if(phi == nullptr) {
+				continue;
+			}
+			for(unsigned j = 0; j < phi->getNumIncomingValues(); j++) {
+				if(phi->getIncomingBlock(j) != &BB) {
+					continue;
+				}
+				Value *value = phi->getIncomingValue(j);
+				Symbol *symbol = symbolMap.get(value);
+				if(symbol && symbol == reg) {
+					return value;
+				}
+			}
+		}
+	}
+	assert(false && "Error: There is no value with [reg] allocation");
+	return nullptr;
+}
+
+// This function finds edges between two basic blocks(srcBB, dstBB).
+void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMap, vector<vector<Symbol *>> &adjList) {
+	for(Instruction &I : dstBB) {
+		PHINode *phi = dyn_cast<PHINode>(&I);
+		if(phi == nullptr) {
+			continue;
+		}
+		// Only phi nodes
+		bool findSrc = false;
+		Symbol *phiSymbol = symbolMap.get(dyn_cast<Value>(&I));
+		assert(phiSymbol && "Error: Symbol of phi does not exist");
+		string phiName = phiSymbol->getName();
+		// phiName = "r{i}" -> stoi(substr(1)) = i
+		int phiNum = stoi(phiName.substr(1));
+		for(unsigned i = 0; i < phi->getNumIncomingValues(); i++) {
+			BasicBlock *from = phi->getIncomingBlock(i);
+			if(&srcBB != from) {
+				continue;
+			}
+			findSrc = true;
+			Symbol *instSymbol = symbolMap.get(phi->getIncomingValue(i));
+			if(instSymbol == nullptr || phiSymbol == instSymbol) {
+				continue;
+			}
+			adjList[phiNum].push_back(instSymbol);
+		}
+	}
+}
+
+map<Function*, unsigned> Backend::processAlloca(Module& M, SymbolMap& SM) {
+
+  map<Function*, unsigned> spOffsetMap;
+
+  for(Function& F : M) {
+	if(F.isDeclaration()) continue;
+    BasicBlock& entry = F.getEntryBlock();
+
+    //Process alloca instructions which are only in the entry block.
+    //acc: total stack accumulation of a function before an alloca inst.
+    unsigned acc = 0;
+    for(Instruction& I : entry) {
+
+      AllocaInst* alloca = dyn_cast<AllocaInst>(&I);
+      if(alloca) {
+        //Update SymbolMap.
+        Memory* stackaddr = new Memory(TM.sp(), acc);
+        SM.set(alloca, stackaddr);
+        SM.coallocateSameValues(alloca, stackaddr);
+        //Update acc
+        acc += getAccessSize(alloca->getAllocatedType());
+      }
+    }
+
+    spOffsetMap[&F] = acc;
+  }
+
+  return spOffsetMap;
+}
+ 
+//---------------------------------------------------------------
+//class SymbolMap
+//---------------------------------------------------------------
+
+SymbolMap::SymbolMap(Module* M, TargetMachine& TM, RegisterGraph& RG) : M(M), TM(TM) {
+  //Initiate Machine symbols.
+
+  for(Function& F : *M) {
+    assert(F.hasName() && "All functions in module should be named");
+    symbolTable[&F] = new Func(F.getName());
+
+    unsigned unnamedBB = 0;
+
+    //Assign registers for arguments
+    int i = 0;
+    for(Value& arg : F.args()) {
+      symbolTable[&arg] = TM.arg(i);
+      coallocateSameValues(&arg, TM.arg(i));
+      i++;
+    }
+
+    //Assign registers for instructions
+    for(BasicBlock& BB : F) {
+
+      symbolTable[&BB] = new Block(BB.hasName() ? BB.getName().str() : "_defaultBB" + to_string(unnamedBB++));
+
+      for(Instruction& I : BB) {
+        //If not colored(alloca and its derivatives), do nothing.
+        if(RG.findValue(&I) == -1) continue;
+
+        unsigned c = RG.getValueToColor(&F, &I);
+        Symbol* s = TM.reg(c);
+        symbolTable[&I] = s;
+
+      }
+    }
+  }
+
+  //Assign registers for Global variables
+  unsigned acc = 0; //accumulated offset from the gvp pointer
+  for(Value& gv : M->globals()) {
+    if(!isa<GlobalVariable>(gv)) continue;
+    unsigned size = getAccessSize(dyn_cast<GlobalVariable>(&gv)->getValueType());
+    Memory* gvaddr = new Memory(TM.gvp(), acc);
+    symbolTable[&gv] = gvaddr;
+    coallocateSameValues(&gv, gvaddr);
+    acc += size;
+  }
+}
+
+void SymbolMap::set(Value* value, Symbol* symbol) {
+  symbolTable[value] = symbol;
+}
+
+Symbol* SymbolMap::get(Value* value) {
+  if(symbolTable.find(value) == symbolTable.end()) return nullptr;
+  return symbolTable[value];
+}
+
+void SymbolMap::coallocateSameValues(Value* value, Symbol* symbol) {
+  for(User* u : value->users()) {
+    Instruction* I = dyn_cast<Instruction>(u);
+    //If u is an instruction && type declared in SAME_CONSIDER
+    if(I && RegisterGraph::SAME_CONSIDER.find(I->getOpcode()) != RegisterGraph::SAME_CONSIDER.end()) {
+      symbolTable[I] = symbol;
+    }
+  }
+}
+*/
+} //end namespace backend
