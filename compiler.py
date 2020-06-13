@@ -82,12 +82,12 @@ def build(config):
             continue
         print("  Compiling <" + p + "> ...")
         SRC = "".join([" src/" + config["passes"][p]["root"] + "/" + cpp for cpp in config["passes"][p]["src"]])
-        subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
+        subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -frtti -fPIC", shell=True)
         print("  Complete!\n")
     
     print("  Compiling <translator> ...")
     SRC = "".join([" src/backend/" + cpp for cpp in config["translator"]])
-    subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o obj/backend.o -shared -fPIC -frtti", shell=True)
+    subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -shared -fPIC -frtti -o backend", shell=True)
     print("  Complete!\n")
 
 def opt(config):
@@ -156,7 +156,7 @@ def backend(config, inputIR, outputS):
     runPass(config, inputIR, outputIR, passes)
 
     print("now running: <translator>")
-    subprocessRun("./obj/backend.o "+inputIR + " -o " + outputS)
+    subprocessRun("./backend.out "+inputIR + " " + outputS)
 
     print("Complete!")
 

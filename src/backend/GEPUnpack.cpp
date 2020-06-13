@@ -7,7 +7,18 @@
 using namespace llvm;
 using namespace std;
 
-namespace optim {
+namespace backend {
+
+static unsigned getAccessSize(Type *T) {
+  if (isa<PointerType>(T))
+    return 8;
+  else if (isa<IntegerType>(T)) {
+    return T->getIntegerBitWidth() == 1 ? 1 : (T->getIntegerBitWidth() / 8);
+  } else if (isa<ArrayType>(T)) {
+    return getAccessSize(T->getArrayElementType()) * T->getArrayNumElements();
+  }
+  assert(false && "Unsupported access size type!");
+}
 
 PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
     LLVMContext &Context = M.getContext();

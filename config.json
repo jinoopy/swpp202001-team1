@@ -36,6 +36,20 @@
             ],
             "lib": "libPowRed"
         },
+        "group-access": {
+            "root": "optim",
+            "src": [
+                "StackHeapAccessGroup.cpp"
+            ],
+            "lib": "libSHAccGr"
+        },
+        "gep-unpack": {
+            "root": "backend",
+            "src": [
+                "GEPUnpack.cpp"
+            ],
+            "lib": "libGEPUnp"
+        },
         "regspill": {
             "root": "backend",
             "src": [
@@ -112,6 +126,7 @@
             "inst-optim"
         ],
         "backend": [
+            "gep-unpack",
             "power-reduc",
             "instcombine",
             "power-reduc",
