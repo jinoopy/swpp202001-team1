@@ -9,7 +9,17 @@ namespace backend
 //---------------------------------------------------------------
 //class RegisterGraph
 //---------------------------------------------------------------
-
+set<unsigned int> RegisterGraph::DO_NOT_CONSIDER = {Instruction::Store,
+                                                    Instruction::Alloca,
+                                                    Instruction::Ret,
+                                                    Instruction::Switch,
+                                                    Instruction::Br};
+set<unsigned int> RegisterGraph::SAME_CONSIDER = {Instruction::GetElementPtr,
+                                                  Instruction::BitCast,
+                                                  Instruction::PtrToInt,
+                                                  Instruction::IntToPtr,
+                                                  Instruction::SExt,
+                                                  Instruction::ZExt}; 
 RegisterGraph::RegisterGraph(Module &M)
 {
     this->M = &M;

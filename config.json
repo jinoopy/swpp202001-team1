@@ -1,27 +1,57 @@
 {
-    "llvm-bin-dir": "~/llvmscript/llvm-10.0-release/bin",
-    "opt-pass": {
+    "llvm-bin-dir": "/home/jinulee/llvmscript/llvm-10.0-release/bin",
+    "passes": {
         "vectorize": {
-            "src": "optim/VectorizeLoadStore.cpp",
+            "root": "optim",
+            "src": [
+                "VectorizeLoadStore.cpp"
+            ],
             "lib": "libVLS"
         },
         "malloc2gv": {
-            "src": "optim/MallocToGV.cpp",
-            "lib": "libMTGV"
+            "root": "optim",
+            "src": [
+                "MallocToGV.cpp"
+            ],
+            "lib": "libM2GV"
         },
         "gv2malloc": {
-            "src": "optim/GVToMalloc.cpp",
-            "lib": "libGVTM"
+            "root": "optim",
+            "src": [
+                "GVToMalloc.cpp"
+            ],
+            "lib": "libGV2M"
         },
         "heap2stack": {
-            "src": "optim/HeapToStack.cpp",
-            "lib": "libHTS"
+            "root": "optim",
+            "src": [
+                "HeapToStack.cpp"
+            ],
+            "lib": "libH2S"
         },
         "power-reduc": {
-            "src": "optim/PowerReduction.cpp",
-            "lib": "libPR"
+            "root": "optim",
+            "src": [
+                "PowerReduction.cpp"
+            ],
+            "lib": "libPowRed"
+        },
+        "regspill": {
+            "root": "backend",
+            "src": [
+                "RegisterSpill.cpp",
+                "LivenessAnalysis.cpp"
+            ],
+            "lib": "libRegSp"
         }
     },
+    "translator": [
+        "AssemblyEmitter.cpp",
+        "Backend.cpp",
+        "LivenessAnalysis.cpp",
+        "TargetMachine.cpp",
+        "BackendMain.cpp"
+    ],
     "preset-passes": {
         "global-optim": [
             "globaldce",
@@ -67,6 +97,15 @@
             "indvars",
             "loop-unroll",
             "vectorize"
+        ],
+        "backend": [
+            "gep-unpack",
+            "power-reduc",
+            "instcombine",
+            "power-reduc",
+            "register-spill",
+            "deadstoreelim",
+            "translate"
         ]
     },
     "run": {
@@ -79,8 +118,8 @@
             "loop-optim-1",
             "inst-optim",
             "loop-optim-2",
-            "inst-optim"
-        ],
-        "backend": ""
+            "inst-optim",
+            "backend"
+        ]
     }
 }

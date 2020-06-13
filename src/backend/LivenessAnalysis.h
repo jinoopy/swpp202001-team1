@@ -53,21 +53,12 @@ public:
   auto& getColorToValue() {return colorToValue;}
   auto& getColorToValue(Function* F) {return colorToValue[F];}
 
+  static set<unsigned int> DO_NOT_CONSIDER;
+  static set<unsigned int> SAME_CONSIDER;
+
 private:
   
-  //Private Variables
-
-  set<unsigned int> DO_NOT_CONSIDER = {Instruction::Store,
-                                      Instruction::Alloca,
-                                      Instruction::Ret,
-                                      Instruction::Switch,
-                                      Instruction::Br};
-  set<unsigned int> SAME_CONSIDER = {Instruction::GetElementPtr,
-                                      Instruction::BitCast,
-                                      Instruction::PtrToInt,
-                                      Instruction::IntToPtr,
-                                      Instruction::SExt,
-                                      Instruction::ZExt};                           
+  //Private Variables                          
 
   //M: Module which is analyzed
   Module* M;

@@ -42,7 +42,7 @@ def updateConfig(config):
         pipename = input("> ")
         print("Enter custom sequences of passes")
         print("existing passes: mem2reg indvars ...")
-        print("custom passes: (refer to keys of config.json::opt-pass)")
+        print("custom passes: (refer to keys of config.json::passes)")
         print("ex: loop-simplify loop-unroll vectorize")
         passes = input("> ").split(" ")
         config["preset-passes"][pipename] = passes
@@ -56,8 +56,6 @@ def build(config):
         ISYSROOT = ""
         LIBTYPE = ".so"
 
-    #Build namespace optim
-    print("Building opt pipeline...")
     LLVMCONFIG = config["llvm-bin-dir"]+"/llvm-config"
     CXXFLAGS = subprocessRun(LLVMCONFIG + " --cxxflags")
     LDFLAGS = subprocessRun(LLVMCONFIG + " --ldflags")
@@ -66,13 +64,31 @@ def build(config):
     CXX = config["llvm-bin-dir"] + "/clang++"
     LDFLAGS = LDFLAGS + "-W1,-rpath," + subprocessRun(LLVMCONFIG + " --libdir")
     CXXFLAGS= CXXFLAGS + " -std=c++17 -I \"" + SRCROOT + "/include\""
+
+    #Build namespace optim
+    print("Building namespace <optim>...\n")
+    for p in config["passes"].keys():
+        if config["passes"][p]["root"] != "optim":
+            continue
+        print("  Compiling <" + p + "> ...\n")
+        SRC = "".join([" src/" + config["passes"][p]["root"] + "/" + cpp for cpp in config["passes"][p]["src"]])
+        subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
+        print("  Complete!\n")
     
-    for p in config["opt-pass"].keys():
-        print("Compiling " + "./src/"+config["opt-pass"][p]["src"] + " ...\n")
-        subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + " src/" + config["opt-pass"][p]["src"] + " -o " + "lib/"+config["opt-pass"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
-        print("Complete!\n")
+    #Build namespace backend
+    print("Building namespace <backend>...\n")
+    for p in config["passes"].keys():
+        if config["passes"][p]["root"] != "backend":
+            continue
+        print("  Compiling <" + p + "> ...\n")
+        SRC = "".join([" src/" + config["passes"][p]["root"] + "/" + cpp for cpp in config["passes"][p]["src"]])
+        subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
+        print("  Complete!\n")
     
-    print("Building backend(TO BE DEVELOPED)...")
+    print("  Compiling <translator> ...\n")
+    SRC = "".join([" src/backend/" + cpp for cpp in config["translator"]])
+    subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o obj/backend.o -shared -fPIC -frtti", shell=True)
+    print("  Complete!\n")
 
 def opt(config):
     if(platform.system() == "Darwin"):
@@ -85,7 +101,7 @@ def opt(config):
         print("Enter the directory for .ll file.")
         llvmir = input("> ")
         
-        regex = re.compile(r"[\d\w_/.]+\.ll")
+        regex = re.compile(r"[\d\w_-/.]+\.ll")
         if not re.fullmatch(regex, llvmir):
             print("Invalid input")
             continue
@@ -114,14 +130,14 @@ def opt(config):
         else:
             print("Enter custom sequences of passes")
             print("existing passes: mem2reg indvars ...")
-            print("custom passes: (refer to keys of config.json::opt-pass)")
+            print("custom passes: (refer to keys of config.json::passes)")
             print("ex: loop-simplify loop-unroll vectorize")
             passes = input("> ").split(" ")
     
     outir = llvmir[:-3]+"_out.ll "
     for p in passes:
-        if p in config["opt-pass"].keys():
-            arg = "-load-pass-plugin=./lib/"+config["opt-pass"][p]["lib"]+LIBTYPE + " "
+        if p in config["passes"].keys():
+            arg = "-load-pass-plugin=./lib/"+config["passes"][p]["lib"]+LIBTYPE + " "
             arg += "-passes=\"" + p + "\" "
         else:
             arg = "--" + p + " "
