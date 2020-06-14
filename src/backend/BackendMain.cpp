@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   if(argc!=3) return -1;
   string optInput = argv[1];
   string optOutput = argv[2];
-  bool optPrintProgress = false;
+  bool optPrintProgress = true;
 
   //Parse input LLVM IR module
   LLVMContext Context;

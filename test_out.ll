@@ -1,92 +1,55 @@
 ; ModuleID = 'test_out.ll'
-source_filename = "bitcount4/src/bitcount4.c"
+source_filename = "bitcount2/src/bitcount2.c"
 target datalayout = "e-m:o-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-apple-macosx10.15.0"
-
-@BitsSetTable256 = external global [256 x i32], align 16
 
 ; Function Attrs: nounwind ssp uwtable
 define i32 @countSetBits(i32 %n) #0 {
 entry:
-  %and2 = srem i32 %n, 256
-  %idxprom = sext i32 %and2 to i64
-  %arrayidx = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom
-  %0 = load i32, i32* %arrayidx, align 4
-  %shr3 = sdiv i32 %n, 256
-  %and11 = srem i32 %shr3, 256
-  %idxprom2 = zext i32 %and11 to i64
-  %arrayidx3 = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom2
-  %1 = load i32, i32* %arrayidx3, align 4
-  %add = add nsw i32 %1, %0
-  %shr44 = sdiv i32 %n, 65536
-  %and52 = srem i32 %shr44, 256
-  %idxprom6 = zext i32 %and52 to i64
-  %arrayidx7 = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom6
-  %2 = load i32, i32* %arrayidx7, align 4
-  %add8 = add nsw i32 %add, %2
-  %shr95 = sdiv i32 %n, 16777216
-  %idxprom10 = sext i32 %shr95 to i64
-  %arrayidx11 = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom10
-  %3 = load i32, i32* %arrayidx11, align 4
-  %add12 = add nsw i32 %add8, %3
-  ret i32 %add12
+  %cmp1 = icmp eq i32 %n, 0
+  br i1 %cmp1, label %return, label %if.else
+
+if.else:                                          ; preds = %if.else, %entry
+  %n.tr3 = phi i32 [ %shr1, %if.else ], [ %n, %entry ]
+  %accumulator.tr2 = phi i32 [ %add, %if.else ], [ 0, %entry ]
+  %and1 = srem i32 %n.tr3, 2
+  %shr1 = sdiv i32 %n.tr3, 2
+  %add = add nsw i32 %and1, %accumulator.tr2
+  %n.tr3.off = add i32 %n.tr3, 1
+  %0 = icmp ult i32 %n.tr3.off, 3
+  br i1 %0, label %return, label %if.else
+
+return:                                           ; preds = %if.else, %entry
+  %accumulator.tr.lcssa = phi i32 [ 0, %entry ], [ %add, %if.else ]
+  ret i32 %accumulator.tr.lcssa
 }
 
 ; Function Attrs: nounwind ssp uwtable
 define i32 @main() #0 {
 entry:
-  store i32 0, i32* getelementptr inbounds ([256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 0), align 16
-  br label %for.body
-
-for.cond.cleanup:                                 ; preds = %for.body
   %call = tail call i64 (...) @read() #2
   %conv = trunc i64 %call to i32
-  %and.i1 = srem i32 %conv, 256
-  %idxprom.i = sext i32 %and.i1 to i64
-  %arrayidx.i = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom.i
-  %0 = load i32, i32* %arrayidx.i, align 4
-  %shr.i2 = sdiv i32 %conv, 256
-  %and1.i1 = srem i32 %shr.i2, 256
-  %idxprom2.i = zext i32 %and1.i1 to i64
-  %arrayidx3.i = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom2.i
-  %1 = load i32, i32* %arrayidx3.i, align 4
-  %add.i = add nsw i32 %1, %0
-  %shr4.i3 = sdiv i32 %conv, 65536
-  %and5.i2 = srem i32 %shr4.i3, 256
-  %idxprom6.i = zext i32 %and5.i2 to i64
-  %arrayidx7.i = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom6.i
-  %2 = load i32, i32* %arrayidx7.i, align 4
-  %add8.i = add nsw i32 %add.i, %2
-  %shr9.i4 = sdiv i32 %conv, 16777216
-  %idxprom10.i = sext i32 %shr9.i4 to i64
-  %arrayidx11.i = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom10.i
-  %3 = load i32, i32* %arrayidx11.i, align 4
-  %add12.i = add nsw i32 %add8.i, %3
-  %conv4 = sext i32 %add12.i to i64
-  tail call void @write(i64 %conv4) #2
-  ret i32 0
+  %cmp.i1 = icmp eq i32 %conv, 0
+  br i1 %cmp.i1, label %countSetBits.exit, label %if.else.i
 
-for.body:                                         ; preds = %for.body, %entry
-  %indvars.iv = phi i64 [ 0, %entry ], [ %indvars.iv.next.1, %for.body ]
-  %4 = trunc i64 %indvars.iv to i32
-  %div111 = sdiv i32 %4, 2
-  %idxprom = zext i32 %div111 to i64
-  %arrayidx = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom
-  %5 = load i32, i32* %arrayidx, align 4
-  %arrayidx2 = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %indvars.iv
-  store i32 %5, i32* %arrayidx2, align 8
-  %indvars.iv.next = or i64 %indvars.iv, 1
-  %6 = trunc i64 %indvars.iv.next to i32
-  %div11.12 = sdiv i32 %6, 2
-  %idxprom.1 = zext i32 %div11.12 to i64
-  %arrayidx.1 = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %idxprom.1
-  %7 = load i32, i32* %arrayidx.1, align 4
-  %add.1 = add nsw i32 %7, 1
-  %arrayidx2.1 = getelementptr inbounds [256 x i32], [256 x i32]* @BitsSetTable256, i64 0, i64 %indvars.iv.next
-  store i32 %add.1, i32* %arrayidx2.1, align 4
-  %indvars.iv.next.1 = add nuw nsw i64 %indvars.iv, 2
-  %exitcond.1 = icmp eq i64 %indvars.iv.next.1, 256
-  br i1 %exitcond.1, label %for.cond.cleanup, label %for.body
+if.else.i:                                        ; preds = %if.else.i, %entry
+  %n.tr.i3 = phi i32 [ %shr.i1, %if.else.i ], [ %conv, %entry ]
+  %accumulator.tr.i2 = phi i32 [ %add.i, %if.else.i ], [ 0, %entry ]
+  %and.i1 = srem i32 %n.tr.i3, 2
+  %shr.i1 = sdiv i32 %n.tr.i3, 2
+  %add.i = add nsw i32 %and.i1, %accumulator.tr.i2
+  %n.tr.i3.off = add i32 %n.tr.i3, 1
+  %0 = icmp ult i32 %n.tr.i3.off, 3
+  br i1 %0, label %tailrecurse.i.countSetBits.exit_crit_edge, label %if.else.i
+
+tailrecurse.i.countSetBits.exit_crit_edge:        ; preds = %if.else.i
+  %phitmp = sext i32 %add.i to i64
+  br label %countSetBits.exit
+
+countSetBits.exit:                                ; preds = %tailrecurse.i.countSetBits.exit_crit_edge, %entry
+  %accumulator.tr.i.lcssa = phi i64 [ %phitmp, %tailrecurse.i.countSetBits.exit_crit_edge ], [ 0, %entry ]
+  tail call void @write(i64 %accumulator.tr.i.lcssa) #2
+  ret i32 0
 }
 
 declare void @write(i64) #1

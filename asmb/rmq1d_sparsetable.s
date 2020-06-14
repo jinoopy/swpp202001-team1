@@ -32,6 +32,8 @@ start main 0:
   store 4 r3 r1 0 
   r2 = add r4 1 64 
   r1 = load 4 sp 4 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r1 = icmp slt r2 r1 64 
   r4 = mul r2 1 64 
   br r1 .for.body .for.cond.cleanup 
@@ -63,6 +65,8 @@ start main 0:
   r1 = mul gvp0 1 64 
   r2 = load 8 r1 0 
   r1 = sub 31 r5 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
   r4 = load 8 r1 0 
@@ -72,12 +76,16 @@ start main 0:
   r3 = load 4 r1 0 
   r1 = lshr 2147483648 r5 32 
   r1 = sub r6 r1 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r2 = mul r4 1 64 
   r1 = mul r1 4 64 
   r1 = add r1 r2 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r3 r2 32 
-  r1 = select r1 r3 r2 32 
+  r1 = select r1 r3 r2 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   call write r1 
   r2 = icmp eq r8 0 32 
   r1 = mul r8 1 32 
@@ -122,7 +130,7 @@ end malloc_upto_8.1
 start min.2 4:
 .entry:
   r1 = icmp slt arg1 arg2 32 
-  r1 = select r1 arg1 arg2 32 
+  r1 = select r1 arg1 arg2 
   ret r1 
 end min.2
 
@@ -158,6 +166,8 @@ start initA.3 2:
 .while.body12:
   r1 = sub 1 r9 32 
   r1 = add r1 r2 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r1 = mul r1 4 64 
   r1 = add r1 7 64 
   r1 = and r1 18446744073709551608 64 
@@ -172,6 +182,8 @@ start initA.3 2:
   br r2 .for.cond.cleanup .for.body.lr.ph 
 .for.body.lr.ph:
   r6 = sdiv r9 2 32 
+  r6 = mul r6 4294967296 64 
+  r6 = sdiv r6 4294967296 64 
   r5 = mul 0 1 64 
   br .for.body 
 .for.cond.cleanup:
@@ -204,7 +216,7 @@ start initA.3 2:
   r1 = add r1 r2 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r3 r2 32 
-  r3 = select r1 r3 r2 32 
+  r3 = select r1 r3 r2 
   r2 = mul r7 1 64 
   r1 = mul r8 8 64 
   r1 = add r1 r2 64 
@@ -215,6 +227,8 @@ start initA.3 2:
   r2 = add r5 1 64 
   r3 = load 4 arg1 0 
   r1 = sub r3 r9 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r1 = icmp slt r5 r1 64 
   r4 = mul r3 1 32 
   r5 = mul r2 1 64 

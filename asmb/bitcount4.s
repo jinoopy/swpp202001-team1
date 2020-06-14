@@ -1,6 +1,8 @@
 start countSetBits 1:
 .entry:
   r1 = srem arg1 256 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r2 = mul r1 4 64 
   r1 = add 20480 0 64 
   r1 = add r2 r1 64 
@@ -20,6 +22,8 @@ start countSetBits 1:
   r1 = load 4 r1 0 
   r3 = add r3 r1 32 
   r1 = sdiv arg1 16777216 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r2 = mul r1 4 64 
   r1 = add 20480 0 64 
   r1 = add r2 r1 64 
@@ -39,6 +43,8 @@ start main 0:
   r1 = call read 
   r4 = mul r1 1 32 
   r1 = srem r4 256 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r2 = mul r1 4 64 
   r1 = add 20480 0 64 
   r1 = add r2 r1 64 
@@ -58,11 +64,15 @@ start main 0:
   r1 = load 4 r1 0 
   r3 = add r3 r1 32 
   r1 = sdiv r4 16777216 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r2 = mul r1 4 64 
   r1 = add 20480 0 64 
   r1 = add r2 r1 64 
   r1 = load 4 r1 0 
   r1 = add r3 r1 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   call write r1 
   ret 0 
 .for.body:

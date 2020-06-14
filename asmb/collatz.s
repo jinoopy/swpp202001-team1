@@ -70,6 +70,8 @@ start main 0:
   r1 = or r1 r2 1 
   br r1 .tailrecurse.i.collatz.exit_crit_edge .if.end6.i 
 .tailrecurse.i.collatz.exit_crit_edge:
+  r1 = mul r3 281474976710656 64 
+  r1 = sdiv r1 281474976710656 64 
   r2 = mul r1 1 64 
   br .collatz.exit 
 .collatz.exit:

@@ -149,9 +149,11 @@ void AssemblyEmitter::visitZExtInst(ZExtInst& I) {
     }
 }
 void AssemblyEmitter::visitSExtInst(SExtInst& I) {
-    //Do nothing.
-    //FIXME
-    //swpp202001-compiler: treated as no-op => is this a correct implementation?
+    unsigned beforeBits = getBitWidth(I.getOperand(0)->getType());
+    unsigned afterBits = getBitWidth(I.getType());
+    assert(afterBits > beforeBits && "SExt must increase the bandwidth");
+    *fout << emitBinary(&I, "mul", name(I.getOperand(0)), to_string(1llu<<(afterBits-beforeBits)));
+    *fout << emitBinary(&I, "sdiv", name(&I), to_string(1llu<<(afterBits-beforeBits)));
 }
 void AssemblyEmitter::visitPtrToIntInst(PtrToIntInst& I) {
     Value* ptr = I.getPointerOperand();
@@ -192,7 +194,7 @@ void AssemblyEmitter::visitBitCastInst(BitCastInst& I) {
 
 //Select inst.
 void AssemblyEmitter::visitSelectInst(SelectInst& I) {
-    *fout << emitInst({name(&I), "= select", name(I.getCondition()), name(I.getTrueValue()), name(I.getFalseValue()), stringBandWidth(&I)});
+    *fout << emitInst({name(&I), "= select", name(I.getCondition()), name(I.getTrueValue()), name(I.getFalseValue())});
 }
 
 void AssemblyEmitter::visitCallInst(CallInst& I) {

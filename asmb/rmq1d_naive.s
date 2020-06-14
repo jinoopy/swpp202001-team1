@@ -29,7 +29,7 @@ start min_element 2:
   br r1 .while.body.prol.loopexit .while.body.prol 
 .while.body.prol:
   r1 = icmp slt r7 r4 32 
-  r4 = select r1 r7 r4 32 
+  r4 = select r1 r7 r4 
   r1 = mul r6 1 64 
   r3 = add r1 4 64 
   r2 = add r5 18446744073709551615 64 
@@ -53,42 +53,42 @@ start min_element 2:
 .while.body:
   r2 = load 4 r4 0 
   r1 = icmp slt r2 r5 32 
-  r3 = select r1 r2 r5 32 
+  r3 = select r1 r2 r5 
   r1 = mul r4 1 64 
   r1 = add r1 4 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 8 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 12 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 16 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 20 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 24 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 28 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r2 = select r1 r2 r3 32 
+  r2 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 32 64 
   r3 = icmp eq r1 arg2 64 
@@ -162,7 +162,7 @@ start main 0:
   br r2 .while.body.i.prol.loopexit .while.body.i.prol 
 .while.body.i.prol:
   r1 = icmp slt r5 r4 32 
-  r4 = select r1 r5 r4 32 
+  r4 = select r1 r5 r4 
   r1 = mul r3 1 64 
   r3 = add r1 4 64 
   r2 = add r6 18446744073709551615 64 
@@ -185,42 +185,42 @@ start main 0:
 .while.body.i:
   r2 = load 4 r4 0 
   r1 = icmp slt r2 r5 32 
-  r3 = select r1 r2 r5 32 
+  r3 = select r1 r2 r5 
   r1 = mul r4 1 64 
   r1 = add r1 4 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 8 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 12 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 16 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 20 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 24 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
+  r3 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 28 64 
   r2 = load 4 r1 0 
   r1 = icmp slt r2 r3 32 
-  r2 = select r1 r2 r3 32 
+  r2 = select r1 r2 r3 
   r1 = mul r4 1 64 
   r1 = add r1 32 64 
   r3 = icmp eq r1 r11 64 
@@ -230,6 +230,8 @@ start main 0:
   br r3 .min_element.exit .while.body.i 
 .min_element.exit:
   r2 = add r12 4294967295 32 
+  r1 = mul r1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   call write r1 
   r1 = icmp eq r2 0 32 
   r12 = mul r2 1 32 

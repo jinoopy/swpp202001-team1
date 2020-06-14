@@ -37,6 +37,8 @@ start main 0:
   r5 = mul r3 1 32 
   br r1 .tailrecurse.i.countSetBits.exit_crit_edge .if.else.i 
 .tailrecurse.i.countSetBits.exit_crit_edge:
+  r1 = mul r2 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r2 = mul r1 1 64 
   br .countSetBits.exit 
 .countSetBits.exit:

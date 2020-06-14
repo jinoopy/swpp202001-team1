@@ -9,7 +9,7 @@ end malloc_upto_8
 start min 2:
 .entry:
   r1 = icmp slt arg1 arg2 32 
-  r1 = select r1 arg1 arg2 32 
+  r1 = select r1 arg1 arg2 
   ret r1 
 end min
 
@@ -37,7 +37,7 @@ start min_element 2:
   r2 = load 4 r6 0 
   r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
-  r3 = select r1 r6 r3 64 
+  r3 = select r1 r6 r3 
   r1 = mul r6 1 64 
   r2 = add r1 4 64 
   r1 = add r5 18446744073709551615 64 
@@ -58,25 +58,25 @@ start min_element 2:
   r2 = load 4 r5 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r5 r4 64 
+  r4 = select r1 r5 r4 
   r1 = mul r5 1 64 
   r3 = add r1 4 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r3 r4 64 
+  r4 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r3 = add r1 8 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r3 r4 64 
+  r4 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r3 = add r1 12 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r2 = select r1 r3 r4 64 
+  r2 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r1 = add r1 16 64 
   r3 = icmp eq r1 arg2 64 
@@ -92,12 +92,18 @@ start min_at_row 3:
 .entry:
   r1 = mul gvp0 1 64 
   r2 = load 8 r1 0 
+  r1 = mul arg1 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
   r6 = load 8 r1 0 
+  r5 = mul arg2 4294967296 64 
+  r5 = sdiv r5 4294967296 64 
   r2 = mul r6 1 64 
   r1 = mul r5 4 64 
   r4 = add r1 r2 64 
+  r3 = mul arg3 4294967296 64 
+  r3 = sdiv r3 4294967296 64 
   r2 = mul r6 1 64 
   r1 = mul r3 4 64 
   r1 = add r1 r2 64 
@@ -121,7 +127,7 @@ start min_at_row 3:
   r2 = load 4 r7 0 
   r1 = load 4 r8 0 
   r1 = icmp slt r2 r1 32 
-  r3 = select r1 r7 r8 64 
+  r3 = select r1 r7 r8 
   r1 = mul r7 1 64 
   r2 = add r1 4 64 
   r1 = add r6 18446744073709551615 64 
@@ -148,25 +154,25 @@ start min_at_row 3:
   r2 = load 4 r5 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r5 r4 64 
+  r4 = select r1 r5 r4 
   r1 = mul r5 1 64 
   r3 = add r1 4 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r3 r4 64 
+  r4 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r3 = add r1 8 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r3 = select r1 r3 r4 64 
+  r3 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r4 = add r1 12 64 
   r2 = load 4 r4 0 
   r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
-  r2 = select r1 r4 r3 64 
+  r2 = select r1 r4 r3 
   r1 = mul r5 1 64 
   r1 = add r1 16 64 
   r3 = icmp eq r4 r10 64 
@@ -299,7 +305,7 @@ start main 0:
   r2 = load 4 r6 0 
   r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
-  r3 = select r1 r6 r3 64 
+  r3 = select r1 r6 r3 
   r1 = mul r6 1 64 
   r2 = add r1 4 64 
   r1 = add r5 18446744073709551615 64 
@@ -320,25 +326,25 @@ start main 0:
   r2 = load 4 r5 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r5 r4 64 
+  r4 = select r1 r5 r4 
   r1 = mul r5 1 64 
   r3 = add r1 4 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r3 r4 64 
+  r4 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r3 = add r1 8 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r3 r4 64 
+  r4 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r3 = add r1 12 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r2 = select r1 r3 r4 64 
+  r2 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r1 = add r1 16 64 
   r3 = icmp eq r1 r10 64 
@@ -371,6 +377,8 @@ start main 0:
 .for.cond.cleanup38:
   r1 = load 8 sp 0 
   r2 = add r1 4294967295 32 
+  r1 = mul r4 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   call write r1 
   r1 = icmp eq r2 0 32 
   r1 = mul r2 1 32 
@@ -408,7 +416,7 @@ start main 0:
   r1 = load 4 r1 0 
   r2 = icmp slt r2 r1 32 
   r1 = load 8 sp 16 
-  r3 = select r2 r7 r1 64 
+  r3 = select r2 r7 r1 
   r1 = mul r7 1 64 
   r2 = add r1 4 64 
   r1 = add r6 18446744073709551615 64 
@@ -435,25 +443,25 @@ start main 0:
   r2 = load 4 r5 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r5 r4 64 
+  r4 = select r1 r5 r4 
   r1 = mul r5 1 64 
   r3 = add r1 4 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r3 r4 64 
+  r4 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r3 = add r1 8 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r3 r4 64 
+  r4 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r3 = add r1 12 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r2 = select r1 r3 r4 64 
+  r2 = select r1 r3 r4 
   r1 = mul r5 1 64 
   r1 = add r1 16 64 
   r3 = icmp eq r1 r8 64 
@@ -464,7 +472,7 @@ start main 0:
 .min_at_row.exit22:
   r2 = load 4 r1 0 
   r1 = icmp slt r12 r2 32 
-  r1 = select r1 r12 r2 32 
+  r1 = select r1 r12 r2 
   r2 = icmp eq r9 r13 64 
   r3 = mul r9 1 64 
   r4 = mul r1 1 32 
