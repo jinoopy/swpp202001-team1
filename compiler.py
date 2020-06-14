@@ -62,9 +62,9 @@ def build(config):
     LIBS = subprocessRun(LLVMCONFIG + " --libs core irreader bitreader passes support analysis asmparser --system-libs")
     SRCROOT = subprocessRun(LLVMCONFIG + " --src-root")
     CXX = config["llvm-bin-dir"] + "/clang++"
-    LDFLAGS = LDFLAGS + "-W1,-rpath," + subprocessRun(LLVMCONFIG + " --libdir")
+    LDFLAGS = LDFLAGS + " -Wl,-rpath," + subprocessRun(LLVMCONFIG + " --libdir")
     CXXFLAGS= CXXFLAGS + " -std=c++17 -I \"" + SRCROOT + "/include\""
-
+    
     #Build namespace optim
     print("Building namespace <optim>...\n")
     for p in config["passes"].keys():
@@ -82,12 +82,12 @@ def build(config):
             continue
         print("  Compiling <" + p + "> ...")
         SRC = "".join([" src/" + config["passes"][p]["root"] + "/" + cpp for cpp in config["passes"][p]["src"]])
-        subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -frtti -fPIC", shell=True)
+        subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
         print("  Complete!\n")
     
     print("  Compiling <translator> ...")
     SRC = "".join([" src/backend/" + cpp for cpp in config["translator"]])
-    subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -shared -fPIC -frtti -o backend", shell=True)
+    subprocess.run(CXX + SRC + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + " -lpthread -lm -fPIC -frtti -o backend", shell=True)
     print("  Complete!\n")
 
 def opt(config):
@@ -131,9 +131,9 @@ def opt(config):
             passes = input("> ").split(" ")
     
     outputIR = inputIR[:-3]+"_out.ll "
-    runPass(config, inputIR, outputIR, passes)
+    runPass(config, inputIR, outputIR, passes, debug=True)
 
-def runPass(config, inputIR, outputIR, passes):
+def runPass(config, inputIR, outputIR, passes, debug=False):
     if(platform.system() == "Darwin"):
         LIBTYPE = ".dylib"
     else:
@@ -147,10 +147,10 @@ def runPass(config, inputIR, outputIR, passes):
         print("now running: <" + p +">")
         subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outputIR + inputIR)
         inputIR = outputIR
+    if debug:
+        subprocessRun("rm "+outputIR)
 
-    print("Complete!")
-
-def backend(config, inputIR, outputS):
+def backend(config, inputIR, outputS, debug=False):
     outputIR = inputIR[:-3]+"_backend.ll "
     passes = config["run"]["backend"]
     runPass(config, inputIR, outputIR, passes)
@@ -158,7 +158,8 @@ def backend(config, inputIR, outputS):
     print("now running: <translator>")
     subprocessRun("./backend.out "+inputIR + " " + outputS)
 
-    print("Complete!")
+    if debug:
+        subprocessRun("rm " + inputIR)
 
 HELP = r'''
 ==============================
@@ -190,7 +191,7 @@ def DEV():
         elif mode == 4:
             inputIR = input("Enter the directory for input .ll file.\n> ")
             outputS = input("Enter the directory for output .s file.\n> ")
-            backend(config, inputIR, outputS)
+            backend(config, inputIR, outputS, debug=True)
         elif mode == 5:
             inputIR = input("Enter the directory for input .ll file.\n> ")
             outputS = input("Enter the directory for output .s file.\n> ")

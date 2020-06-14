@@ -8,7 +8,6 @@
 #include "llvm/Support/raw_ostream.h"
 
 #include "LivenessAnalysis.h"
-#include "RegisterSpill.h"
 
 #include <string>
 #include <queue>

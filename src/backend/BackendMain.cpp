@@ -12,8 +12,8 @@ using namespace llvm;
 int main(int argc, char *argv[]) {
   //Parse command line arguments
   if(argc!=3) return -1;
-  char* optInput = argv[1];
-  char* optOutput = argv[2];
+  string optInput = argv[1];
+  string optOutput = argv[2];
   bool optPrintProgress = false;
 
   //Parse input LLVM IR module
@@ -37,6 +37,6 @@ int main(int argc, char *argv[]) {
   Backend B(optOutput, optPrintProgress);
 
   B.run(*M, MAM);
-
+  
   return 0;
 }
