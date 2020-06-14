@@ -86,7 +86,7 @@ BasicBlock::iterator PowerReductionPass::replaceLSBBitMaskWithRem(BasicBlock::it
     Instruction& I = *it;
     if(I.getOpcode() == Instruction::And && (rhsVal & (rhsVal+1)) == 0) { 
         Value* newI;
-        newI = BinaryOperator::Create(Instruction::SRem, I.getOperand(0),  ConstantInt::get(I.getType(), rhsVal+1, true), I.getName(), &I);
+        newI = BinaryOperator::Create(Instruction::URem, I.getOperand(0),  ConstantInt::get(I.getType(), rhsVal+1, true), I.getName(), &I);
         I.replaceAllUsesWith(newI);
         return I.eraseFromParent();
     }
