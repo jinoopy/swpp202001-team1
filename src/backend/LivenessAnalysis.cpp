@@ -124,14 +124,18 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
 
             //Additionally, oprand for terminators and phi nodes should be marked
             Instruction* term = BB.getTerminator();
-            if(term->getNumOperands() > 1){ //if branches,
+            
+            Value* condition;
+            if(isa<BranchInst>(term) && dyn_cast<BranchInst>(term)->isConditional()) condition = dyn_cast<BranchInst>(term)->getCondition();
+            else if(isa<SwitchInst>(term)) condition = dyn_cast<SwitchInst>(term)->getCondition();
+            if(condition && findValue(condition) != -1){ //if branches,
                 vector<bool> PhiTerm(N);
                 //the branching condition should be live.
-                PhiTerm[findValue(term->getOperand(0))] = true;
+                PhiTerm[findValue(condition)] = true;
                 for(BasicBlock* succ : successors(&BB)) {
                     for(PHINode& phi : succ->phis()) {
                         Value* incomeV = phi.getIncomingValueForBlock(&BB);
-                        if(incomeV != nullptr && findValue(&phi) != -1) {
+                        if(incomeV && findValue(&phi) != -1) {
                             PhiTerm[findValue(&phi)] = true;
                         }
                     }

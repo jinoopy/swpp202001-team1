@@ -64,7 +64,7 @@ def build(config):
     CXX = config["llvm-bin-dir"] + "/clang++"
     LDFLAGS = LDFLAGS + " -Wl,-rpath," + subprocessRun(LLVMCONFIG + " --libdir")
     CXXFLAGS= CXXFLAGS + " -std=c++17 -I \"" + SRCROOT + "/include\""
-    '''
+    
     #Build namespace optim
     print("Building namespace <optim>...\n")
     for p in config["passes"].keys():
@@ -84,7 +84,7 @@ def build(config):
         SRC = "".join([" src/" + config["passes"][p]["root"] + "/" + cpp for cpp in config["passes"][p]["src"]])
         subprocess.run(CXX + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + SRC + " -o " + "lib/"+config["passes"][p]["lib"] + LIBTYPE + " -shared -fPIC", shell=True)
         print("  Complete!\n")
-    '''
+    
     print("  Compiling <translator> ...")
     SRC = "".join([" src/backend/" + cpp for cpp in config["translator"]])
     subprocess.run(CXX + SRC + " " + ISYSROOT + " " + CXXFLAGS + " " + LDFLAGS + " " + LIBS + " -lpthread -lm -fPIC -frtti -o backend", shell=True)

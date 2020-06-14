@@ -211,7 +211,7 @@ void AssemblyEmitter::visitCallInst(CallInst& I) {
     }
     else if(Fname == "free") {
         assert(args.size()==1 && "argument of free() should be 1");
-        *fout << emitInst("free", name(I.getArgOperand(0))});
+        *fout << emitInst({"free", name(I.getArgOperand(0))});
     }
 	else if(F->getReturnType()->isVoidTy()) {
 		vector<string> printlist = {"call", Fname};
@@ -230,7 +230,9 @@ void AssemblyEmitter::visitCallInst(CallInst& I) {
 void AssemblyEmitter::visitReturnInst(ReturnInst& I) {
     //increase sp(which was decreased in the beginning of the function.)
     Function* F = I.getFunction();
-    *fout << emitInst({"sp = add sp",to_string(spOffset[F]),"64"});
+    if(spOffset[F] > 0) {
+        *fout << emitInst({"sp = add sp",to_string(spOffset[F]),"64"});
+    }
     *fout << emitInst({"ret", name(I.getReturnValue())});
 }
 void AssemblyEmitter::visitBranchInst(BranchInst& I) {
@@ -244,7 +246,13 @@ void AssemblyEmitter::visitBranchInst(BranchInst& I) {
     }
 }
 void AssemblyEmitter::visitSwitchInst(SwitchInst& I) {
-
+    string asmb("switch " + name(I.getCondition()));
+    for(auto& c : I.cases()) {
+        if(c.getCaseIndex() == I.case_default()->getCaseIndex()) continue;
+        asmb.append(" " + name(c.getCaseValue()) + " ." + name(c.getCaseSuccessor()));
+    }
+    asmb.append(" ." + name(I.case_default()->getCaseSuccessor()));
+    *fout << asmb << "\n";
 }
 void AssemblyEmitter::visitBinaryOperator(BinaryOperator& I) {
     string opcode = "";
