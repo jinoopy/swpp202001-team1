@@ -35,7 +35,7 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
             Type* curr = ptrOp->getType();
             curr = curr->getPointerElementType();
 
-            Instruction *pti = CastInst::CreateBitOrPointerCast(ptrOp, IntegerType::getInt64Ty(Context), "DEBUG");
+            Instruction *pti = CastInst::CreateBitOrPointerCast(ptrOp, IntegerType::getInt64Ty(Context));
 			pti->insertBefore(&I);
             
 			vector<Instruction *> v;
@@ -53,7 +53,7 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
                 if(curr->isArrayTy()) curr = curr->getArrayElementType();
             }
 
-            Instruction *itp = CastInst::CreateBitOrPointerCast(v.back(), I.getType(), "DEBUG2");
+            Instruction *itp = CastInst::CreateBitOrPointerCast(v.back(), I.getType());
 			// Builder.Insert(itp);
 			itp->insertBefore(&I);
             I.replaceAllUsesWith(itp);

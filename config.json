@@ -136,9 +136,6 @@
         ],
         "backend": [
             "gep-unpack",
-            "power-reduc",
-            "instcombine",
-            "power-reduc",
             "regspill",
             "dse"
         ]
