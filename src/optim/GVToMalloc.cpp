@@ -25,7 +25,8 @@ namespace optim
         {
             auto type = gv->getValueType();
             if(type->getTypeID() != 11) continue;
-            auto *value = gv->getInitializer();
+            Constant *value = nullptr;
+            if(gv->hasInitializer()) value = gv->getInitializer();
             malloc.push_back(MakeNewMalloc(M, Context, MallocF, type, value, m_index));
             m_index++;
         }
@@ -110,11 +111,13 @@ namespace optim
 
         Value *bitCast = builder.CreateBitCast(malloc, type->getPointerTo(), "gv" + std::to_string(m_index)); // %gv1 = bitcast i8* %ma1 to type*
 
-        auto constInt_value = dyn_cast<ConstantInt>(value); // getting The real value in C++ integer type not llvm value type.
-        int64_t init_value = constInt_value->getSExtValue();
-        if (init_value != 0)
-        {
-            auto *store = builder.CreateStore(value, bitCast); // initialize the variable as the original value if it was initialized with some value.
+        if(value) {
+            auto constInt_value = dyn_cast<ConstantInt>(value); // getting The real value in C++ integer type not llvm value type.
+            int64_t init_value = constInt_value->getSExtValue();
+            if (init_value != 0)
+            {
+                auto *store = builder.CreateStore(value, bitCast); // initialize the variable as the original value if it was initialized with some value.
+            }
         }
         return bitCast;
     }

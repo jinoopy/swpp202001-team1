@@ -96,7 +96,7 @@ def opt(config):
         print("Enter the directory for .ll file.")
         inputIR = input("> ")
         
-        regex = re.compile(r"[\d\w_\-/.]+\.ll")
+        regex = re.compile(r"[\d\w_\~\-/.]+\.ll")
         if not re.fullmatch(regex, inputIR):
             print("Invalid input")
             continue
@@ -266,12 +266,12 @@ elif mode == "-run":
         print("ex) python3 compiler.py -run input.ll -bin (llvm/bin dir) -o (output file)")
         sys.exit()
 
-    regex = re.compile(r"[\d\w_/.]+\.ll")
+    regex = re.compile(r"[\d\w_\~\-/.]+\.ll")
     if not re.fullmatch(regex, inputIR):
         print("WRONG INPUT: wrong filename for input IR")
         print("ex) python3 compiler.py -run input.ll -bin (llvm/bin dir) -o (output file)")
         sys.exit()
-    regex = re.compile(r"[\d\w_/.]+\.s")
+    regex = re.compile(r"[\d\w_\~\-/.]+\.s")
     if not re.fullmatch(regex, outputS):
         print("WRONG INPUT: wrong filename for output Assembly")
         sys.exit()
