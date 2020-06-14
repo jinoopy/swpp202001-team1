@@ -62,7 +62,7 @@ void AssemblyEmitter::visitBasicBlock(BasicBlock& BB) {
                 //temporarily stores the GV pointer.
                 *fout << emitInst({"r0 = malloc", to_string(getAccessSize(gv.getType()))});
                 if(gv.hasInitializer() && !gv.getInitializer()->isZeroValue()) {
-                    *fout << emitInst({"store", name(gv.getInitializer()), to_string(getAccessSize(gv.getType())), "r0 0"});
+                    *fout << emitInst({"store", to_string(getAccessSize(gv.getType())), name(gv.getInitializer()), "r0 0"});
                 }
             }
         }
@@ -114,16 +114,16 @@ void AssemblyEmitter::visitStoreInst(StoreInst& I) {
     //if pointer operand is a memory value(GV or alloca),
     if(Memory* mem = dynamic_cast<Memory*>(symbol)) {
         if(mem->getBase() == TM->sp()) {
-            *fout << emitInst({"store", name(val), size ,"sp", to_string(mem->getOffset())});
+            *fout << emitInst({"store", size, name(val), "sp", to_string(mem->getOffset())});
         }
         else if(mem->getBase() == TM->gvp()) {
-            *fout << emitInst({"store", name(val), size, "20480", to_string(mem->getOffset())});
+            *fout << emitInst({"store", size, name(val), "20480", to_string(mem->getOffset())});
         }
         else assert(false && "base of memory pointers should be sp or gvp");
     }
     //else a pointer stored in register,
     else if(Register* reg = dynamic_cast<Register*>(symbol)) {
-        *fout << emitInst({"store", name(val),size, reg->getName(), "0"});
+        *fout << emitInst({"store", size, name(val),reg->getName(), "0"});
     }
     else assert(false && "pointer of a memory operation should have an appropriate symbol assigned");
 }
@@ -211,7 +211,7 @@ void AssemblyEmitter::visitCallInst(CallInst& I) {
     }
     else if(Fname == "free") {
         assert(args.size()==1 && "argument of free() should be 1");
-        *fout << emitInst({name(&I), "= free", name(I.getArgOperand(0))});
+        *fout << emitInst("free", name(I.getArgOperand(0))});
     }
 	else if(F->getReturnType()->isVoidTy()) {
 		vector<string> printlist = {"call", Fname};
