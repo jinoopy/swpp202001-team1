@@ -1,0 +1,1 @@
+Syntax error at asmb/matmul4.s:7: instruction expected

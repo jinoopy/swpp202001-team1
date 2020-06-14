@@ -1,0 +1,1 @@
+Syntax error at asmb/rmq1d_naive.s:0: function not ended

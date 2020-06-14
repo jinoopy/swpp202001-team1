@@ -7,18 +7,7 @@
 using namespace llvm;
 using namespace std;
 
-namespace backend {
-
-static unsigned getAccessSize(Type *T) {
-  if (isa<PointerType>(T))
-    return 8;
-  else if (isa<IntegerType>(T)) {
-    return T->getIntegerBitWidth() == 1 ? 1 : (T->getIntegerBitWidth() / 8);
-  } else if (isa<ArrayType>(T)) {
-    return getAccessSize(T->getArrayElementType()) * T->getArrayNumElements();
-  }
-  assert(false && "Unsupported access size type!");
-}
+namespace optim {
 
 PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
     LLVMContext &Context = M.getContext();
@@ -28,25 +17,31 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
             Instruction &I = *it;
             if(I.getOpcode() != Instruction::GetElementPtr) continue;
 
-            IRBuilder<> Builder(&I);
+            IRBuilder Builder(&I);
             GetElementPtrInst *GI = dyn_cast<GetElementPtrInst>(&I);
 
             Value* ptrOp = GI->getPointerOperand();
             Type* curr = ptrOp->getType();
             curr = curr->getPointerElementType();
 
-            Value* pti = Builder.CreatePtrToInt(ptrOp, IntegerType::getInt64Ty(Context));
+            Instruction *pti = CastInst::CreateBitOrPointerCast(ptrOp, IntegerType::getInt64Ty(Context));
+			Builder.Insert(pti);
             
-            Value* sum = pti;
+			vector<Instruction *> v;
+			v.push_back(pti);
             for(auto opIt = GI->idx_begin(); opIt!=GI->idx_end(); ++opIt) {
                 Value *op = *opIt;
                 unsigned int size = getAccessSize(curr);
-                Value* mul = Builder.CreateMul(op, ConstantInt::get(IntegerType::getInt64Ty(Context), size, true));
-                sum = Builder.CreateAdd(sum, mul);
+                Instruction *mul = BinaryOperator::CreateMul(op, ConstantInt::get(IntegerType::getInt64Ty(Context), size, true));
+				Builder.Insert(mul);
+                Instruction *sum = BinaryOperator::CreateAdd(v.back(), mul);
+				Builder.Insert(sum);
+				v.push_back(sum);
                 if(curr->isArrayTy()) curr = curr->getArrayElementType();
             }
 
-            Value* itp = Builder.CreateIntToPtr(sum, I.getType());
+            Instruction *itp = CastInst::CreateBitOrPointerCast(v.back(), I.getType());
+			Builder.Insert(itp);
             I.replaceAllUsesWith(itp);
 			s.insert(&I);
         }
