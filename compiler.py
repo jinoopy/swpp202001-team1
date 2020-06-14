@@ -152,7 +152,7 @@ def runPass(config, inputIR, outputIR, passes, debug=False):
 def backend(config, inputIR, outputS, debug=False):
     outputIR = inputIR[:-8]+"_backend.ll "
     passes = config["run"]["backend"]
-    runPass(config, inputIR, outputIR, passes)
+    runPass(config, inputIR, outputIR, passes, debug)
 
     if debug:
         print("now running: <translator>")

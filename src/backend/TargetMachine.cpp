@@ -22,6 +22,18 @@ Register* TargetMachine::sp() {
 Register* TargetMachine::gvp() {
     return gvpreg;
 }
+unsigned TargetMachine::regNo(Symbol* symbol) {
+    for(int i = 0; i < 16; i++) {
+        if(symbol == regfile[i]) return i;
+    }
+    return -1;
+}
+unsigned TargetMachine::argNo(Symbol* symbol) {
+    for(int i = 0; i < 16; i++) {
+        if(symbol == argfile[i]) return i;
+    }
+    return -1;
+}
 bool TargetMachine::valid(Symbol* symbol) {
     if(dynamic_cast<Register*>(symbol)) {
         for(int i = 0; i < 16; i++) {
@@ -40,8 +52,8 @@ bool TargetMachine::valid(Symbol* symbol) {
 
 TargetMachine::TargetMachine() {
     for(int i = 0; i < 16; i++) {
-        regfile[i] = new Register("r"+to_string(i));
-        argfile[i] = new Register("arg"+to_string(i));
+        regfile[i] = new Register("r"+to_string(i+1));
+        argfile[i] = new Register("arg"+to_string(i+1));
     }
     spreg = new Register("sp");
     gvpreg = new Register("gvp");
@@ -54,14 +66,6 @@ TargetMachine::TargetMachine() {
 //Class that represents a hardware symbol corresponding to IR symbol
 string Symbol::getName() {
     return name;
-}
-string Symbol::getPrintName() {
-	if(name.substr(0, 1) == "r") {
-		return "r" + itostr(stoi(name.substr(1)) + 1);
-	} else if(name.substr(0, 3) == "arg") {
-		return "arg" + itostr(stoi(name.substr(3)) + 1);
-	}
-	return name;
 }
 Memory::Memory(Register* base, int64_t offset) : base(base), offset(offset) {
     this->name = base->getName() + to_string(offset);

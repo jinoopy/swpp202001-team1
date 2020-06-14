@@ -31,7 +31,6 @@ protected:
   Symbol(string name): name(name) {}
 public:
   string getName();
-  string getPrintName();
 };
 //Hardware registers
 class Register : public virtual Symbol {
@@ -72,6 +71,9 @@ public:
   Register* arg(unsigned);
   Register* sp();
   Register* gvp();
+
+  unsigned regNo(Symbol*);
+  unsigned argNo(Symbol*);
 
   //Checks the validity of the given symbol within the machine.
   bool valid(Symbol*);

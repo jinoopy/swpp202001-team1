@@ -14,7 +14,7 @@ string AssemblyEmitter::name(Value* v) {
         //return the value itself.
         return to_string(dyn_cast<ConstantInt>(v)->getZExtValue());
     }
-    return SM->get(v)->getPrintName();
+    return SM->get(v)->getName();
 }
 
 //static functions for emitting common formats.
@@ -62,7 +62,7 @@ void AssemblyEmitter::visitBasicBlock(BasicBlock& BB) {
                 //temporarily stores the GV pointer.
                 *fout << emitInst({"r0 = malloc", to_string(getAccessSize(gv.getType()))});
                 if(gv.hasInitializer() && !gv.getInitializer()->isZeroValue()) {
-                    *fout << emitInst({"store", name(gv.getInitializer()), to_string(getAccessSize(gv.getType())), "r0 0"});
+                    *fout << emitInst({"store", to_string(getAccessSize(gv.getType())), name(gv.getInitializer()), "r0 0"});
                 }
             }
         }
@@ -114,16 +114,16 @@ void AssemblyEmitter::visitStoreInst(StoreInst& I) {
     //if pointer operand is a memory value(GV or alloca),
     if(Memory* mem = dynamic_cast<Memory*>(symbol)) {
         if(mem->getBase() == TM->sp()) {
-            *fout << emitInst({"store", name(val), size ,"sp", to_string(mem->getOffset())});
+            *fout << emitInst({"store", size, name(val), "sp", to_string(mem->getOffset())});
         }
         else if(mem->getBase() == TM->gvp()) {
-            *fout << emitInst({"store", name(val), size, "20480", to_string(mem->getOffset())});
+            *fout << emitInst({"store", size, name(val), "20480", to_string(mem->getOffset())});
         }
         else assert(false && "base of memory pointers should be sp or gvp");
     }
     //else a pointer stored in register,
     else if(Register* reg = dynamic_cast<Register*>(symbol)) {
-        *fout << emitInst({"store", name(val),size, reg->getName(), "0"});
+        *fout << emitInst({"store", size, name(val),reg->getName(), "0"});
     }
     else assert(false && "pointer of a memory operation should have an appropriate symbol assigned");
 }
@@ -211,7 +211,7 @@ void AssemblyEmitter::visitCallInst(CallInst& I) {
     }
     else if(Fname == "free") {
         assert(args.size()==1 && "argument of free() should be 1");
-        *fout << emitInst({name(&I), "= free", name(I.getArgOperand(0))});
+        *fout << emitInst({"free", name(I.getArgOperand(0))});
     }
 	else if(F->getReturnType()->isVoidTy()) {
 		vector<string> printlist = {"call", Fname};
@@ -230,7 +230,9 @@ void AssemblyEmitter::visitCallInst(CallInst& I) {
 void AssemblyEmitter::visitReturnInst(ReturnInst& I) {
     //increase sp(which was decreased in the beginning of the function.)
     Function* F = I.getFunction();
-    *fout << emitInst({"sp = add sp",to_string(spOffset[F]),"64"});
+    if(spOffset[F] > 0) {
+        *fout << emitInst({"sp = add sp",to_string(spOffset[F]),"64"});
+    }
     *fout << emitInst({"ret", name(I.getReturnValue())});
 }
 void AssemblyEmitter::visitBranchInst(BranchInst& I) {
@@ -244,7 +246,13 @@ void AssemblyEmitter::visitBranchInst(BranchInst& I) {
     }
 }
 void AssemblyEmitter::visitSwitchInst(SwitchInst& I) {
-
+    string asmb("switch " + name(I.getCondition()));
+    for(auto& c : I.cases()) {
+        if(c.getCaseIndex() == I.case_default()->getCaseIndex()) continue;
+        asmb.append(" " + name(c.getCaseValue()) + " ." + name(c.getCaseSuccessor()));
+    }
+    asmb.append(" ." + name(I.case_default()->getCaseSuccessor()));
+    *fout << asmb << "\n";
 }
 void AssemblyEmitter::visitBinaryOperator(BinaryOperator& I) {
     string opcode = "";
