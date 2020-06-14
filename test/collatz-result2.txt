@@ -1,1 +1,2 @@
-Syntax error at asmb/collatz.s:0: function not ended
+1
+0

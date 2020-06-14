@@ -1,1 +1,1 @@
-Error: cannot find asmb/matmul3.s
+Runtime error at asmb/matmul3.s:630: allocation size should not be 0

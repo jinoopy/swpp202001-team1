@@ -1,1 +1,1 @@
-Syntax error at asmb/matmul2.s:0: function not ended
+Syntax error at asmb/matmul2.s:156: instruction expected

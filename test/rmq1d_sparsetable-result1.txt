@@ -1,1 +1,1 @@
-Error: cannot find asmb/rmq1d_sparsetable.s
+Syntax error at asmb/rmq1d_sparsetable.s:4: instruction expected

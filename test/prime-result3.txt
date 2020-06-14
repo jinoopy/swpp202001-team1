@@ -1,1 +1,1 @@
-Error: cannot find asmb/prime.s
+Syntax error at asmb/prime.s:4: instruction expected

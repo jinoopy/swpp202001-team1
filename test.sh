@@ -11,7 +11,7 @@ function test() {
 	python3 compiler.py -run ~/swpp202001-test/$TESTNAME/src/$TESTNAME.ll \
 	-o asmb/$TESTNAME.s
 	for i in $(seq 1 5); do
-		$TIMEOUT 10 ~/swpp202001-interpreter/sf-interpreter asmb/$TESTNAME.s \
+		~/swpp202001-interpreter/sf-interpreter asmb/$TESTNAME.s \
 		< ~/swpp202001-test/$TESTNAME/test/input$i.txt > test/$TESTNAME-result$i.txt
 		cmp ~/swpp202001-test/$TESTNAME/test/output$i.txt test/$TESTNAME-result$i.txt
 	done

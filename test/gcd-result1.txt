@@ -1,1 +1,1 @@
-Syntax error at asmb/gcd.s:0: function not ended
+1000

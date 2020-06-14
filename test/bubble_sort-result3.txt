@@ -1,1 +1,1 @@
-Syntax error at asmb/bubble_sort.s:0: function not ended
+Runtime error at asmb/bubble_sort.s:247: address not aligned
