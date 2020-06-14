@@ -13,8 +13,10 @@ start min_element 2:
   r2 = mul r3 1 32 
   br r1 .while.end .while.body.preheader 
 .while.body.preheader:
-  r1 = add arg2 18446744073709551612 64 
-  r1 = sub r1 arg1 64 
+  r2 = mul arg1 1 64 
+  r1 = mul arg2 1 64 
+  r1 = add r1 18446744073709551612 64 
+  r1 = sub r1 r2 64 
   r9 = sdiv r1 4 64 
   r1 = add r9 1 64 
   r2 = srem r1 8 64 
@@ -99,14 +101,12 @@ end min_element
 
 start main 0:
 .entry:
-  ; Init global variables
-  r0 = malloc 8 
   r4 = call read 
   r2 = mul r4 1 32 
   r1 = sdiv r4 1073741824 64 
   r1 = add r1 7 64 
   r1 = and r1 18446744073709551608 64 
-  r6 = malloc r1 
+  r14 = malloc r1 
   r3 = icmp sgt r2 0 32 
   r1 = call read 
   r2 = mul r1 1 64 
@@ -119,15 +119,15 @@ start main 0:
   r1 = icmp eq r2 0 32 
   br r1 .while.end .while.body.lr.ph 
 .while.body.lr.ph:
-  r1 = mul r6 1 64 
+  r1 = mul r14 1 64 
   r13 = add r1 4 64 
   r12 = mul r2 1 32 
   br .while.body 
 .for.body:
   r3 = mul r1 1 32 
-  r2 = mul r5 4 64 
-  gvp0 = add 20480 0 64 
-  r1 = add r2 gvp0 64 
+  r2 = mul r14 1 64 
+  r1 = mul r5 4 64 
+  r1 = add r1 r2 64 
   store 4 r3 r1 0 
   r2 = add r5 1 64 
   r1 = call read 
@@ -138,9 +138,9 @@ start main 0:
 .while.body:
   r4 = call read 
   r3 = call read 
+  r2 = mul r14 1 64 
   r1 = mul r4 4 64 
-  gvp0 = add 20480 0 64 
-  r6 = add r1 gvp0 64 
+  r6 = add r1 r2 64 
   r1 = mul r3 4 64 
   r11 = add r13 r1 64 
   r5 = load 4 r6 0 

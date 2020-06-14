@@ -1,6 +1,7 @@
 start collatz 2:
 .entry:
-  call write arg2 
+  r1 = mul arg2 1 64 
+  call write r1 
   r1 = icmp ult arg2 2 32 
   r3 = mul arg2 1 32 
   r4 = mul arg2 1 32 

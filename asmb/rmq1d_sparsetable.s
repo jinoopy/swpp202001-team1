@@ -1,16 +1,20 @@
 start main 0:
 .entry:
   ; Init global variables
-  r0 = malloc 8 
-  r0 = malloc 8 
-  r0 = malloc 8 
+  r1 = malloc 8 
+  r1 = malloc 8 
   ; Init stack pointer
   sp = sub sp 8 64 
   r1 = call read 
-  r2 = mul r1 1 32 
-  store 4 r2 sp 4 
-  store 8 gvp16 20480 8 
-  r1 = icmp sgt r2 0 32 
+  r3 = mul r1 1 32 
+  store 4 r3 sp 4 
+  r1 = sdiv r1 1073741824 64 
+  r1 = add r1 7 64 
+  r1 = and r1 18446744073709551608 64 
+  r2 = malloc r1 
+  r1 = mul gvp8 1 64 
+  store 8 r2 r1 0 
+  r1 = icmp sgt r3 0 32 
   r4 = mul 0 1 64 
   br r1 .for.body .for.cond.cleanup 
 .for.cond.cleanup:
@@ -21,7 +25,8 @@ start main 0:
 .for.body:
   r1 = call read 
   r3 = mul r1 1 32 
-  r2 = load 8 20480 8 
+  r1 = mul gvp8 1 64 
+  r2 = load 8 r1 0 
   r1 = mul r4 4 64 
   r1 = add r2 r1 64 
   store 4 r3 r1 0 
@@ -55,7 +60,8 @@ start main 0:
   r5 = mul r2 1 32 
   br r1 .if.end.i.1 .count_leading_zeros.4.exit 
 .count_leading_zeros.4.exit:
-  r2 = load 8 20480 0 
+  r1 = mul gvp0 1 64 
+  r2 = load 8 r1 0 
   r1 = sub 31 r5 32 
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
@@ -136,8 +142,10 @@ start initA.3 2:
   store 4 r5 arg2 0 
   r1 = sdiv r3 536870912 64 
   r4 = malloc r1 
-  store 8 r4 20480 0 
-  r2 = load 8 20480 8 
+  r1 = mul gvp0 1 64 
+  store 8 r4 r1 0 
+  r1 = mul gvp8 1 64 
+  r2 = load 8 r1 0 
   r1 = mul r4 1 64 
   store 8 r2 r1 0 
   r2 = load 4 arg1 0 

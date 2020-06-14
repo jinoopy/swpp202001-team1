@@ -184,7 +184,7 @@ def DEV():
         print(HELP, end = "")
         mode = -1
         while not 0 <= mode <= 5:
-            mode = int(input("Enter the mode number(1~4).\n> "))
+            mode = int(input("Enter the mode number(1~5).\n> "))
         config = readConfig()
         print("==============================")
         if mode == 1:
@@ -200,21 +200,21 @@ def DEV():
         elif mode == 5:
             inputIR = input("Enter the directory for input .ll file.\n> ")
             outputS = input("Enter the directory for output .s file.\n> ")
-            RUN(inputIR, outputS)
+            RUN(inputIR, outputS, debug=True)
         else:
             break
     
 
-def RUN(inputIR, outputS):
+def RUN(inputIR, outputS, debug=False):
     config = readConfig()
     outputIR = inputIR[:-3]+"_out.ll "
     passes = []
     for pipename in config["run"]["opt"]:
         passes.extend(config["preset-passes"][pipename])
     print("Optimizing LLVM IR...")
-    runPass(config, inputIR, outputIR, passes)
+    runPass(config, inputIR, outputIR, passes, debug)
     print("Translating to Assembly...")
-    backend(config, outputIR, outputS)
+    backend(config, outputIR, outputS, debug)
     print("Complete!")
 
 #################################################

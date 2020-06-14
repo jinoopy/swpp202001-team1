@@ -1,16 +1,20 @@
 start main 0:
 .entry:
   ; Init global variables
-  r0 = malloc 8 
-  r0 = malloc 8 
+  r1 = malloc 8 
+  r1 = malloc 8 
   ; Init stack pointer
   sp = sub sp 8 64 
-  r2 = malloc 16 
-  store 8 r2 20480 0 
-  r1 = mul r2 1 64 
+  r3 = malloc 16 
+  r2 = mul r3 1 64 
+  r1 = mul gvp0 1 64 
+  store 8 r3 r1 0 
+  store 8 2 r2 0 
+  r1 = mul r3 1 64 
   r1 = add r1 8 64 
   store 8 0 r1 0 
-  store 8 r2 20480 8 
+  r1 = mul gvp8 1 64 
+  store 8 r3 r1 0 
   store 8 2 sp 0 
   r1 = call read 
   r2 = icmp eq r1 0 64 
@@ -108,10 +112,12 @@ switch r5 0 .while.cond.i 3 .while.end.i .if.end5
   r1 = add r1 8 64 
   store 8 0 r1 0 
   r2 = mul r3 1 64 
-  r1 = load 8 20480 8 
+  r1 = mul gvp8 1 64 
+  r1 = load 8 r1 0 
   r1 = add r1 8 64 
   store 8 r2 r1 0 
-  store 8 r3 20480 8 
+  r1 = mul gvp8 1 64 
+  store 8 r3 r1 0 
   r2 = load 8 arg2 0 
   r1 = urem arg1 r2 64 
   r1 = icmp eq r1 0 64 
@@ -201,10 +207,12 @@ switch r3 0 .while.cond.i.i 3 .while.end.i.i .if.end5.i
   r1 = add r1 8 64 
   store 8 0 r1 0 
   r2 = mul r3 1 64 
-  r1 = load 8 20480 8 
+  r1 = mul gvp8 1 64 
+  r1 = load 8 r1 0 
   r1 = add r1 8 64 
   store 8 r2 r1 0 
-  store 8 r3 20480 8 
+  r1 = mul gvp8 1 64 
+  store 8 r3 r1 0 
   r2 = load 8 arg2 0 
   r1 = urem arg1 r2 64 
   r1 = icmp eq r1 0 64 

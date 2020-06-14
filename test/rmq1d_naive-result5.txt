@@ -1,1 +1,1 @@
-Syntax error at asmb/rmq1d_naive.s:30: instruction expected
+Syntax error at asmb/rmq1d_naive.s:32: instruction expected

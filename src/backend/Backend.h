@@ -154,12 +154,6 @@ public:
   //interface for indirect access to symbolTable.
   void set(Value*, Symbol*);
   Symbol* get(Value*);
-
-  //FIXME: This function should be private and friended to Backend::processAlloca.
-  // - friend void Backend::processAlloca(Module& M, SymbolMap& SM);
-  //However, it produces an unsolvable error, so it is set public for now.
-  //Do not use this function elsewhere.
-  void coallocateSameValues(Value*, Symbol*);
 };
 
 class Backend : public PassInfoMixin<Backend> {

@@ -1,1 +1,1 @@
-Runtime error at asmb/bubble_sort.s:247: address not aligned
+Runtime error at asmb/bubble_sort.s:256: address not aligned

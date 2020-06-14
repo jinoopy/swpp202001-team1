@@ -19,8 +19,10 @@ start min_element 2:
   r1 = mul arg1 1 64 
   br r2 .while.end .while.body.preheader 
 .while.body.preheader:
-  r1 = add arg2 18446744073709551612 64 
-  r1 = sub r1 arg1 64 
+  r2 = mul arg1 1 64 
+  r1 = mul arg2 1 64 
+  r1 = add r1 18446744073709551612 64 
+  r1 = sub r1 r2 64 
   r7 = sdiv r1 4 64 
   r1 = add r7 1 64 
   r1 = srem r1 4 64 
@@ -88,30 +90,32 @@ end min_element
 
 start min_at_row 3:
 .entry:
-  r2 = load 8 20480 0 
-  r1 = mul arg1 8 64 
+  r1 = mul gvp0 1 64 
+  r2 = load 8 r1 0 
+  r1 = mul r1 8 64 
   r1 = add r2 r1 64 
-  r4 = load 8 r1 0 
-  r2 = mul r4 1 64 
-  r1 = mul arg2 4 64 
-  r3 = add r1 r2 64 
-  r2 = mul r4 1 64 
-  r1 = mul arg3 4 64 
+  r6 = load 8 r1 0 
+  r2 = mul r6 1 64 
+  r1 = mul r5 4 64 
+  r4 = add r1 r2 64 
+  r2 = mul r6 1 64 
+  r1 = mul r3 4 64 
   r1 = add r1 r2 64 
   r10 = mul r1 1 64 
   r1 = add r1 4 64 
-  r2 = icmp eq r3 r1 64 
-  r1 = mul r3 1 64 
+  r2 = icmp eq r4 r1 64 
+  r1 = mul r4 1 64 
   br r2 .min_element.exit .while.body.i.preheader 
 .while.body.i.preheader:
-  r9 = sub arg3 arg2 64 
+  r9 = sub r3 r5 64 
   r1 = add r9 1 64 
   r1 = srem r1 4 64 
   r2 = icmp eq r1 0 64 
+  r3 = mul r4 1 64 
   r6 = mul r1 1 64 
-  r7 = mul r3 1 64 
-  r8 = mul r3 1 64 
-  r1 = mul r3 1 64 
+  r7 = mul r4 1 64 
+  r8 = mul r4 1 64 
+  r1 = mul r4 1 64 
   br r2 .while.body.i.prol.loopexit .while.body.i.prol 
 .while.body.i.prol:
   r2 = load 4 r7 0 
@@ -178,8 +182,7 @@ end min_at_row
 start main 0:
 .entry:
   ; Init global variables
-  r0 = malloc 8 
-  r0 = malloc 8 
+  r1 = malloc 8 
   ; Init stack pointer
   sp = sub sp 24 64 
   r4 = call read 
@@ -187,8 +190,10 @@ start main 0:
   r9 = call read 
   r1 = sdiv r4 536870912 64 
   r2 = malloc r1 
-  store 8 r2 20480 0 
+  r1 = mul gvp0 1 64 
+  store 8 r2 r1 0 
   r1 = icmp sgt r3 0 32 
+  r3 = mul r2 1 64 
   br r1 .for.body.lr.ph .for.cond.cleanup 
 .for.body.lr.ph:
   r2 = mul r9 1 32 
@@ -197,8 +202,8 @@ start main 0:
   r8 = and r1 18446744073709551608 64 
   r1 = icmp sgt r2 0 32 
   r7 = srem r4 4294967296 64 
-  r2 = add 20480 8 64 
-  r5 = add 20480 8 64 
+  r2 = mul r3 1 64 
+  r5 = mul r3 1 64 
   r6 = mul 0 1 64 
   r4 = mul 0 1 64 
   br r1 .for.body.us .for.body 
@@ -214,7 +219,8 @@ start main 0:
 .for.body13.us:
   r1 = call read 
   r3 = mul r1 1 32 
-  r2 = load 8 20480 0 
+  r1 = mul gvp0 1 64 
+  r2 = load 8 r1 0 
   r1 = mul r6 8 64 
   r1 = add r2 r1 64 
   r2 = load 8 r1 0 

@@ -48,8 +48,7 @@ void RegisterGraph::SearchAllArgInst(Module &M)
         {
             for (Instruction &I : BB)
             {
-                if (DO_NOT_CONSIDER.find(I.getOpcode())==DO_NOT_CONSIDER.end()
-                    && !(SAME_CONSIDER.find(I.getOpcode())!=SAME_CONSIDER.end() && (isa<Argument>(I.getOperand(0)) || isa<AllocaInst>(I.getOperand(0))) ) )
+                if (DO_NOT_CONSIDER.find(I.getOpcode())==DO_NOT_CONSIDER.end())
                 {
                     values.push_back(&I);
                     valuesInFunction[&F].push_back(&I);

@@ -17,7 +17,6 @@ PreservedAnalyses ConstExprRemovePass::run(Module& M, ModuleAnalysisManager& MAM
                 //ConstantExpr includes 'inlined' operations as in
                 //store i32 %val, %i32* getelementptr...
                 ConstantExpr* expr = dyn_cast<ConstantExpr>(operand);
-                I.print(outs());
                 if(expr) {
                     outs() << "\n";
                     Instruction* newI = expr->getAsInstruction();

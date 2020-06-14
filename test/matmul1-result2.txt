@@ -1,1 +1,1 @@
-Syntax error at asmb/matmul1.s:163: instruction expected
+Runtime error at asmb/matmul1.s:177: allocation size should not be 0

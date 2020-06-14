@@ -1,1 +1,1 @@
-Syntax error at asmb/rmq1d_sparsetable.s:4: instruction expected
+Syntax error at asmb/rmq1d_sparsetable.s:15: instruction expected

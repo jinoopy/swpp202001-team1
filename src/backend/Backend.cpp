@@ -472,7 +472,6 @@ map<Function*, unsigned> Backend::processAlloca(Module& M, SymbolMap& SM) {
         //Update SymbolMap.
         Memory* stackaddr = new Memory(TM.sp(), acc);
         SM.set(alloca, stackaddr);
-        SM.coallocateSameValues(alloca, stackaddr);
         //Update acc
         acc += getAccessSize(alloca->getAllocatedType());
       }
@@ -501,7 +500,6 @@ SymbolMap::SymbolMap(Module* M, TargetMachine& TM, RegisterGraph& RG) : M(M), TM
     int i = 0;
     for(Value& arg : F.args()) {
       symbolTable[&arg] = TM.arg(i);
-      coallocateSameValues(&arg, TM.arg(i));
       i++;
     }
 
@@ -529,7 +527,6 @@ SymbolMap::SymbolMap(Module* M, TargetMachine& TM, RegisterGraph& RG) : M(M), TM
     unsigned size = getAccessSize(dyn_cast<GlobalVariable>(&gv)->getValueType());
     Memory* gvaddr = new Memory(TM.gvp(), acc);
     symbolTable[&gv] = gvaddr;
-    coallocateSameValues(&gv, gvaddr);
     acc += size;
   }
 }
@@ -541,16 +538,6 @@ void SymbolMap::set(Value* value, Symbol* symbol) {
 Symbol* SymbolMap::get(Value* value) {
   if(symbolTable.find(value) == symbolTable.end()) return nullptr;
   return symbolTable[value];
-}
-
-void SymbolMap::coallocateSameValues(Value* value, Symbol* symbol) {
-  for(User* u : value->users()) {
-    Instruction* I = dyn_cast<Instruction>(u);
-    //If u is an instruction && type declared in SAME_CONSIDER
-    if(I && RegisterGraph::SAME_CONSIDER.find(I->getOpcode()) != RegisterGraph::SAME_CONSIDER.end()) {
-      symbolTable[I] = symbol;
-    }
-  }
 }
 
 } //end namespace backend

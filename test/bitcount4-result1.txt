@@ -1,1 +1,1 @@
-Syntax error at asmb/bitcount4.s:5: instruction expected
+2
