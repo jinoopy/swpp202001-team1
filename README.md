@@ -43,9 +43,9 @@ This field is recommended to fix with `-dev` mode. Do not touch if necessary.
 
 > `"preset-passes": ....`
 
-You may freely touch the list of presets included.
+It is recommended not to modify or delete existing component.
 If you add a custom pipeline, this will appear in the 3rd option in the `-dev` mode.
 
 > `"run": ...`
 
-This is for the run mode later on. Do not touch or modify now.
+This is for the run mode. This contains the information about the order of optimizations and backend sequence.

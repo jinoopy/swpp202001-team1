@@ -144,22 +144,23 @@ def runPass(config, inputIR, outputIR, passes, debug=False):
             arg += "-passes=\"" + p + "\" "
         else:
             arg = "--" + p + " "
-        print("now running: <" + p +">")
+        if debug:
+            print("now running: <" + p +">")
         subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outputIR + inputIR)
         inputIR = outputIR
-    if debug:
-        subprocessRun("rm "+outputIR)
 
 def backend(config, inputIR, outputS, debug=False):
-    outputIR = inputIR[:-3]+"_backend.ll "
+    outputIR = inputIR[:-8]+"_backend.ll "
     passes = config["run"]["backend"]
     runPass(config, inputIR, outputIR, passes)
 
-    print("now running: <translator>")
+    if debug:
+        print("now running: <translator>")
     subprocessRun("./backend "+inputIR + " " + outputS)
 
-    if debug:
-        subprocessRun("rm " + inputIR)
+    if not debug:
+        subprocessRun("rm -f " + inputIR)
+        subprocessRun("rm -f " + outputIR)
 
 HELP = r'''
 ==============================
@@ -206,10 +207,11 @@ def RUN(inputIR, outputS):
     passes = []
     for pipename in config["run"]["opt"]:
         passes.extend(config["preset-passes"][pipename])
-    print("<optim>")
+    print("Optimizing LLVM IR...")
     runPass(config, inputIR, outputIR, passes)
-    print("<backend>")
+    print("Translating to Assembly...")
     backend(config, outputIR, outputS)
+    print("Complete!")
 
 #################################################
 

@@ -70,21 +70,21 @@
         "global-optim": [
             "gv2malloc",
             "globaldce",
-            "globalopt",
             "ipsccp",
             "mem2reg",
-            "gvn"
+            "gvn",
+            "globaldce"
         ],
         "function-optim": [
             "mergefunc",
             "tailcallelim",
             "inline",
-            "globaldce"
+            "globaldce",
+            "deadargelim"
         ],
         "memory-optim": [
             "heap2stack",
             "deadargelim",
-            "malloc2gv",
             "mem2reg"
         ],
         "inst-optim": [
@@ -112,6 +112,13 @@
             "indvars",
             "loop-unroll",
             "vectorize"
+        ],
+        "cleanup": [
+            "globaldce",
+            "gvn",
+            "dce",
+            "sccp",
+            "ipsccp"
         ]
     },
     "run": {
@@ -124,7 +131,8 @@
             "loop-optim-1",
             "inst-optim",
             "loop-optim-2",
-            "inst-optim"
+            "inst-optim",
+            "cleanup"
         ],
         "backend": [
             "gep-unpack",
