@@ -65,7 +65,7 @@ namespace optim
             if (f->getName() != "main")
                 f->eraseFromParent();
         }
-        for (auto gv = GVs.begin(); gv != GVs.end(); gv++, i++) // every gv,
+        for (auto gv = GVs.begin(); gv != GVs.end(); gv++) // every gv,
         {
             if(gv->getValueType()->getTypeID() != 11 || gv->use_empty()) continue;
             for (Function &F : M)
@@ -93,6 +93,7 @@ namespace optim
                 }
                 gv->replaceUsesWithIf(replaceV, isWithinFn);
             }
+            i++;
         }
 
         return PreservedAnalyses::all();
