@@ -23,10 +23,10 @@ public:
     PreservedAnalyses run(Module &, ModuleAnalysisManager &);
 
 private:
-    BasicBlock::iterator replaceShiftWithMulDiv(BasicBlock::iterator, int64_t);
-    bool isRegMove(Instruction &, int64_t);
-    BasicBlock::iterator replaceRegMoveWithMul(BasicBlock::iterator, int64_t);
-    BasicBlock::iterator replaceLSBBitMaskWithRem(BasicBlock::iterator, int64_t);
+    BasicBlock::iterator replaceShiftWithMulDiv(BasicBlock::iterator, uint64_t);
+    bool isRegMove(Instruction &, uint64_t);
+    BasicBlock::iterator replaceRegMoveWithMul(BasicBlock::iterator, uint64_t);
+    BasicBlock::iterator replaceLSBBitMaskWithRem(BasicBlock::iterator, uint64_t);
     BasicBlock::iterator replace1BitAndWithMul(BasicBlock::iterator);
 };
 

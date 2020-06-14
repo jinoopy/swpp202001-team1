@@ -1,1 +1,4 @@
-Syntax error at asmb/prime.s:10: instruction expected
+1
+1
+1
+0

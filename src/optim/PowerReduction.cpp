@@ -16,19 +16,34 @@ PreservedAnalyses PowerReductionPass::run(Module &M, ModuleAnalysisManager &MAM)
     for(Function &F : M) {
         if(F.isDeclaration()) continue;
         for(BasicBlock& BB : F) {
-            for(auto it = BB.begin(); it!=BB.end(); ++it) {
+            for(auto it = BB.begin(); it!=BB.end();) {
                 Instruction& I = *it;
-                if(!I.isBinaryOp()) continue;
+
+                if(I.getNumOperands() != 2){
+                   ++it; 
+                   continue;
+                } 
 
                 ConstantInt *rhsC = dyn_cast<ConstantInt>(I.getOperand(1));
 
+                auto it_prev = it;
                 if(rhsC) {
-                    int64_t rhsVal = rhsC->getSExtValue();
+                    uint64_t rhsVal = rhsC->getZExtValue();
+
                     it = replaceShiftWithMulDiv(it, rhsVal);
+                    if(it_prev != it) continue;
+
                     it = replaceRegMoveWithMul(it, rhsVal);
+                    if(it_prev != it) continue;
+
                     it = replaceLSBBitMaskWithRem(it, rhsVal);
+                    if(it_prev != it) continue;
                 }
+
                 it = replace1BitAndWithMul(it);
+                if(it_prev != it) continue;
+
+                ++it;
             }
         }
     }
@@ -36,7 +51,7 @@ PreservedAnalyses PowerReductionPass::run(Module &M, ModuleAnalysisManager &MAM)
     return PreservedAnalyses::all();
 }
 
-BasicBlock::iterator PowerReductionPass::replaceShiftWithMulDiv(BasicBlock::iterator it, int64_t rhsVal) {
+BasicBlock::iterator PowerReductionPass::replaceShiftWithMulDiv(BasicBlock::iterator it, uint64_t rhsVal) {
     Instruction& I = *it;
     if(I.isShift()) {
         Value* newI;
@@ -51,7 +66,7 @@ BasicBlock::iterator PowerReductionPass::replaceShiftWithMulDiv(BasicBlock::iter
     return it;
 }
 
-bool PowerReductionPass::isRegMove(Instruction &I, int64_t rhsVal) {
+bool PowerReductionPass::isRegMove(Instruction &I, uint64_t rhsVal) {
     return (I.getOpcode() == Instruction::Add && rhsVal == 0) //x + 0
         || (I.getOpcode() == Instruction::Sub && rhsVal == 0) //x - 0
         || (I.getOpcode() == Instruction::Or && rhsVal == 0) //x | 0
@@ -60,7 +75,7 @@ bool PowerReductionPass::isRegMove(Instruction &I, int64_t rhsVal) {
         || (I.isShift() && rhsVal == 0); //x << 0, x >> 0
 }
 
-BasicBlock::iterator PowerReductionPass::replaceRegMoveWithMul(BasicBlock::iterator it, int64_t rhsVal) {
+BasicBlock::iterator PowerReductionPass::replaceRegMoveWithMul(BasicBlock::iterator it, uint64_t rhsVal) {
     Instruction& I = *it;
     if(isRegMove(I, rhsVal)) {
         Value* newI;
@@ -82,9 +97,9 @@ BasicBlock::iterator PowerReductionPass::replace1BitAndWithMul(BasicBlock::itera
     return it;
 }
 
-BasicBlock::iterator PowerReductionPass::replaceLSBBitMaskWithRem(BasicBlock::iterator it, int64_t rhsVal) {
+BasicBlock::iterator PowerReductionPass::replaceLSBBitMaskWithRem(BasicBlock::iterator it, uint64_t rhsVal) {
     Instruction& I = *it;
-    if(I.getOpcode() == Instruction::And && (rhsVal & (rhsVal+1)) == 0) { 
+    if(I.getOpcode() == Instruction::And && (rhsVal & (rhsVal+1)) == 0) {
         Value* newI;
         newI = BinaryOperator::Create(Instruction::URem, I.getOperand(0),  ConstantInt::get(I.getType(), rhsVal+1, true), I.getName(), &I);
         I.replaceAllUsesWith(newI);

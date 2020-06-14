@@ -64,6 +64,13 @@
                 "ConstExprRemove.cpp"
             ],
             "lib": "libConstExpr"
+        },
+        "addrcast": {
+            "root": "backend",
+            "src": [
+                "AddressArgCast.cpp"
+            ],
+            "lib": "libAddrCast"
         }
     },
     "translator": [
@@ -148,6 +155,7 @@
             "instcombine",
             "power-reduc",
             "constexpr",
+            "addrcast",
             "regspill",
             "dse"
         ]

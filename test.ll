@@ -1,205 +1,216 @@
 ; ModuleID = '/tmp/a.ll'
-source_filename = "matmul1/src/matmul1.c"
+source_filename = "rmq2d_naive/src/rmq2d_naive.c"
 target datalayout = "e-m:o-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-apple-macosx10.15.0"
 
+@v = external global i32**, align 8
+
 ; Function Attrs: nounwind ssp uwtable
-define void @matmul(i32 %dim, i64* %c, i64* %a, i64* %b) #0 {
+define i8* @malloc_upto_8(i64 %x) #0 {
 entry:
-  br label %for.cond
+  %add = add i64 %x, 7
+  %div = udiv i64 %add, 8
+  %mul = mul i64 %div, 8
+  %call = call noalias i8* @malloc(i64 %mul) #4
+  ret i8* %call
+}
 
-for.cond:                                         ; preds = %for.inc20, %entry
-  %i.0 = phi i32 [ 0, %entry ], [ %inc21, %for.inc20 ]
-  %cmp = icmp ult i32 %i.0, %dim
-  br i1 %cmp, label %for.body, label %for.end22
+; Function Attrs: allocsize(0)
+declare noalias i8* @malloc(i64) #1
 
-for.body:                                         ; preds = %for.cond
-  br label %for.cond1
+; Function Attrs: nounwind ssp uwtable
+define i32 @min(i32 %x, i32 %y) #0 {
+entry:
+  %cmp = icmp slt i32 %x, %y
+  br i1 %cmp, label %cond.true, label %cond.false
 
-for.cond1:                                        ; preds = %for.inc17, %for.body
-  %j.0 = phi i32 [ 0, %for.body ], [ %inc18, %for.inc17 ]
-  %cmp2 = icmp ult i32 %j.0, %dim
-  br i1 %cmp2, label %for.body3, label %for.end19
+cond.true:                                        ; preds = %entry
+  br label %cond.end
 
-for.body3:                                        ; preds = %for.cond1
-  br label %for.cond4
+cond.false:                                       ; preds = %entry
+  br label %cond.end
 
-for.cond4:                                        ; preds = %for.inc, %for.body3
-  %k.0 = phi i32 [ 0, %for.body3 ], [ %inc, %for.inc ]
-  %sum.0 = phi i64 [ 0, %for.body3 ], [ %add12, %for.inc ]
-  %cmp5 = icmp ult i32 %k.0, %dim
-  br i1 %cmp5, label %for.body6, label %for.end
+cond.end:                                         ; preds = %cond.false, %cond.true
+  %cond = phi i32 [ %x, %cond.true ], [ %y, %cond.false ]
+  ret i32 %cond
+}
 
-for.body6:                                        ; preds = %for.cond4
-  %mul = mul i32 %i.0, %dim
-  %add = add i32 %mul, %k.0
-  %idxprom = zext i32 %add to i64
-  %arrayidx = getelementptr inbounds i64, i64* %a, i64 %idxprom
-  %0 = load i64, i64* %arrayidx, align 8
-  %mul7 = mul i32 %k.0, %dim
-  %add8 = add i32 %mul7, %j.0
-  %idxprom9 = zext i32 %add8 to i64
-  %arrayidx10 = getelementptr inbounds i64, i64* %b, i64 %idxprom9
-  %1 = load i64, i64* %arrayidx10, align 8
-  %mul11 = mul i64 %0, %1
-  %add12 = add i64 %sum.0, %mul11
-  br label %for.inc
+; Function Attrs: nounwind ssp uwtable
+define i32* @min_element(i32* %p, i32* %q) #0 {
+entry:
+  br label %while.cond
 
-for.inc:                                          ; preds = %for.body6
-  %inc = add i32 %k.0, 1
-  br label %for.cond4
+while.cond:                                       ; preds = %if.end, %entry
+  %p.addr.0 = phi i32* [ %p, %entry ], [ %incdec.ptr, %if.end ]
+  %e.0 = phi i32* [ %p, %entry ], [ %e.1, %if.end ]
+  %cmp = icmp ne i32* %p.addr.0, %q
+  br i1 %cmp, label %while.body, label %while.end
 
-for.end:                                          ; preds = %for.cond4
-  %mul13 = mul i32 %i.0, %dim
-  %add14 = add i32 %mul13, %j.0
-  %idxprom15 = zext i32 %add14 to i64
-  %arrayidx16 = getelementptr inbounds i64, i64* %c, i64 %idxprom15
-  store i64 %sum.0, i64* %arrayidx16, align 8
-  br label %for.inc17
+while.body:                                       ; preds = %while.cond
+  %0 = load i32, i32* %p.addr.0, align 4
+  %1 = load i32, i32* %e.0, align 4
+  %cmp1 = icmp slt i32 %0, %1
+  br i1 %cmp1, label %if.then, label %if.end
 
-for.inc17:                                        ; preds = %for.end
-  %inc18 = add i32 %j.0, 1
-  br label %for.cond1
+if.then:                                          ; preds = %while.body
+  br label %if.end
 
-for.end19:                                        ; preds = %for.cond1
-  br label %for.inc20
+if.end:                                           ; preds = %if.then, %while.body
+  %e.1 = phi i32* [ %p.addr.0, %if.then ], [ %e.0, %while.body ]
+  %incdec.ptr = getelementptr inbounds i32, i32* %p.addr.0, i64 1
+  br label %while.cond
 
-for.inc20:                                        ; preds = %for.end19
-  %inc21 = add i32 %i.0, 1
-  br label %for.cond
-
-for.end22:                                        ; preds = %for.cond
-  ret void
+while.end:                                        ; preds = %while.cond
+  ret i32* %e.0
 }
 
 ; Function Attrs: argmemonly nounwind willreturn
-declare void @llvm.lifetime.start.p0i8(i64 immarg, i8* nocapture) #1
+declare void @llvm.lifetime.start.p0i8(i64 immarg, i8* nocapture) #2
 
 ; Function Attrs: argmemonly nounwind willreturn
-declare void @llvm.lifetime.end.p0i8(i64 immarg, i8* nocapture) #1
+declare void @llvm.lifetime.end.p0i8(i64 immarg, i8* nocapture) #2
 
 ; Function Attrs: nounwind ssp uwtable
-define void @read_mat(i32 %dim, i64* %mat) #0 {
+define i32 @min_at_row(i32 %row, i32 %from_j, i32 %to_j) #0 {
 entry:
-  br label %for.cond
-
-for.cond:                                         ; preds = %for.inc4, %entry
-  %i.0 = phi i32 [ 0, %entry ], [ %inc5, %for.inc4 ]
-  %cmp = icmp ult i32 %i.0, %dim
-  br i1 %cmp, label %for.body, label %for.end6
-
-for.body:                                         ; preds = %for.cond
-  br label %for.cond1
-
-for.cond1:                                        ; preds = %for.inc, %for.body
-  %j.0 = phi i32 [ 0, %for.body ], [ %inc, %for.inc ]
-  %cmp2 = icmp ult i32 %j.0, %dim
-  br i1 %cmp2, label %for.body3, label %for.end
-
-for.body3:                                        ; preds = %for.cond1
-  %call = call i64 (...) @read()
-  %mul = mul i32 %i.0, %dim
-  %add = add i32 %mul, %j.0
-  %idxprom = zext i32 %add to i64
-  %arrayidx = getelementptr inbounds i64, i64* %mat, i64 %idxprom
-  store i64 %call, i64* %arrayidx, align 8
-  br label %for.inc
-
-for.inc:                                          ; preds = %for.body3
-  %inc = add i32 %j.0, 1
-  br label %for.cond1
-
-for.end:                                          ; preds = %for.cond1
-  br label %for.inc4
-
-for.inc4:                                         ; preds = %for.end
-  %inc5 = add i32 %i.0, 1
-  br label %for.cond
-
-for.end6:                                         ; preds = %for.cond
-  ret void
+  %0 = load i32**, i32*** @v, align 8
+  %idx.ext = sext i32 %row to i64
+  %add.ptr = getelementptr inbounds i32*, i32** %0, i64 %idx.ext
+  %1 = load i32*, i32** %add.ptr, align 8
+  %idx.ext1 = sext i32 %from_j to i64
+  %add.ptr2 = getelementptr inbounds i32, i32* %1, i64 %idx.ext1
+  %2 = load i32*, i32** %add.ptr, align 8
+  %idx.ext3 = sext i32 %to_j to i64
+  %add.ptr4 = getelementptr inbounds i32, i32* %2, i64 %idx.ext3
+  %add.ptr5 = getelementptr inbounds i32, i32* %add.ptr4, i64 1
+  %call = call i32* @min_element(i32* %add.ptr2, i32* %add.ptr5)
+  %3 = load i32, i32* %call, align 4
+  ret i32 %3
 }
-
-declare i64 @read(...) #2
-
-; Function Attrs: nounwind ssp uwtable
-define void @print_mat(i32 %dim, i64* %mat) #0 {
-entry:
-  br label %for.cond
-
-for.cond:                                         ; preds = %for.inc4, %entry
-  %i.0 = phi i32 [ 0, %entry ], [ %inc5, %for.inc4 ]
-  %cmp = icmp ult i32 %i.0, %dim
-  br i1 %cmp, label %for.body, label %for.end6
-
-for.body:                                         ; preds = %for.cond
-  br label %for.cond1
-
-for.cond1:                                        ; preds = %for.inc, %for.body
-  %j.0 = phi i32 [ 0, %for.body ], [ %inc, %for.inc ]
-  %cmp2 = icmp ult i32 %j.0, %dim
-  br i1 %cmp2, label %for.body3, label %for.end
-
-for.body3:                                        ; preds = %for.cond1
-  %mul = mul i32 %i.0, %dim
-  %add = add i32 %mul, %j.0
-  %idxprom = zext i32 %add to i64
-  %arrayidx = getelementptr inbounds i64, i64* %mat, i64 %idxprom
-  %0 = load i64, i64* %arrayidx, align 8
-  call void @write(i64 %0)
-  br label %for.inc
-
-for.inc:                                          ; preds = %for.body3
-  %inc = add i32 %j.0, 1
-  br label %for.cond1
-
-for.end:                                          ; preds = %for.cond1
-  br label %for.inc4
-
-for.inc4:                                         ; preds = %for.end
-  %inc5 = add i32 %i.0, 1
-  br label %for.cond
-
-for.end6:                                         ; preds = %for.cond
-  ret void
-}
-
-declare void @write(i64) #2
 
 ; Function Attrs: nounwind ssp uwtable
 define i32 @main() #0 {
 entry:
   %call = call i64 (...) @read()
   %conv = trunc i64 %call to i32
-  %mul = mul i32 %conv, %conv
-  %conv1 = zext i32 %mul to i64
-  %mul2 = mul i64 %conv1, 8
-  %call3 = call noalias i8* @malloc(i64 %mul2) #4
-  %0 = bitcast i8* %call3 to i64*
-  %mul4 = mul i32 %conv, %conv
-  %conv5 = zext i32 %mul4 to i64
-  %mul6 = mul i64 %conv5, 8
-  %call7 = call noalias i8* @malloc(i64 %mul6) #4
-  %1 = bitcast i8* %call7 to i64*
-  %mul8 = mul i32 %conv, %conv
-  %conv9 = zext i32 %mul8 to i64
-  %mul10 = mul i64 %conv9, 8
-  %call11 = call noalias i8* @malloc(i64 %mul10) #4
-  %2 = bitcast i8* %call11 to i64*
-  call void @read_mat(i32 %conv, i64* %0)
-  call void @read_mat(i32 %conv, i64* %1)
-  call void @matmul(i32 %conv, i64* %2, i64* %0, i64* %1)
-  call void @print_mat(i32 %conv, i64* %2)
+  %call1 = call i64 (...) @read()
+  %conv2 = trunc i64 %call1 to i32
+  %conv3 = sext i32 %conv to i64
+  %mul = mul i64 8, %conv3
+  %call4 = call i8* @malloc_upto_8(i64 %mul)
+  %0 = bitcast i8* %call4 to i32**
+  store i32** %0, i32*** @v, align 8
+  br label %for.cond
+
+for.cond:                                         ; preds = %for.inc20, %entry
+  %i.0 = phi i32 [ 0, %entry ], [ %inc21, %for.inc20 ]
+  %cmp = icmp slt i32 %i.0, %conv
+  br i1 %cmp, label %for.body, label %for.cond.cleanup
+
+for.cond.cleanup:                                 ; preds = %for.cond
+  br label %for.end22
+
+for.body:                                         ; preds = %for.cond
+  %conv6 = sext i32 %conv2 to i64
+  %mul7 = mul i64 4, %conv6
+  %call8 = call i8* @malloc_upto_8(i64 %mul7)
+  %1 = bitcast i8* %call8 to i32*
+  %2 = load i32**, i32*** @v, align 8
+  %idxprom = sext i32 %i.0 to i64
+  %arrayidx = getelementptr inbounds i32*, i32** %2, i64 %idxprom
+  store i32* %1, i32** %arrayidx, align 8
+  br label %for.cond9
+
+for.cond9:                                        ; preds = %for.inc, %for.body
+  %j.0 = phi i32 [ 0, %for.body ], [ %inc, %for.inc ]
+  %cmp10 = icmp slt i32 %j.0, %conv2
+  br i1 %cmp10, label %for.body13, label %for.cond.cleanup12
+
+for.cond.cleanup12:                               ; preds = %for.cond9
+  br label %for.end
+
+for.body13:                                       ; preds = %for.cond9
+  %call14 = call i64 (...) @read()
+  %conv15 = trunc i64 %call14 to i32
+  %3 = load i32**, i32*** @v, align 8
+  %idxprom16 = sext i32 %i.0 to i64
+  %arrayidx17 = getelementptr inbounds i32*, i32** %3, i64 %idxprom16
+  %4 = load i32*, i32** %arrayidx17, align 8
+  %idxprom18 = sext i32 %j.0 to i64
+  %arrayidx19 = getelementptr inbounds i32, i32* %4, i64 %idxprom18
+  store i32 %conv15, i32* %arrayidx19, align 4
+  br label %for.inc
+
+for.inc:                                          ; preds = %for.body13
+  %inc = add nsw i32 %j.0, 1
+  br label %for.cond9
+
+for.end:                                          ; preds = %for.cond.cleanup12
+  br label %for.inc20
+
+for.inc20:                                        ; preds = %for.end
+  %inc21 = add nsw i32 %i.0, 1
+  br label %for.cond
+
+for.end22:                                        ; preds = %for.cond.cleanup
+  %call23 = call i64 (...) @read()
+  %conv24 = trunc i64 %call23 to i32
+  br label %while.cond
+
+while.cond:                                       ; preds = %for.end44, %for.end22
+  %Q.0 = phi i32 [ %conv24, %for.end22 ], [ %dec, %for.end44 ]
+  %dec = add nsw i32 %Q.0, -1
+  %tobool = icmp ne i32 %Q.0, 0
+  br i1 %tobool, label %while.body, label %while.end
+
+while.body:                                       ; preds = %while.cond
+  %call25 = call i64 (...) @read()
+  %conv26 = trunc i64 %call25 to i32
+  %call27 = call i64 (...) @read()
+  %conv28 = trunc i64 %call27 to i32
+  %call29 = call i64 (...) @read()
+  %conv30 = trunc i64 %call29 to i32
+  %call31 = call i64 (...) @read()
+  %conv32 = trunc i64 %call31 to i32
+  %call33 = call i32 @min_at_row(i32 %conv26, i32 %conv30, i32 %conv32)
+  %add = add nsw i32 %conv26, 1
+  br label %for.cond35
+
+for.cond35:                                       ; preds = %for.inc42, %while.body
+  %res.0 = phi i32 [ %call33, %while.body ], [ %call41, %for.inc42 ]
+  %i34.0 = phi i32 [ %add, %while.body ], [ %inc43, %for.inc42 ]
+  %cmp36 = icmp sle i32 %i34.0, %conv28
+  br i1 %cmp36, label %for.body39, label %for.cond.cleanup38
+
+for.cond.cleanup38:                               ; preds = %for.cond35
+  br label %for.end44
+
+for.body39:                                       ; preds = %for.cond35
+  %call40 = call i32 @min_at_row(i32 %i34.0, i32 %conv30, i32 %conv32)
+  %call41 = call i32 @min(i32 %res.0, i32 %call40)
+  br label %for.inc42
+
+for.inc42:                                        ; preds = %for.body39
+  %inc43 = add nsw i32 %i34.0, 1
+  br label %for.cond35
+
+for.end44:                                        ; preds = %for.cond.cleanup38
+  %conv45 = sext i32 %res.0 to i64
+  call void @write(i64 %conv45)
+  br label %while.cond
+
+while.end:                                        ; preds = %while.cond
   ret i32 0
 }
 
-; Function Attrs: allocsize(0)
-declare noalias i8* @malloc(i64) #3
+declare i64 @read(...) #3
+
+declare void @write(i64) #3
 
 attributes #0 = { nounwind ssp uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+cx8,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #1 = { argmemonly nounwind willreturn }
-attributes #2 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+cx8,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #3 = { allocsize(0) "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+cx8,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { allocsize(0) "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+cx8,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { argmemonly nounwind willreturn }
+attributes #3 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+cx8,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #4 = { allocsize(0) }
 
 !llvm.module.flags = !{!0, !1, !2}

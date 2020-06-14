@@ -14,7 +14,7 @@ start collatz 2:
 .if.end6:
   r1 = add r1 1 16 
   store 2 r1 arg1 0 
-  r1 = srem r4 2 32 
+  r1 = urem r4 2 32 
   r1 = icmp eq r1 0 32 
   br r1 .cond.true .cond.false 
 .cond.true:
@@ -41,7 +41,7 @@ start main 0:
 .entry:
   r1 = call read 
   r2 = mul r1 1 32 
-  r1 = srem r1 4294967296 64 
+  r1 = urem r1 4294967296 64 
   call write r1 
   r1 = icmp ult r2 2 32 
   r4 = mul r2 1 32 
@@ -49,7 +49,7 @@ start main 0:
   r2 = mul 0 1 64 
   br r1 .collatz.exit .if.end6.i 
 .if.end6.i:
-  r1 = srem r4 2 32 
+  r1 = urem r4 2 32 
   r1 = icmp eq r1 0 32 
   br r1 .cond.true.i .cond.false.i 
 .cond.true.i:

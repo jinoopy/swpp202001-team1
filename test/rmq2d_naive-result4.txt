@@ -1,1 +1,1 @@
-Syntax error at asmb/rmq2d_naive.s:93: instruction expected
+Runtime error at asmb/rmq2d_naive.s:198: allocation size should not be 0

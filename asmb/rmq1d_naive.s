@@ -19,7 +19,7 @@ start min_element 2:
   r1 = sub r1 r2 64 
   r9 = sdiv r1 4 64 
   r1 = add r9 1 64 
-  r2 = srem r1 8 64 
+  r2 = urem r1 8 64 
   r1 = icmp eq r2 0 64 
   r4 = mul r3 1 32 
   r5 = mul r2 1 64 
@@ -112,7 +112,7 @@ start main 0:
   r2 = mul r1 1 64 
   br r3 .for.body.preheader .while.cond.preheader 
 .for.body.preheader:
-  r4 = srem r4 4294967296 64 
+  r4 = urem r4 4294967296 64 
   r5 = mul 0 1 64 
   br .for.body 
 .while.cond.preheader:
@@ -152,7 +152,7 @@ start main 0:
   r1 = mul r1 4 64 
   r7 = sdiv r1 4 64 
   r1 = add r7 1 64 
-  r1 = srem r1 8 64 
+  r1 = urem r1 8 64 
   r2 = icmp eq r1 0 64 
   r3 = mul r6 1 64 
   r4 = mul r5 1 32 

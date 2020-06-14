@@ -675,20 +675,23 @@ start main 0:
 .entry:
   r12 = call read 
   r13 = mul r12 1 32 
-  r1 = srem r13 4 32 
+  r1 = urem r13 4 32 
   r1 = icmp eq r1 0 32 
   br r1 .if.end .cleanup 
 .if.end:
-  r8 = malloc 0 
+  r1 = mul r12 8 64 
+  r1 = mul r1 r12 64 
+  r1 = and r1 34359738360 64 
+  r8 = malloc r1 
   r14 = mul r8 1 64 
-  r11 = malloc 0 
-  r10 = malloc 0 
+  r11 = malloc r1 
+  r10 = malloc r1 
   r9 = icmp eq r13 0 32 
   r7 = mul 0 1 32 
   br r9 .for.cond.i3.preheader .for.cond1.i.preheader.us 
 .for.cond1.i.preheader.us:
   r6 = mul r7 r13 32 
-  r5 = srem r12 4294967296 64 
+  r5 = urem r12 4294967296 64 
   r4 = mul 0 1 64 
   br .for.body3.i.us 
 .for.body3.i.us:
@@ -714,7 +717,7 @@ start main 0:
   br r9 .read_mat.exit17 .for.cond1.i7.preheader.us 
 .for.cond1.i7.preheader.us:
   r6 = mul r7 r13 32 
-  r5 = srem r12 4294967296 64 
+  r5 = urem r12 4294967296 64 
   r4 = mul 0 1 64 
   br .for.body3.i14.us 
 .for.body3.i14.us:
@@ -741,7 +744,7 @@ start main 0:
   br r9 .cleanup .for.cond1.i24.preheader.us 
 .for.cond1.i24.preheader.us:
   r4 = mul r6 r13 32 
-  r3 = srem r12 4294967296 64 
+  r3 = urem r12 4294967296 64 
   r5 = mul 0 1 64 
   br .for.body3.i30.us 
 .for.body3.i30.us:
