@@ -173,8 +173,8 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 			set<int> unused;
 			for(unsigned i = 0; i < 16; i++) {
 				for(auto &there : adjList[i]) {
-					if(there->getName().substr(0, 1) == "r") {
-						indegree[stoi(there->getName().substr(1))]++;
+					if(TM.regNo(there) != -1) {
+						indegree[TM.regNo(there)]++;
 					}
 				}
 				// If a register has no outgoing edge, store and use as temporary register.
@@ -220,9 +220,9 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 					symbolMap.set(moveInst, TM.reg(curReg));
 				}
 				
-				if(adjList[curReg][0]->getName().substr(0, 1) == "r"
-				&& !--indegree[stoi(adjList[curReg][0]->getName().substr(1))]) {
-					q.push(stoi(adjList[curReg][0]->getName().substr(1)));
+				if(TM.regNo(adjList[curReg][0]) != -1
+				&& !--indegree[TM.regNo(adjList[curReg][0])]) {
+					q.push(TM.regNo(adjList[curReg][0]));
 				}
 			}
 			// countRest is under 1 if graph has no loop or only one self loop.
@@ -279,9 +279,9 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 								symbolMap.set(moveInst, TM.reg(curReg));
 							}
 
-							if(adjList[curReg][0]->getName().substr(0, 1) == "r"
-							&& !--indegree[stoi(adjList[curReg][0]->getName().substr(1))]) {
-								q.push(stoi(adjList[curReg][0]->getName().substr(1)));
+							if(TM.regNo(adjList[curReg][0]) != -1
+							&& !--indegree[TM.regNo(adjList[curReg][0])]) {
+								q.push(TM.regNo(adjList[curReg][0]));
 							}
 						}
 						// At the end, move a value of temporary register to a register before register i.
@@ -320,11 +320,11 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 
 								Instruction *ptoi2 = CastInst::CreateBitOrPointerCast(nextValue, IntegerType::getInt64Ty(Context));
 								ptoi2->insertBefore(BB.getTerminator());
-								symbolMap.set(ptoi2, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+								symbolMap.set(ptoi2, TM.reg(TM.regNo(adjList[curReg][0])));
 
 								Instruction *xor1 = BinaryOperator::CreateXor(ptoi1, ptoi2);
 								xor1->insertBefore(BB.getTerminator());
-								symbolMap.set(xor1, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+								symbolMap.set(xor1, TM.reg(TM.regNo(adjList[curReg][0])));
 
 								Instruction *xor2 = BinaryOperator::CreateXor(ptoi1, xor1);
 								xor2->insertBefore(BB.getTerminator());
@@ -332,7 +332,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 
 								Instruction *xor3 = BinaryOperator::CreateXor(xor1, xor2);
 								xor3->insertBefore(BB.getTerminator());
-								symbolMap.set(xor3, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+								symbolMap.set(xor3, TM.reg(TM.regNo(adjList[curReg][0])));
 
 								Instruction *itop1 = CastInst::CreateBitOrPointerCast(xor2, startValue->getType());
 								itop1->insertBefore(BB.getTerminator());
@@ -347,7 +347,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 								// XOR swapping
 								Instruction *xor1 = BinaryOperator::CreateXor(startValue, nextValue);
 								xor1->insertBefore(BB.getTerminator());
-								symbolMap.set(xor1, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+								symbolMap.set(xor1, adjList[curReg][0]);
 
 								Instruction *xor2 = BinaryOperator::CreateXor(startValue, xor1);
 								xor2->insertBefore(BB.getTerminator());
@@ -355,15 +355,15 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 
 								Instruction *xor3 = BinaryOperator::CreateXor(xor1, xor2);
 								xor3->insertBefore(BB.getTerminator());
-								symbolMap.set(xor3, TM.reg(stoi(adjList[curReg][0]->getName().substr(1))));
+								symbolMap.set(xor3, adjList[curReg][0]);
 
 								startValue = xor3;
 							}
 
 							if(adjList[curReg][0]->getName().substr(0, 1) == "r"
-							&& !--indegree[stoi(adjList[curReg][0]->getName().substr(1))]
+							&& !--indegree[TM.regNo(adjList[curReg][0])]
 							&& adjList[curReg][0]->getName() != "r" + itostr(i)) {
-								q.push(stoi(adjList[curReg][0]->getName().substr(1)));
+								q.push(TM.regNo(adjList[curReg][0]));
 							}
 						}
 					}
@@ -390,8 +390,8 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 
 // This function finds endmost register which is allocated to register i. 
 Value *Backend::findLeastReg(Symbol *reg, BasicBlock &BB, SymbolMap &symbolMap) {
-	if(reg->getName().substr(0, 3) == "arg") {
-		return BB.getParent()->getArg(stoi(reg->getName().substr(3)));
+	if(TM.argNo(reg) != -1) {
+		return BB.getParent()->getArg(TM.argNo(reg));
 	} else if(reg->getName().substr(0, 3) == "gvp") {
 		for(auto &G : BB.getParent()->getParent()->globals()) {
 			if(symbolMap.get(&G)->getName() == reg->getName()) {
@@ -438,8 +438,7 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 		Symbol *phiSymbol = symbolMap.get(dyn_cast<Value>(&I));
 		assert(phiSymbol && "Error: Symbol of phi does not exist");
 		string phiName = phiSymbol->getName();
-		// phiName = "r{i}" -> stoi(substr(1)) = i
-		int phiNum = stoi(phiName.substr(1));
+		int phiNum = TM.regNo(phiSymbol);
 		for(unsigned i = 0; i < phi->getNumIncomingValues(); i++) {
 			BasicBlock *from = phi->getIncomingBlock(i);
 			if(&srcBB != from) {
@@ -451,16 +450,6 @@ void Backend::addEdges(BasicBlock &srcBB, BasicBlock &dstBB, SymbolMap &symbolMa
 				continue;
 			}
 			adjList[phiNum].push_back(instSymbol);
-			/*
-			string instName = instSymbol->getName();
-			outs() << instName << "\n";
-			int instNum = stoi(instName.substr(1));
-			// phiNum == instNum -> self loop, ignore it (because it is useless)
-			if(phiNum == instNum) {
-				continue;
-			}
-			adjList[phiNum].push_back(instNum);
-			*/
 		}
 	}
 }

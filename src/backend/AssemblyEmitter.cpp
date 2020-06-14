@@ -14,7 +14,7 @@ string AssemblyEmitter::name(Value* v) {
         //return the value itself.
         return to_string(dyn_cast<ConstantInt>(v)->getZExtValue());
     }
-    return SM->get(v)->getPrintName();
+    return SM->get(v)->getName();
 }
 
 //static functions for emitting common formats.
