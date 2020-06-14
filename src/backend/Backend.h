@@ -31,6 +31,7 @@ protected:
   Symbol(string name): name(name) {}
 public:
   string getName();
+  string getPrintName();
 };
 //Hardware registers
 class Register : public virtual Symbol {

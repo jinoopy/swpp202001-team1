@@ -14,7 +14,7 @@ string AssemblyEmitter::name(Value* v) {
         //return the value itself.
         return to_string(dyn_cast<ConstantInt>(v)->getZExtValue());
     }
-    return SM->get(v)->getName();
+    return SM->get(v)->getPrintName();
 }
 
 //static functions for emitting common formats.
@@ -213,6 +213,11 @@ void AssemblyEmitter::visitCallInst(CallInst& I) {
         assert(args.size()==1 && "argument of free() should be 1");
         *fout << emitInst({name(&I), "= free", name(I.getArgOperand(0))});
     }
+	else if(F->getType()->isVoidTy()) {
+		vector<string> printlist = {"call", Fname};
+		printlist.insert(printlist.end(), args.begin(), args.end());
+		*fout << emitInst(printlist);
+	}
     //ordinary function calls.
     else {
         vector<string> printlist = {name(&I), "= call", Fname};
@@ -231,11 +236,11 @@ void AssemblyEmitter::visitReturnInst(ReturnInst& I) {
 void AssemblyEmitter::visitBranchInst(BranchInst& I) {
     if(I.isConditional()) {
         assert(I.getNumSuccessors() == 2 && "conditional branches must have 2 successors");
-        *fout << emitInst({"br", name(I.getCondition()), name(I.getSuccessor(0)), name(I.getSuccessor(1))});
+        *fout << emitInst({"br", name(I.getCondition()), "." + name(I.getSuccessor(0)), "." + name(I.getSuccessor(1))});
     }
     else {
         assert(I.getNumSuccessors() == 1 && "unconditional branches must have 1 successor");
-        *fout << emitInst({"br", name(I.getSuccessor(0))});
+        *fout << emitInst({"br", "." + name(I.getSuccessor(0))});
     }
 }
 void AssemblyEmitter::visitSwitchInst(SwitchInst& I) {
