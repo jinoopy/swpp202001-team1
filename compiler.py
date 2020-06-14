@@ -169,8 +169,8 @@ TEAM 1 COMPILER : DEV mode
 1. Update&Rewrite config.json
 2. Build all src/XXX.cpp files
 3. Run clang/opt with existing/custom passes
-4. Run the backend(unimplemented)
-5. Run the whole compiler(unimplemented)
+4. Run the backend
+5. Run the whole compiler
 ==============================
 '''
 def DEV():

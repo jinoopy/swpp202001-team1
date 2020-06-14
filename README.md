@@ -18,8 +18,6 @@ Builds the cpp sources from /src.
 
 ### Run mode
 
-<b> NOT_IMPLEMENTED </b>
-
 `python3 compiler.py -run (input file .ll) (-bin (llvm/bin directory)) (-o (output file .s))`
 
 Emits the result in .s format of our target machine.

@@ -78,7 +78,8 @@
         "function-optim": [
             "mergefunc",
             "tailcallelim",
-            "inline"
+            "inline",
+            "globaldce"
         ],
         "memory-optim": [
             "heap2stack",
