@@ -1,201 +1,313 @@
-start malloc_upto_8 1:
+start insert 2:
 .entry:
-  r1 = add arg1 7 64 
-  r1 = and r1 18446744073709551608 64 
-  r1 = malloc r1 
+  r7 = mul arg1 1 64 
+  r6 = mul 0 1 64 
+  br .while.cond 
+.while.cond:
+  r2 = load 8 r7 0 
+  r1 = icmp ugt r2 arg2 64 
+  br r1 .if.then .if.else 
+.if.then:
+  r1 = mul r4 1 64 
+  r1 = load 8 r1 0 
+  r3 = icmp eq r1 0 64 
+  r2 = mul r1 1 64 
+  r1 = mul r6 1 64 
+  r5 = mul 1 1 1 
+  br r3 .if.then2 .cleanup 
+.if.then2:
+  r2 = malloc 24 
+  r1 = mul r2 1 64 
+  store arg2 8 r1 0 
+  store 0 8 r1 0 
+  store 0 8 r1 0 
+  r1 = mul r2 1 64 
+  store r1 8 r4 0 
+  r2 = mul r7 1 64 
+  r5 = mul 0 1 1 
+  r1 = mul 1 1 64 
+  br .cleanup 
+.if.else:
+  r3 = icmp ult r2 arg2 64 
+  r2 = mul r7 1 64 
+  r5 = mul 0 1 1 
+  r1 = mul 0 1 64 
+  br r3 .if.then7 .cleanup 
+.if.then7:
+  r1 = mul r3 1 64 
+  r1 = load 8 r1 0 
+  r4 = icmp eq r1 0 64 
+  r2 = mul r1 1 64 
+  r1 = mul r6 1 64 
+  r5 = mul 1 1 1 
+  br r4 .if.then10 .cleanup 
+.if.then10:
+  r2 = malloc 24 
+  r1 = mul r2 1 64 
+  store arg2 8 r1 0 
+  store 0 8 r1 0 
+  store 0 8 r1 0 
+  r1 = mul r2 1 64 
+  store r1 8 r3 0 
+  r2 = mul r7 1 64 
+  r5 = mul 0 1 1 
+  r1 = mul 1 1 64 
+  br .cleanup 
+.cleanup:
+  r6 = mul r1 1 64 
+  r7 = mul r2 1 64 
+  br r5 .while.cond .cleanup19 
+.cleanup19:
   sp = add sp 0 64 
   ret r1 
-end malloc_upto_8
+end insert
 
-start min_element 2:
+start adjust 1:
 .entry:
-  r3 = load 4 arg1 0 
-  r1 = icmp eq arg1 arg2 64 
-  r2 = mul r3 1 32 
-  br r1 .while.end .while.body.preheader 
-.while.body.preheader:
-  r1 = mul arg2 1 64 
-  r1 = sub r1 arg1 64 
-  r9 = sdiv r1 4 64 
-  r1 = add r9 1 64 
-  r2 = srem r1 8 64 
+  r1 = mul arg1 1 64 
+  r2 = load 8 r1 0 
   r1 = icmp eq r2 0 64 
-  r5 = mul r2 1 64 
-  r6 = mul arg1 1 64 
-  r7 = mul r3 1 32 
-  r8 = mul r3 1 32 
-  r2 = mul arg1 1 64 
-  br r1 .while.body.prol.loopexit .while.body.prol 
-.while.body.prol:
-  r1 = icmp slt r8 r7 32 
-  r4 = select r1 r8 r7 32 
-  r2 = add r5 18446744073709551615 64 
+  r4 = mul r2 1 64 
+  br r1 .if.then .while.cond 
+.if.then:
+  r1 = mul arg1 1 64 
+  r1 = load 8 r1 0 
+  br .cleanup 
+.while.cond:
+  r2 = load 8 r1 0 
   r1 = icmp eq r2 0 64 
-  r2 = mul r3 1 64 
-  r3 = mul r4 1 32 
-  br r1 .while.body.prol.loopexit .while.body.prol.while.body.prol_crit_edge 
-.while.body.prol.while.body.prol_crit_edge:
-  r1 = load 4 r3 0 
-  r5 = mul r2 1 64 
-  r6 = mul r3 1 64 
-  r7 = mul r4 1 32 
-  r8 = mul r1 1 32 
-  br .while.body.prol 
-.while.body.prol.loopexit:
-  r1 = icmp ult r9 7 64 
-  r5 = mul r3 1 32 
-  r10 = mul r2 1 64 
-  r2 = mul r4 1 32 
+  r3 = mul r4 1 64 
   r4 = mul r2 1 64 
-  r2 = mul r4 1 32 
-  r1 = mul r4 1 64 
-  r10 = mul r4 1 32 
-  r4 = mul r2 1 64 
-  r1 = mul r4 1 64 
-  br r1 .while.end .while.body 
-.while.body:
-  r2 = load 4 r4 0 
-  r1 = icmp slt r2 r5 32 
-  r2 = select r1 r2 r5 32 
-  r3 = load 4 r1 0 
-  r1 = icmp slt r3 r2 32 
-  r3 = select r1 r3 r2 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r2 = select r1 r2 r3 32 
-  r3 = icmp eq r1 arg2 64 
-  r4 = mul r1 1 64 
-  r5 = mul r2 1 32 
-  br r3 .while.end .while.body 
+  br r1 .while.end .while.cond 
 .while.end:
+  r2 = icmp eq r3 0 64 
+  r1 = mul r4 1 64 
+  br r2 .cleanup .if.then6 
+.if.then6:
+  r2 = load 8 r1 0 
+  store r2 8 r1 0 
+  r1 = mul r4 1 64 
+  br .cleanup 
+.cleanup:
+  sp = add sp 0 64 
+  ret r1 
+end adjust
+
+start remove 2:
+.entry:
+  r1 = load 8 arg1 0 
+  r4 = icmp eq r1 arg2 64 
+  r3 = mul r1 1 64 
+  r8 = mul arg1 1 64 
+  r7 = mul 0 1 64 
+  r2 = mul 0 1 64 
+  br r4 .cleanup24 .while.cond 
+.while.cond:
+  r1 = icmp ugt r3 arg2 64 
+  br r1 .if.then2 .if.else 
+.if.then2:
+  r1 = mul r6 1 64 
+  r5 = load 8 r1 0 
+  r4 = icmp eq r5 0 64 
+  r3 = mul r8 1 64 
+  r1 = mul 1 1 32 
+  r2 = mul 0 1 64 
+  br r4 .cleanup .if.end5 
+.if.end5:
+  r1 = load 8 r5 0 
+  r4 = icmp eq r1 arg2 64 
+  r2 = mul r7 1 64 
+  r3 = mul r5 1 64 
+  r1 = mul 2 1 32 
+  br r4 .if.then7 .cleanup 
+.if.then7:
+  r2 = load 8 r1 0 
+  r1 = icmp eq r2 0 64 
+  r4 = mul r2 1 64 
+  br r1 .if.then.i .while.cond.i 
+.if.then.i:
+  r1 = load 8 r1 0 
+  br .adjust.exit 
+.while.cond.i:
+  r2 = load 8 r1 0 
+  r1 = icmp eq r2 0 64 
+  r3 = mul r4 1 64 
+  r4 = mul r2 1 64 
+  br r1 .while.end.i .while.cond.i 
+.while.end.i:
+  r2 = icmp eq r3 0 64 
+  r1 = mul r4 1 64 
+  br r2 .adjust.exit .if.then6.i 
+.if.then6.i:
+  r2 = load 8 r1 0 
+  store r2 8 r1 0 
+  r1 = mul r4 1 64 
+  br .adjust.exit 
+.adjust.exit:
+  store r1 8 r6 0 
+  r1 = mul r5 1 64 
+  0 = free r1 
+  r3 = mul r8 1 64 
+  r1 = mul 1 1 32 
+  r2 = mul 1 1 64 
+  br .cleanup 
+.if.else:
+  r4 = icmp ult r3 arg2 64 
+  r2 = mul r7 1 64 
+  r3 = mul r8 1 64 
+  r1 = mul 0 1 32 
+  br r4 .if.then11 .cleanup 
+.if.then11:
+  r1 = mul r6 1 64 
+  r5 = load 8 r1 0 
+  r4 = icmp eq r5 0 64 
+  r3 = mul r8 1 64 
+  r1 = mul 1 1 32 
+  r2 = mul 0 1 64 
+  br r4 .cleanup .if.end15 
+.if.end15:
+  r1 = load 8 r5 0 
+  r4 = icmp eq r1 arg2 64 
+  r2 = mul r7 1 64 
+  r3 = mul r5 1 64 
+  r1 = mul 2 1 32 
+  br r4 .if.then17 .cleanup 
+.if.then17:
+  r2 = load 8 r1 0 
+  r1 = icmp eq r2 0 64 
+  r4 = mul r2 1 64 
+  br r1 .if.then.i4 .while.cond.i10 
+.if.then.i4:
+  r1 = load 8 r1 0 
+  br .adjust.exit19 
+.while.cond.i10:
+  r2 = load 8 r1 0 
+  r1 = icmp eq r2 0 64 
+  r3 = mul r4 1 64 
+  r4 = mul r2 1 64 
+  br r1 .while.end.i13 .while.cond.i10 
+.while.end.i13:
+  r2 = icmp eq r3 0 64 
+  r1 = mul r4 1 64 
+  br r2 .adjust.exit19 .if.then6.i16 
+.if.then6.i16:
+  r2 = load 8 r1 0 
+  store r2 8 r1 0 
+  r1 = mul r4 1 64 
+  br .adjust.exit19 
+.adjust.exit19:
+  store r1 8 r6 0 
+  r1 = mul r5 1 64 
+  0 = free r1 
+  r3 = mul r8 1 64 
+  r1 = mul 1 1 32 
+  r2 = mul 1 1 64 
+  br .cleanup 
+.cleanup:
+.while.cond.backedge:
+  r1 = load 8 r3 0 
+  r7 = mul r2 1 64 
+  r8 = mul r3 1 64 
+  r3 = mul r1 1 64 
+  br .while.cond 
+.cleanup24:
   sp = add sp 0 64 
   ret r2 
-end min_element
+end remove
+
+start traverse 1:
+.entry:
+  r1 = icmp eq arg1 0 64 
+  r2 = mul arg1 1 64 
+  br r1 .return .if.end 
+.if.end:
+  r4 = load 8 r2 0 
+  r3 = load 8 r1 0 
+  r2 = load 8 r1 0 
+  call traverse r3 
+  call write r4 
+  r1 = icmp eq r2 0 64 
+  br r1 .return .if.end 
+.return:
+  sp = add sp 0 64 
+  ret 0 
+end traverse
 
 start main 0:
 .entry:
-  r2 = call read 
-  r3 = mul r2 1 32 
-  r1 = sdiv r2 1073741824 64 
-  r1 = add r1 7 64 
-  r1 = and r1 18446744073709551608 64 
-  r6 = malloc r1 
-  r13 = mul r6 1 64 
-  r3 = icmp sgt r3 0 32 
+  r2 = malloc 24 
+  r8 = mul r2 1 64 
   r1 = call read 
-  r2 = mul r1 1 64 
-  br r3 .for.body.preheader .while.cond.preheader 
-.for.body.preheader:
-  r5 = srem r2 4294967296 64 
-  r4 = mul 0 1 64 
-  br .for.body 
-.while.cond.preheader:
-  r1 = icmp eq r2 0 32 
-  br r1 .while.end .while.body.lr.ph 
-.while.body.lr.ph:
-  r10 = mul r2 1 32 
-  br .while.body 
-.for.body:
-  r2 = mul r1 1 32 
-  store r2 4 r1 0 
-  r2 = add r4 1 64 
-  r1 = call read 
-  r3 = icmp eq r2 r5 64 
-  r4 = mul r2 1 64 
-  r2 = mul r1 1 64 
-  br r3 .while.cond.preheader .for.body 
-.while.body:
-  r2 = call read 
-  r1 = call read 
-  r3 = load 4 r5 0 
-  r4 = icmp eq r5 r11 64 
-  r1 = mul r3 1 32 
-  br r4 .min_element.exit .while.body.i.preheader 
-.while.body.i.preheader:
-  r1 = sub r1 r2 64 
-  r1 = mul r1 4 64 
-  r9 = sdiv r1 4 64 
-  r1 = add r9 1 64 
-  r2 = srem r1 8 64 
-  r1 = icmp eq r2 0 64 
-  r4 = mul r3 1 32 
-  r6 = mul r5 1 64 
-  r7 = mul r3 1 32 
-  r8 = mul r3 1 32 
-  r3 = mul r5 1 64 
-  br r1 .while.body.i.prol.loopexit .while.body.i.prol 
-.while.body.i.prol:
-  r1 = icmp slt r8 r7 32 
-  r4 = select r1 r8 r7 32 
-  r2 = add r2 18446744073709551615 64 
-  r1 = icmp eq r2 0 64 
-  r5 = mul r4 1 32 
-  br r1 .while.body.i.prol.loopexit .while.body.i.prol.while.body.i.prol_crit_edge 
-.while.body.i.prol.while.body.i.prol_crit_edge:
-  r1 = load 4 r3 0 
-  r6 = mul r3 1 64 
-  r7 = mul r4 1 32 
-  r8 = mul r1 1 32 
-  br .while.body.i.prol 
-.while.body.i.prol.loopexit:
-  r2 = icmp ult r9 7 64 
-  r1 = mul r5 1 32 
-  r5 = mul r4 1 32 
-  r4 = mul r3 1 64 
-  br r2 .min_element.exit .while.body.i 
-.while.body.i:
-  r2 = load 4 r4 0 
-  r1 = icmp slt r2 r5 32 
-  r2 = select r1 r2 r5 32 
-  r3 = load 4 r1 0 
-  r1 = icmp slt r3 r2 32 
-  r3 = select r1 r3 r2 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r3 = select r1 r2 r3 32 
-  r2 = load 4 r1 0 
-  r1 = icmp slt r2 r3 32 
-  r2 = select r1 r2 r3 32 
-  r3 = icmp eq r1 r11 64 
-  r4 = mul r1 1 64 
-  r5 = mul r2 1 32 
-  r1 = mul r2 1 32 
-  br r3 .min_element.exit .while.body.i 
-.min_element.exit:
-  r2 = add r10 4294967295 32 
-  call write r1 
-  r1 = icmp eq r2 0 32 
-  r10 = mul r2 1 32 
-  br r1 .while.end .while.body 
-.while.end:
+  store r1 8 r8 0 
+  store 0 8 r1 0 
+  store 0 8 r1 0 
+  r7 = call read 
+  r1 = icmp eq r7 0 64 
+  r6 = mul 0 1 64 
+  br r1 .for.cond.cleanup .for.body 
+.for.cond.cleanup:
+  call traverse r8 
   sp = add sp 0 64 
   ret 0 
+.for.body:
+  r1 = call read 
+  r5 = call read 
+  r1 = icmp eq r1 0 64 
+  r4 = mul r8 1 64 
+  br r1 .while.cond.i .if.else 
+.while.cond.i:
+  r2 = load 8 r4 0 
+  r1 = icmp ugt r2 r5 64 
+  br r1 .if.then.i .if.else.i 
+.if.then.i:
+  r1 = mul r3 1 64 
+  r1 = load 8 r1 0 
+  r2 = icmp eq r1 0 64 
+  r3 = mul 1 1 1 
+  br r2 .if.then2.i .cleanup.i 
+.if.then2.i:
+  r2 = malloc 24 
+  r1 = mul r2 1 64 
+  store r5 8 r1 0 
+  store 0 8 r1 0 
+  store 0 8 r1 0 
+  r1 = mul r2 1 64 
+  store r1 8 r3 0 
+  r1 = mul r4 1 64 
+  r3 = mul 0 1 1 
+  br .cleanup.i 
+.if.else.i:
+  r2 = icmp ult r2 r5 64 
+  r1 = mul r4 1 64 
+  r3 = mul 0 1 1 
+  br r2 .if.then7.i .cleanup.i 
+.if.then7.i:
+  r1 = mul r3 1 64 
+  r1 = load 8 r1 0 
+  r2 = icmp eq r1 0 64 
+  r3 = mul 1 1 1 
+  br r2 .if.then10.i .cleanup.i 
+.if.then10.i:
+  r2 = malloc 24 
+  r1 = mul r2 1 64 
+  store r5 8 r1 0 
+  store 0 8 r1 0 
+  store 0 8 r1 0 
+  r1 = mul r2 1 64 
+  store r1 8 r3 0 
+  r1 = mul r4 1 64 
+  r3 = mul 0 1 1 
+  br .cleanup.i 
+.cleanup.i:
+  r4 = mul r1 1 64 
+  br r3 .while.cond.i .if.end 
+.if.else:
+  r1 = call remove r8 r5 
+  br .if.end 
+.if.end:
+  r1 = add r6 1 64 
+  r2 = icmp eq r1 r7 64 
+  r6 = mul r1 1 64 
+  br r2 .for.cond.cleanup .for.body 
 end main
 
