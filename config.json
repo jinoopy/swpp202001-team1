@@ -57,6 +57,13 @@
                 "LivenessAnalysis.cpp"
             ],
             "lib": "libRegSp"
+        },
+        "constexpr": {
+            "root": "backend",
+            "src": [
+                "ConstExprRemove.cpp"
+            ],
+            "lib": "libConstExpr"
         }
     },
     "translator": [
@@ -135,10 +142,12 @@
             "cleanup"
         ],
         "backend": [
+            "constexpr",
             "gep-unpack",
             "power-reduc",
             "instcombine",
             "power-reduc",
+            "constexpr",
             "regspill",
             "dse"
         ]

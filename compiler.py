@@ -146,7 +146,11 @@ def runPass(config, inputIR, outputIR, passes, debug=False):
             arg = "--" + p + " "
         if debug:
             print("now running: <" + p +">")
-        subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outputIR + inputIR)
+        result = subprocessRun(config["llvm-bin-dir"]+"/opt -S " + arg + " -o " + outputIR + inputIR)
+        if debug:
+            print(result, end="")
+            if result:
+                print()
         inputIR = outputIR
 
 def backend(config, inputIR, outputS, debug=False):
@@ -156,7 +160,7 @@ def backend(config, inputIR, outputS, debug=False):
 
     if debug:
         print("now running: <translator>")
-    subprocessRun("./backend "+inputIR + " " + outputS)
+    subprocessRun("./backend "+outputIR + " " + outputS)
 
     if not debug:
         subprocessRun("rm -f " + inputIR)

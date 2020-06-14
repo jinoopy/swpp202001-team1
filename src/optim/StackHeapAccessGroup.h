@@ -48,7 +48,7 @@ llvmGetPassPluginInfo() {
 			PB.registerPipelineParsingCallback (
 				[](StringRef Name, ModulePassManager &MPM,
 				ArrayRef<PassBuilder::PipelineElement>) {
-					if (Name == "access-group") {
+					if (Name == "group-access") {
 						FunctionPassManager FPM;
 						FPM.addPass(StackHeapAccessGroupPass());
 						MPM.addPass(createModuleToFunctionPassAdaptor(std::move(FPM)));

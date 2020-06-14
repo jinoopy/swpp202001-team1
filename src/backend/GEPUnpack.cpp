@@ -7,17 +7,31 @@
 using namespace llvm;
 using namespace std;
 
-namespace optim {
+namespace backend {
+
+// Return sizeof(T) in bytes.
+unsigned getAccessSize(Type *T) {
+  if (isa<PointerType>(T))
+    return 8;
+  else if (isa<IntegerType>(T)) {
+    return T->getIntegerBitWidth() == 1 ? 1 : (T->getIntegerBitWidth() / 8);
+  } else if (isa<ArrayType>(T)) {
+    return getAccessSize(T->getArrayElementType()) * T->getArrayNumElements();
+  }
+  assert(false && "Unsupported access size type!");
+}
 
 PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
     LLVMContext &Context = M.getContext();
+
+    //Unpack GEPs.
     for(Function &F : M) {
 		set<Instruction *> s;
         for(auto it = inst_begin(&F); it!=inst_end(&F); ++it) {
             Instruction &I = *it;
             if(I.getOpcode() != Instruction::GetElementPtr) continue;
 
-            IRBuilder Builder(&I);
+            IRBuilder<> Builder(&I);
             GetElementPtrInst *GI = dyn_cast<GetElementPtrInst>(&I);
 
             Value* ptrOp = GI->getPointerOperand();
