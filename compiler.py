@@ -156,7 +156,7 @@ def backend(config, inputIR, outputS, debug=False):
     runPass(config, inputIR, outputIR, passes)
 
     print("now running: <translator>")
-    subprocessRun("./backend.out "+inputIR + " " + outputS)
+    subprocessRun("./backend "+inputIR + " " + outputS)
 
     if debug:
         subprocessRun("rm " + inputIR)
