@@ -97,11 +97,11 @@
         "inst-optim": [
             "reassociate",
             "constprop",
+            "sccp",
             "power-reduc",
             "instcombine",
             "power-reduc",
             "sink",
-            "sccp",
             "simplifycfg",
             "dce"
         ],
@@ -121,11 +121,12 @@
             "vectorize"
         ],
         "cleanup": [
-            "globaldce",
             "gvn",
             "dce",
             "sccp",
-            "ipsccp"
+            "malloc2gv",
+            "ipsccp",
+            "globaldce"
         ]
     },
     "run": {
