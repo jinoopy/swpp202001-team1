@@ -14,6 +14,7 @@ function test() {
 		~/swpp202001-interpreter/sf-interpreter asmb/$TESTNAME.s \
 		< ~/swpp202001-test/$TESTNAME/test/input$i.txt > test/$TESTNAME-result$i.txt
 		cmp ~/swpp202001-test/$TESTNAME/test/output$i.txt test/$TESTNAME-result$i.txt
+		cat sf-interpreter.log
 	done
 	echo "-----end test $TESTNAME-----"
 }
