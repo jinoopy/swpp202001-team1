@@ -55,6 +55,14 @@ TargetMachine::TargetMachine() {
 string Symbol::getName() {
     return name;
 }
+string Symbol::getPrintName() {
+	if(name.substr(0, 1) == "r") {
+		return "r" + itostr(stoi(name.substr(1)) + 1);
+	} else if(name.substr(0, 3) == "arg") {
+		return "arg" + itostr(stoi(name.substr(3)) + 1);
+	}
+	return name;
+}
 Memory::Memory(Register* base, int64_t offset) : base(base), offset(offset) {
     this->name = base->getName() + to_string(offset);
 }
