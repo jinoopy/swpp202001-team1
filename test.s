@@ -2,12 +2,12 @@ start countSetBits 1:
 .entry:
   r1 = icmp eq arg1 0 32 
   r4 = mul arg1 1 32 
-  r2 = mul 0 1 32 
   r3 = mul 0 1 32 
+  r2 = mul 0 1 32 
   br r1 .while.end .while.body 
 .while.body:
   r1 = srem r4 2 32 
-  r3 = add r1 r2 32 
+  r3 = add r1 r3 32 
   r2 = sdiv r4 2 32 
   r1 = add r4 1 32 
   r1 = icmp ult r1 3 32 
@@ -16,7 +16,7 @@ start countSetBits 1:
   br r1 .while.end .while.body 
 .while.end:
   sp = add sp 0 64 
-  ret r3 
+  ret r2 
 end countSetBits
 
 start main 0:
@@ -40,7 +40,7 @@ start main 0:
   r1 = mul r3 1 64 
   br .countSetBits.exit 
 .countSetBits.exit:
-  0 = call write r1 
+  call write r1 
   sp = add sp 0 64 
   ret 0 
 end main

@@ -213,7 +213,7 @@ void AssemblyEmitter::visitCallInst(CallInst& I) {
         assert(args.size()==1 && "argument of free() should be 1");
         *fout << emitInst({name(&I), "= free", name(I.getArgOperand(0))});
     }
-	else if(F->getType()->isVoidTy()) {
+	else if(F->getReturnType()->isVoidTy()) {
 		vector<string> printlist = {"call", Fname};
 		printlist.insert(printlist.end(), args.begin(), args.end());
 		*fout << emitInst(printlist);
