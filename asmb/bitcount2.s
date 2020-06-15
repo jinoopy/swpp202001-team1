@@ -6,7 +6,7 @@ start countSetBits 1:
   r2 = mul 0 1 32 
   br r1 .return .if.else 
 .if.else:
-  r1 = srem r5 2 32 
+  r1 = urem r5 2 32 
   r3 = sdiv r5 2 32 
   r2 = add r1 r4 32 
   r1 = add r5 1 32 
@@ -28,7 +28,7 @@ start main 0:
   r2 = mul 0 1 64 
   br r1 .countSetBits.exit .if.else.i 
 .if.else.i:
-  r1 = srem r5 2 32 
+  r1 = urem r5 2 32 
   r3 = sdiv r5 2 32 
   r2 = add r1 r4 32 
   r1 = add r5 1 32 
@@ -37,8 +37,7 @@ start main 0:
   r5 = mul r3 1 32 
   br r1 .tailrecurse.i.countSetBits.exit_crit_edge .if.else.i 
 .tailrecurse.i.countSetBits.exit_crit_edge:
-  r1 = mul r2 4294967296 64 
-  r1 = sdiv r1 4294967296 64 
+  r1 = mul r2 1 64 
   r2 = mul r1 1 64 
   br .countSetBits.exit 
 .countSetBits.exit:

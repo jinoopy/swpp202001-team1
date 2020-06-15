@@ -30,6 +30,13 @@ string AssemblyEmitter::emitBinary(Instruction* v, string opcode, string op1, st
     return emitInst({name(v), "=", opcode, op1, op2, stringBandWidth(v)});
 }
 string AssemblyEmitter::emitCopy(Instruction* v, Value* op) {
+    Memory* mem = dynamic_cast<Memory*>(SM->get(op));
+    if(mem) {
+        if(mem->getBase() == TM->gvp()) {
+            return emitBinary(v, "add", "20480", to_string(mem->getOffset()));    
+        }
+        return emitBinary(v, "add", mem->getBase()->getName(), to_string(mem->getOffset()));
+    }
     return emitBinary(v, "mul", name(op), "1");
 }
 

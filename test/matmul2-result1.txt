@@ -1,1 +1,4 @@
-Runtime error at asmb/matmul2.s:172: allocation size should not be 0
+19
+22
+43
+50

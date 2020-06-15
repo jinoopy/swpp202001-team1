@@ -1,1 +1,1 @@
-Syntax error at asmb/matmul4.s:380: instruction expected
+Runtime error at asmb/matmul4.s:857: address not aligned

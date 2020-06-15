@@ -37,7 +37,7 @@ start sort 2:
   br r1 .for.body5.preheader .for.cond.cleanup4 
 .for.body5.preheader:
   r1 = sub r11 r9 64 
-  r1 = srem r1 2 64 
+  r1 = urem r1 2 64 
   r1 = icmp eq r1 0 64 
   r3 = mul arg1 1 64 
   r4 = mul r11 1 64 
@@ -169,7 +169,7 @@ start main 0:
   br r1 .for.body5.i.preheader .for.cond.cleanup4.i 
 .for.body5.i.preheader:
   r1 = sub r11 r9 64 
-  r1 = srem r1 2 64 
+  r1 = urem r1 2 64 
   r1 = icmp eq r1 0 64 
   r3 = mul r13 1 64 
   r4 = mul r11 1 64 
@@ -197,9 +197,9 @@ start main 0:
   r1 = icmp eq r10 r9 64 
   br r1 .for.cond.cleanup4.i .for.body5.i.prol.loopexit.for.body5.i_crit_edge 
 .for.body5.i.prol.loopexit.for.body5.i_crit_edge:
-  r2 = mul r12 1 64 
-  r1 = mul r4 8 64 
-  r1 = add r1 r2 64 
+  r1 = mul r12 1 64 
+  r2 = mul r4 8 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r5 = mul r1 1 64 
   r6 = mul r4 1 64 
