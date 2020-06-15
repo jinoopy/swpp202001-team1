@@ -1,1 +1,1 @@
-Runtime error at asmb/rmq1d_sparsetable.s:14: allocation size should not be 0
+100

@@ -1,5 +1,1 @@
-<<<<<<< HEAD
 31
-=======
-Syntax error at asmb/bitcount4.s:0: function not ended
->>>>>>> 84b8df3408d0e6b1c7521ae691e1c4849248a3bf

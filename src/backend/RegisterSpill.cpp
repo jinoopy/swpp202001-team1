@@ -162,7 +162,6 @@ void RegisterSpillPass::spillRegister(unsigned numBuffer, const vector<bool>& is
     set<Value*> skip;
     for(Instruction& I : BB) {
         if(skip.find(&I) != skip.end()){
-            I.print(outs());
             continue;
         } 
 

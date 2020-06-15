@@ -1,1 +1,10 @@
-Runtime error at asmb/rmq1d_naive.s:109: allocation size should not be 0
+498590
+567655
+498590
+567655
+498590
+4044266
+567655
+567655
+498590
+567655

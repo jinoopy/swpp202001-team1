@@ -8,6 +8,7 @@ start main 0:
   r1 = call read 
   r3 = mul r1 1 32 
   store 4 r3 sp 4 
+  r1 = mul r1 4294967296 64 
   r1 = sdiv r1 1073741824 64 
   r1 = add r1 7 64 
   r1 = and r1 18446744073709551608 64 
@@ -72,8 +73,10 @@ start main 0:
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
   r4 = load 8 r1 0 
+  r1 = mul r7 4294967296 64 
+  r1 = sdiv r1 4294967296 64 
   r2 = mul r4 1 64 
-  r1 = mul r7 4 64 
+  r1 = mul r1 4 64 
   r1 = add r1 r2 64 
   r3 = load 4 r1 0 
   r1 = lshr 2147483648 r5 32 
@@ -150,7 +153,8 @@ start initA.3 2:
   br r2 .while.end .while.cond 
 .while.end:
   store 4 r5 arg2 0 
-  r1 = sdiv r3 536870912 64 
+  r1 = mul r3 4294967296 64 
+  r1 = sdiv r1 536870912 64 
   r4 = malloc r1 
   r1 = add 20480 0 64 
   store 8 r4 r1 0 

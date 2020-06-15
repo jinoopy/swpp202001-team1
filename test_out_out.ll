@@ -1,4 +1,4 @@
-; ModuleID = 'test.ll'
+; ModuleID = 'test_out.ll'
 source_filename = "rmq1d_naive/src/rmq1d_naive.c"
 target datalayout = "e-m:o-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-apple-macosx10.15.0"
@@ -56,9 +56,9 @@ define i32 @main() #0 {
 entry:
   %call = call i64 (...) @read() #5
   %conv = trunc i64 %call to i32
-  %sext = shl i64 %call, 32
-  %mul = ashr exact i64 %sext, 30
-  %call2 = call i8* @malloc_upto_8(i64 %mul)
+  %sext3 = mul i64 %call, 4294967296
+  %mul4 = sdiv i64 %sext3, 1073741824
+  %call2 = call i8* @malloc_upto_8(i64 %mul4)
   %0 = bitcast i8* %call2 to i32*
   br label %for.cond
 
@@ -96,14 +96,14 @@ while.body:                                       ; preds = %while.cond
   %dec = add nsw i32 %Q.0, -1
   %call8 = call i64 (...) @read() #5
   %call10 = call i64 (...) @read() #5
-  %sext1 = shl i64 %call8, 32
-  %idx.ext = ashr exact i64 %sext1, 32
-  %add.ptr = getelementptr inbounds i32, i32* %0, i64 %idx.ext
-  %sext2 = shl i64 %call10, 32
-  %idx.ext12 = ashr exact i64 %sext2, 32
+  %sext15 = mul i64 %call8, 4294967296
+  %idx.ext6 = sdiv i64 %sext15, 4294967296
+  %add.ptr = getelementptr inbounds i32, i32* %0, i64 %idx.ext6
+  %sext27 = mul i64 %call10, 4294967296
+  %idx.ext128 = sdiv i64 %sext27, 4294967296
   %add.ptr13 = getelementptr inbounds i8, i8* %call2, i64 4
   %1 = bitcast i8* %add.ptr13 to i32*
-  %add.ptr14 = getelementptr inbounds i32, i32* %1, i64 %idx.ext12
+  %add.ptr14 = getelementptr inbounds i32, i32* %1, i64 %idx.ext128
   %call15 = call i32 @min_element(i32* %add.ptr, i32* nonnull %add.ptr14)
   %conv16 = sext i32 %call15 to i64
   call void @write(i64 %conv16) #5

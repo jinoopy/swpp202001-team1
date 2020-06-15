@@ -19,7 +19,7 @@ PreservedAnalyses PowerReductionPass::run(Module &M, ModuleAnalysisManager &MAM)
             for(auto it = BB.begin(); it!=BB.end();) {
                 Instruction& I = *it;
 
-                if(I.getNumOperands() != 2){
+                if(!I.isBinaryOp()){
                    ++it; 
                    continue;
                 } 
@@ -56,9 +56,11 @@ BasicBlock::iterator PowerReductionPass::replaceShiftWithMulDiv(BasicBlock::iter
     if(I.isShift()) {
         Value* newI;
         if(I.getOpcode() == Instruction::Shl) {
-            newI = BinaryOperator::Create(Instruction::Mul, I.getOperand(0), ConstantInt::get(I.getType(), 1<<rhsVal, true), I.getName(), &I);
-        } else {
-            newI = BinaryOperator::Create(Instruction::SDiv, I.getOperand(0), ConstantInt::get(I.getType(), 1<<rhsVal, true), I.getName(), &I);
+            newI = BinaryOperator::Create(Instruction::Mul, I.getOperand(0), ConstantInt::get(I.getType(), 1llu<<rhsVal, true), I.getName(), &I);
+        } else if(I.getOpcode() == Instruction::AShr) {
+            newI = BinaryOperator::Create(Instruction::SDiv, I.getOperand(0), ConstantInt::get(I.getType(), 1llu<<rhsVal, true), I.getName(), &I);
+        } else if(I.getOpcode() == Instruction::LShr) {
+            newI = BinaryOperator::Create(Instruction::UDiv, I.getOperand(0), ConstantInt::get(I.getType(), 1llu<<rhsVal, true), I.getName(), &I);
         }
         I.replaceAllUsesWith(newI);
         return I.eraseFromParent();

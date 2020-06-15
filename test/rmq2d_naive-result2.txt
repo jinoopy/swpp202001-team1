@@ -1,1 +1,10 @@
-Runtime error at asmb/rmq2d_naive.s:198: allocation size should not be 0
+10
+10
+10
+10
+20
+20
+20
+30
+30
+40
