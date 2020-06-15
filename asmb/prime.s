@@ -37,36 +37,37 @@ end main
 start check_with_primes.1 2:
 .entry:
   r1 = load 8 20480 0 
-  r4 = mul r1 1 64 
+  r5 = mul r1 1 64 
   br .while.cond 
 .while.cond:
-  r1 = icmp eq r4 0 64 
-  br r1 .cleanup5.loopexit1 .while.body 
+  r2 = icmp eq r5 0 64 
+  r1 = mul 1 1 64 
+  br r2 .cleanup5 .while.body 
 .while.body:
-  r3 = load 8 r4 0 
-  r1 = mul r3 r3 64 
-  r2 = icmp ugt r1 arg1 64 
-  r1 = mul r4 1 64 
-  r3 = mul 3 1 32 
-  br r2 .cleanup .if.end 
+  r2 = load 8 r5 0 
+  r1 = mul r2 r2 64 
+  r3 = icmp ugt r1 arg1 64 
+  r1 = mul r5 1 64 
+  r4 = mul 3 1 32 
+  br r3 .cleanup .if.end 
 .if.end:
-  r1 = urem arg1 r3 64 
+  r1 = urem arg1 r2 64 
   r2 = icmp eq r1 0 64 
-  r1 = mul r4 1 64 
-  r3 = mul 1 1 32 
+  r1 = mul r5 1 64 
+  r4 = mul 1 1 32 
   br r2 .cleanup .if.end4 
 .if.end4:
-  r2 = mul r4 1 64 
+  r2 = mul r5 1 64 
   r1 = mul 1 8 64 
   r1 = add r2 r1 64 
   r1 = load 8 r1 0 
-  r3 = mul 0 1 32 
+  r4 = mul 0 1 32 
   br .cleanup 
 .cleanup:
-  r1 = mul 0 1 64 
-switch r3 0 .while.cond 3 .cleanup5.loopexit1 .cleanup5
-.cleanup5.loopexit1:
   r1 = mul 1 1 64 
+switch r4 0 .while.cond 3 .cleanup5 .cleanup5.loopexit
+.cleanup5.loopexit:
+  r1 = mul 0 1 64 
   br .cleanup5 
 .cleanup5:
   ret r1 

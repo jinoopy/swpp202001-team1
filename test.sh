@@ -37,22 +37,23 @@ if [[ "$1" == "run" || "$1" == "all" ]]; then
 		exit 0
 	fi
 	test "binary_tree"			#wrong answer
-	# test "bitcount1"
-	# test "bitcount2"
-	# test "bitcount3"
-	# test "bitcount4"
-	# test "bitcount5"
-	# test "bubble_sort" 		
-	# test "collatz"
-	# test "gcd"
-	# test "matmul1"
-	# test "matmul2"
-	test "matmul3"			#wrong answer
-	test "matmul4"			#compile timeout
+	test "bitcount1"
+	test "bitcount2"
+	test "bitcount3"
+	test "bitcount4"
+	test "bitcount5"
+	test "bubble_sort" 		
+	test "collatz"
+	test "gcd"
+	test "matmul1"
+	test "matmul2"
+	test "matmul3"				#wrong answer
+	test "matmul4"
 	test "prime"				#infinite loop
-	# test "rmq1d_naive"
-	# test "rmq1d_sparsetable"
-	test "rmq2d_naive"			#wrong answer
+	test "rmq1d_naive"
+	test "rmq1d_sparsetable"
+	test "rmq2d_naive"
 	test "rmq2d_sparsetable"	#malloc2gv: replaceUsesWithIf() type problem
 	echo "----- end -----"
 fi
+

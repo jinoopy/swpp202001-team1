@@ -1,1 +1,16 @@
-Runtime error at asmb/matmul4.s:857: address not aligned
+2
+2
+4
+4
+5
+7
+7
+9
+4
+4
+8
+8
+10
+14
+14
+18
