@@ -40,10 +40,7 @@ namespace optim
         for (auto &f : M.functions())
         {
             if(f.isDeclaration()) continue;
-            if (DO_NOT_CONSIDER.find(f.getName()) == DO_NOT_CONSIDER.end())
-            {
-                old_functions.push_back(&f);
-            }
+            old_functions.push_back(&f);
         }
 
         for (auto &f : old_functions)
@@ -171,7 +168,7 @@ namespace optim
                 CallInst *cI = dyn_cast<CallInst>(&*I);
                 if (cI != nullptr)
                 {
-                    if (DO_NOT_CONSIDER.find(cI->getCalledFunction()->getName()) != DO_NOT_CONSIDER.end() || fMap.find(cI->getCalledFunction()) == fMap.end())
+                    if (cI->getCalledFunction()->isDeclaration() || fMap.find(cI->getCalledFunction()) == fMap.end())
                     {
                         ++I;
                         continue;
