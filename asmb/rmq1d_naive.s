@@ -202,11 +202,7 @@ start main 0:
   r1 = mul r5 1 32 
   r15 = mul r3 1 64 
   r3 = mul r4 1 32 
-  r4 = mul r3 1 64 
-  r3 = mul r4 1 32 
-  r1 = mul r4 1 64 
-  r15 = mul r4 1 32 
-  r4 = mul r15 1 32 
+  r4 = mul r15 1 64 
   br r2 .min_element.exit .while.body.i 
 .while.body.i:
   r2 = load 4 r4 0 

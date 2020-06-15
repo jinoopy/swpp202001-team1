@@ -258,7 +258,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 							unsigned curReg = q.front();
 							q.pop();
 							countRest--;
-							if(adjList[curReg][0]->getName() == "r" + itostr(i)) {
+							if(TM.regNo(adjList[curReg][0]) == i) {
 								lastQueue = curReg;
 								break;
 							}
@@ -307,7 +307,7 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 							unsigned curReg = q.front();
 							q.pop();
 
-							if(adjList[curReg].empty() || adjList[curReg][0]->getName() == "r" + itostr(i)) {
+							if(adjList[curReg].empty() || TM.regNo(adjList[curReg][0]) == i) {
 								break;
 							}
 
@@ -360,9 +360,8 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 								startValue = xor3;
 							}
 
-							if(adjList[curReg][0]->getName().substr(0, 1) == "r"
-							&& !--indegree[TM.regNo(adjList[curReg][0])]
-							&& adjList[curReg][0]->getName() != "r" + itostr(i)) {
+							if(!--indegree[TM.regNo(adjList[curReg][0])]
+							&& TM.regNo(adjList[curReg][0]) != i) {
 								q.push(TM.regNo(adjList[curReg][0]));
 							}
 						}

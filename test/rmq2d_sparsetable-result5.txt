@@ -1,1 +1,0 @@
-Error: cannot find asmb/rmq2d_sparsetable.s

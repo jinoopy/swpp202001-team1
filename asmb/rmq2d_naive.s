@@ -152,11 +152,6 @@ start min_at_row 3:
   r12 = mul r3 1 64 
   r3 = mul r5 1 64 
   r5 = mul r3 1 64 
-  r3 = mul r5 1 64 
-  r1 = mul r3 1 64 
-  r12 = mul r5 1 64 
-  r5 = mul r3 1 64 
-  r1 = mul r5 1 64 
   br r2 .min_element.exit .while.body.i 
 .while.body.i:
   r2 = load 4 r5 0 
@@ -389,12 +384,7 @@ start main 0:
   r1 = add r1 1 64 
   r16 = mul r3 1 32 
   r3 = mul r13 1 64 
-  r13 = mul r3 1 32 
-  r3 = mul r13 1 64 
-  r1 = mul r16 1 32 
-  r16 = mul r13 1 64 
-  r13 = mul r3 1 32 
-  r1 = mul r16 1 64 
+  r13 = mul r16 1 32 
   br .for.body39 
 .for.cond.cleanup38:
   r1 = load 8 sp 0 
@@ -454,11 +444,6 @@ start main 0:
   r16 = mul r1 1 64 
   r1 = mul r5 1 64 
   r5 = mul r1 1 64 
-  r1 = mul r5 1 64 
-  r1 = mul r1 1 64 
-  r16 = mul r5 1 64 
-  r5 = mul r1 1 64 
-  r1 = mul r5 1 64 
   br r2 .min_at_row.exit22 .while.body.i.i17 
 .while.body.i.i17:
   r2 = load 4 r5 0 
