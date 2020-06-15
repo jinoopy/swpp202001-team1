@@ -18,7 +18,7 @@ start collatz 2:
   r1 = icmp eq r1 0 32 
   br r1 .cond.true .cond.false 
 .cond.true:
-  r1 = sdiv r4 2 32 
+  r1 = udiv r4 2 32 
   r2 = mul r1 1 32 
   br .cond.end 
 .cond.false:
@@ -53,7 +53,7 @@ start main 0:
   r1 = icmp eq r1 0 32 
   br r1 .cond.true.i .cond.false.i 
 .cond.true.i:
-  r1 = sdiv r4 2 32 
+  r1 = udiv r4 2 32 
   r4 = mul r1 1 32 
   br .cond.end.i 
 .cond.false.i:

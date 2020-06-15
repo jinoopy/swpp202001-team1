@@ -1,1 +1,2490 @@
-main: 6816202.5248
+main: 1956788.2496
+| malloc_upto_8: 21.6352
+| initA: 152399.4976
+| | malloc_upto_8: 21.6608
+| | malloc_upto_8: 21.7248
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | malloc_upto_8: 21.7248
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | malloc_upto_8: 21.7248
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | malloc_upto_8: 21.7248
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | malloc_upto_8: 21.7248
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | malloc_upto_8: 21.7248
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| | min: 17.4016
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1671.3344
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1725.5456
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1617.1232
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1454.4896
+| min: 17.3792
+| count_leading_zeros: 1562.9120
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1400.2784
+| min: 17.3792
+| count_leading_zeros: 1508.7008
+| min: 17.3792

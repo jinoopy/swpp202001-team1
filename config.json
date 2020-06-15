@@ -152,7 +152,6 @@
             "constexpr",
             "gep-unpack",
             "power-reduc",
-            "constexpr",
             "addrcast",
             "regspill",
             "dse"

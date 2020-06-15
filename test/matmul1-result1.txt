@@ -1,4 +1,1 @@
-19
-22
-43
-50
+Runtime error at asmb/matmul1.s:307: accessing non-allocated memory
