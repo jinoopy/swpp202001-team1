@@ -104,10 +104,10 @@
         "inst-optim": [
             "reassociate",
             "constprop",
-            "sccp",
             "power-reduc",
             "instcombine",
             "power-reduc",
+            "sccp",
             "sink",
             "simplifycfg",
             "dce"
@@ -151,8 +151,6 @@
         "backend": [
             "constexpr",
             "gep-unpack",
-            "power-reduc",
-            "instcombine",
             "power-reduc",
             "constexpr",
             "addrcast",

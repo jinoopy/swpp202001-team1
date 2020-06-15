@@ -25,61 +25,61 @@ start matmul 4:
   r1 = mul r3 1 64 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r13 = add r1 r2 64 
+  r13 = add r2 r1 64 
   r1 = or r3 1 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r12 = add r1 r2 64 
+  r12 = add r2 r1 64 
   r1 = or r3 2 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r11 = add r1 r2 64 
+  r11 = add r2 r1 64 
   r1 = or r3 3 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r10 = add r1 r2 64 
+  r10 = add r2 r1 64 
   r1 = load 8 sp 8 
   r3 = add r14 r1 32 
   r1 = mul r3 1 64 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r9 = add r1 r2 64 
+  r9 = add r2 r1 64 
   r1 = add r3 1 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r8 = add r1 r2 64 
+  r8 = add r2 r1 64 
   r1 = add r3 2 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r7 = add r1 r2 64 
+  r7 = add r2 r1 64 
   r1 = add r3 3 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r6 = add r1 r2 64 
+  r6 = add r2 r1 64 
   r1 = load 8 sp 16 
   r3 = add r14 r1 32 
   r1 = mul r3 1 64 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 sp 32 
   store 8 r1 sp 32 
   r1 = or r3 1 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 sp 40 
   store 8 r1 sp 40 
   r1 = add r3 2 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 sp 48 
   store 8 r1 sp 48 
   r1 = add r3 3 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 sp 56 
   store 8 r1 sp 56 
   r1 = load 8 sp 24 
@@ -87,25 +87,25 @@ start matmul 4:
   r1 = mul r3 1 64 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 sp 64 
   store 8 r1 sp 64 
   r1 = add r3 1 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 sp 72 
   store 8 r1 sp 72 
   r1 = add r3 2 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 sp 80 
   store 8 r1 sp 80 
   r1 = add r3 3 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 sp 88 
   store 8 r1 sp 88 
   r5 = mul 0 1 32 
@@ -116,110 +116,110 @@ start matmul 4:
   r1 = mul r3 1 64 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r3 1 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r3 2 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r3 3 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = load 8 sp 8 
   r3 = add r5 r1 32 
   r1 = mul r3 1 64 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 1 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 2 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 3 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = load 8 sp 16 
   r3 = add r5 r1 32 
   r1 = mul r3 1 64 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r3 1 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 2 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 3 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = load 8 sp 24 
   r3 = add r5 r1 32 
   r1 = mul r3 1 64 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 1 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 2 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 3 32 
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = mul r5 arg1 32 
   r3 = add r1 r14 32 
   r1 = mul r3 1 64 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r3 1 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r3 2 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r3 3 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r5 1 32 
   r1 = mul r1 arg1 32 
@@ -227,22 +227,22 @@ start matmul 4:
   r1 = mul r3 1 64 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 1 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 2 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 3 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r5 2 32 
   r1 = mul r1 arg1 32 
@@ -250,22 +250,22 @@ start matmul 4:
   r1 = mul r3 1 64 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r3 1 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 2 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 3 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = or r5 3 32 
   r1 = mul r1 arg1 32 
@@ -273,22 +273,22 @@ start matmul 4:
   r1 = mul r3 1 64 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 1 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 2 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = add r3 3 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r4 = load 8 r1 0 
   r2 = load 8 sp 224 
   r1 = load 8 sp 96 
@@ -625,7 +625,7 @@ start read_mat 2:
   r1 = add r5 r1 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   store 8 r3 r1 0 
   r1 = add r4 1 64 
   r2 = icmp eq r1 r7 64 
@@ -655,7 +655,7 @@ start print_mat 2:
   r1 = add r4 r1 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   call write r1 
   r1 = add r3 1 64 
@@ -673,34 +673,33 @@ end print_mat
 
 start main 0:
 .entry:
-  r12 = call read 
-  r13 = mul r12 1 32 
-  r1 = urem r13 4 32 
+  r11 = call read 
+  r12 = mul r11 1 32 
+  r1 = urem r12 4 32 
   r1 = icmp eq r1 0 32 
   br r1 .if.end .cleanup 
 .if.end:
-  r1 = mul r12 8 64 
-  r1 = mul r1 r12 64 
-  r1 = and r1 34359738360 64 
-  r8 = malloc r1 
-  r14 = mul r8 1 64 
-  r11 = malloc r1 
-  r10 = malloc r1 
-  r9 = icmp eq r13 0 32 
+  r1 = mul r11 8 64 
+  r1 = mul r1 r11 64 
+  r2 = and r1 34359738360 64 
+  r13 = malloc r2 
+  r8 = malloc r2 
+  r10 = malloc r2 
+  r9 = icmp eq r12 0 32 
   r7 = mul 0 1 32 
   br r9 .for.cond.i3.preheader .for.cond1.i.preheader.us 
 .for.cond1.i.preheader.us:
-  r6 = mul r7 r13 32 
-  r5 = urem r12 4294967296 64 
+  r6 = mul r7 r12 32 
+  r5 = urem r11 4294967296 64 
   r4 = mul 0 1 64 
   br .for.body3.i.us 
 .for.body3.i.us:
   r3 = call read 
   r1 = mul r4 1 32 
   r1 = add r6 r1 32 
-  r2 = mul r8 1 64 
+  r2 = mul r13 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   store 8 r3 r1 0 
   r1 = add r4 1 64 
   r2 = icmp eq r1 r5 64 
@@ -708,25 +707,24 @@ start main 0:
   br r2 .for.end.i.us .for.body3.i.us 
 .for.end.i.us:
   r1 = add r7 1 32 
-  r2 = icmp eq r1 r13 32 
+  r2 = icmp eq r1 r12 32 
   r7 = mul r1 1 32 
   br r2 .for.cond.i3.preheader .for.cond1.i.preheader.us 
 .for.cond.i3.preheader:
-  r8 = mul r11 1 64 
   r7 = mul 0 1 32 
   br r9 .read_mat.exit17 .for.cond1.i7.preheader.us 
 .for.cond1.i7.preheader.us:
-  r6 = mul r7 r13 32 
-  r5 = urem r12 4294967296 64 
+  r6 = mul r7 r12 32 
+  r5 = urem r11 4294967296 64 
   r4 = mul 0 1 64 
   br .for.body3.i14.us 
 .for.body3.i14.us:
   r3 = call read 
   r1 = mul r4 1 32 
   r1 = add r6 r1 32 
-  r2 = mul r11 1 64 
+  r2 = mul r8 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   store 8 r3 r1 0 
   r1 = add r4 1 64 
   r2 = icmp eq r1 r5 64 
@@ -734,25 +732,25 @@ start main 0:
   br r2 .for.end.i16.us .for.body3.i14.us 
 .for.end.i16.us:
   r1 = add r7 1 32 
-  r2 = icmp eq r1 r13 32 
+  r2 = icmp eq r1 r12 32 
   r7 = mul r1 1 32 
   br r2 .read_mat.exit17 .for.cond1.i7.preheader.us 
 .read_mat.exit17:
-  r1 = mul r10 1 64 
-  call matmul r13 r1 r14 r8 
+  r7 = mul r10 1 64 
+  call matmul r12 r7 r13 r8 
   r6 = mul 0 1 32 
   br r9 .cleanup .for.cond1.i24.preheader.us 
 .for.cond1.i24.preheader.us:
-  r4 = mul r6 r13 32 
-  r3 = urem r12 4294967296 64 
+  r4 = mul r6 r12 32 
+  r3 = urem r11 4294967296 64 
   r5 = mul 0 1 64 
   br .for.body3.i30.us 
 .for.body3.i30.us:
   r1 = mul r5 1 32 
   r1 = add r4 r1 32 
-  r2 = mul r10 1 64 
+  r2 = mul r7 1 64 
   r1 = mul r1 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   call write r1 
   r1 = add r5 1 64 
@@ -761,7 +759,7 @@ start main 0:
   br r2 .for.end.i32.us .for.body3.i30.us 
 .for.end.i32.us:
   r1 = add r6 1 32 
-  r2 = icmp eq r1 r13 32 
+  r2 = icmp eq r1 r12 32 
   r6 = mul r1 1 32 
   br r2 .cleanup .for.cond1.i24.preheader.us 
 .cleanup:

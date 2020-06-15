@@ -19,10 +19,11 @@ start min_element 2:
   r1 = mul arg1 1 64 
   br r2 .while.end .while.body.preheader 
 .while.body.preheader:
-  r2 = mul arg1 1 64 
-  r1 = mul arg2 1 64 
-  r1 = add r1 18446744073709551612 64 
-  r7 = sub r1 r2 64 
+  r3 = mul arg1 1 64 
+  r2 = mul arg2 1 64 
+  r1 = mul 18446744073709551615 4 64 
+  r1 = add r2 r1 64 
+  r7 = sub r1 r3 64 
   r1 = udiv r7 4 64 
   r1 = add r1 1 64 
   r1 = urem r1 4 64 
@@ -38,8 +39,9 @@ start min_element 2:
   r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
   r3 = select r1 r6 r3 
-  r1 = mul r6 1 64 
-  r2 = add r1 4 64 
+  r2 = mul r6 1 64 
+  r1 = mul 1 4 64 
+  r2 = add r2 r1 64 
   r1 = add r5 18446744073709551615 64 
   r4 = icmp eq r1 0 64 
   r5 = mul r1 1 64 
@@ -50,48 +52,50 @@ start min_element 2:
   br r4 .while.body.prol.loopexit .while.body.prol 
 .while.body.prol.loopexit:
   r2 = icmp ult r7 12 64 
-  r4 = mul r8 1 64 
+  r3 = mul r8 1 64 
   r5 = mul r1 1 64 
   r1 = mul r9 1 64 
   br r2 .while.end .while.body 
 .while.body:
   r2 = load 4 r5 0 
-  r1 = load 4 r4 0 
+  r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r5 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 4 64 
+  r4 = select r1 r5 r3 
+  r2 = mul r5 1 64 
+  r1 = mul 1 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
   r4 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 8 64 
+  r2 = mul r5 1 64 
+  r1 = mul 2 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
   r4 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 12 64 
+  r2 = mul r5 1 64 
+  r1 = mul 3 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r2 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r1 = add r1 16 64 
-  r3 = icmp eq r1 arg2 64 
-  r4 = mul r2 1 64 
+  r3 = select r1 r3 r4 
+  r2 = mul r5 1 64 
+  r1 = mul 4 4 64 
+  r1 = add r2 r1 64 
+  r2 = icmp eq r1 arg2 64 
   r5 = mul r1 1 64 
-  r1 = mul r2 1 64 
-  br r3 .while.end .while.body 
+  r1 = mul r3 1 64 
+  br r2 .while.end .while.body 
 .while.end:
   ret r1 
 end min_element
 
 start min_at_row 3:
 .entry:
-  r1 = add 20480 0 64 
-  r2 = load 8 r1 0 
+  r2 = load 8 20480 0 
   r1 = mul arg1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
   r1 = mul r1 8 64 
@@ -101,14 +105,15 @@ start min_at_row 3:
   r5 = sdiv r5 4294967296 64 
   r2 = mul r6 1 64 
   r1 = mul r5 4 64 
-  r4 = add r1 r2 64 
+  r4 = add r2 r1 64 
   r3 = mul arg3 4294967296 64 
   r3 = sdiv r3 4294967296 64 
   r2 = mul r6 1 64 
   r1 = mul r3 4 64 
-  r1 = add r1 r2 64 
-  r11 = mul r1 1 64 
-  r1 = add r1 4 64 
+  r11 = add r2 r1 64 
+  r2 = mul r11 1 64 
+  r1 = mul 1 4 64 
+  r1 = add r2 r1 64 
   r2 = icmp eq r4 r1 64 
   r1 = mul r4 1 64 
   br r2 .min_element.exit .while.body.i.preheader 
@@ -128,8 +133,9 @@ start min_at_row 3:
   r1 = load 4 r9 0 
   r1 = icmp slt r2 r1 32 
   r3 = select r1 r8 r9 
-  r1 = mul r8 1 64 
-  r2 = add r1 4 64 
+  r2 = mul r8 1 64 
+  r1 = mul 1 4 64 
+  r2 = add r2 r1 64 
   r1 = add r7 18446744073709551615 64 
   r4 = icmp eq r1 0 64 
   r5 = mul r3 1 64 
@@ -143,39 +149,48 @@ start min_at_row 3:
   r1 = urem r10 4611686018427387904 64 
   r2 = icmp ult r1 3 64 
   r1 = mul r6 1 64 
-  r4 = mul r5 1 64 
+  r12 = mul r3 1 64 
+  r3 = mul r5 1 64 
   r5 = mul r3 1 64 
+  r3 = mul r5 1 64 
+  r1 = mul r3 1 64 
+  r12 = mul r5 1 64 
+  r5 = mul r3 1 64 
+  r1 = mul r5 1 64 
   br r2 .min_element.exit .while.body.i 
 .while.body.i:
   r2 = load 4 r5 0 
-  r1 = load 4 r4 0 
+  r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r5 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 4 64 
+  r4 = select r1 r5 r3 
+  r2 = mul r5 1 64 
+  r1 = mul 1 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
   r4 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 8 64 
+  r2 = mul r5 1 64 
+  r1 = mul 2 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
   r3 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r4 = add r1 12 64 
+  r2 = mul r5 1 64 
+  r1 = mul 3 4 64 
+  r4 = add r2 r1 64 
   r2 = load 4 r4 0 
   r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
-  r2 = select r1 r4 r3 
-  r1 = mul r5 1 64 
-  r1 = add r1 16 64 
-  r3 = icmp eq r4 r11 64 
-  r4 = mul r2 1 64 
+  r3 = select r1 r4 r3 
+  r2 = mul r5 1 64 
+  r1 = mul 4 4 64 
+  r1 = add r2 r1 64 
+  r2 = icmp eq r4 r11 64 
   r5 = mul r1 1 64 
-  r1 = mul r2 1 64 
-  br r3 .min_element.exit .while.body.i 
+  r1 = mul r3 1 64 
+  br r2 .min_element.exit .while.body.i 
 .min_element.exit:
   r1 = load 4 r1 0 
   ret r1 
@@ -215,7 +230,7 @@ start main 0:
   r3 = malloc r8 
   r2 = mul r5 1 64 
   r1 = mul r6 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   store 8 r3 r1 0 
   r4 = urem r9 4294967296 64 
   r5 = mul 0 1 64 
@@ -223,8 +238,7 @@ start main 0:
 .for.body13.us:
   r1 = call read 
   r3 = mul r1 1 32 
-  r1 = add 20480 0 64 
-  r2 = load 8 r1 0 
+  r2 = load 8 20480 0 
   r1 = mul r6 8 64 
   r1 = add r2 r1 64 
   r2 = load 8 r1 0 
@@ -251,7 +265,7 @@ start main 0:
 .for.body:
   r3 = malloc r8 
   r1 = mul r4 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   store 8 r3 r1 0 
   r2 = add r4 1 64 
   r1 = icmp eq r2 r7 64 
@@ -274,21 +288,23 @@ start main 0:
   r1 = load 8 sp 8 
   r2 = mul r1 1 64 
   r1 = mul r13 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r5 = load 8 r1 0 
   r1 = mul r3 4294967296 64 
   r15 = sdiv r1 4294967296 64 
   r2 = mul r5 1 64 
   r1 = mul r15 4 64 
-  r3 = add r1 r2 64 
+  r3 = add r2 r1 64 
   r1 = mul r4 4294967296 64 
   r14 = sdiv r1 4294967296 64 
-  r1 = mul r5 1 64 
-  r2 = add r1 4 64 
+  r2 = mul r5 1 64 
+  r1 = mul 1 4 64 
+  r1 = add r2 r1 64 
+  r2 = mul r1 1 64 
   r1 = mul r14 4 64 
   r10 = add r2 r1 64 
   r1 = icmp eq r3 r10 64 
-  r6 = mul r3 1 64 
+  r4 = mul r3 1 64 
   br r1 .min_at_row.exit .while.body.i.i.preheader 
 .while.body.i.i.preheader:
   r7 = sub r14 r15 64 
@@ -305,8 +321,9 @@ start main 0:
   r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
   r3 = select r1 r6 r3 
-  r1 = mul r6 1 64 
-  r2 = add r1 4 64 
+  r2 = mul r6 1 64 
+  r1 = mul 1 4 64 
+  r2 = add r2 r1 64 
   r1 = add r5 18446744073709551615 64 
   r4 = icmp eq r1 0 64 
   r5 = mul r1 1 64 
@@ -320,44 +337,47 @@ start main 0:
   r1 = urem r7 4611686018427387904 64 
   r2 = icmp ult r1 3 64 
   r1 = load 8 sp 16 
-  r4 = mul r9 1 64 
+  r3 = mul r9 1 64 
+  r4 = mul r1 1 64 
   r5 = mul r8 1 64 
-  r6 = mul r1 1 64 
   br r2 .min_at_row.exit .while.body.i.i 
 .while.body.i.i:
   r2 = load 4 r5 0 
-  r1 = load 4 r4 0 
+  r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r5 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 4 64 
+  r4 = select r1 r5 r3 
+  r2 = mul r5 1 64 
+  r1 = mul 1 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
   r4 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 8 64 
+  r2 = mul r5 1 64 
+  r1 = mul 2 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
   r4 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 12 64 
+  r2 = mul r5 1 64 
+  r1 = mul 3 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r2 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r1 = add r1 16 64 
-  r3 = icmp eq r1 r10 64 
-  r4 = mul r2 1 64 
+  r3 = select r1 r3 r4 
+  r2 = mul r5 1 64 
+  r1 = mul 4 4 64 
+  r1 = add r2 r1 64 
+  r2 = icmp eq r1 r10 64 
+  r4 = mul r3 1 64 
   r5 = mul r1 1 64 
-  r6 = mul r2 1 64 
-  br r3 .min_at_row.exit .while.body.i.i 
+  br r2 .min_at_row.exit .while.body.i.i 
 .min_at_row.exit:
   r1 = mul r11 1 32 
   r2 = mul r12 1 32 
-  r3 = load 4 r6 0 
+  r3 = load 4 r4 0 
   r1 = icmp slt r1 r2 32 
   r2 = mul r3 1 32 
   br r1 .for.body39.lr.ph .for.cond.cleanup38 
@@ -390,13 +410,15 @@ start main 0:
   r1 = load 8 sp 8 
   r2 = mul r1 1 64 
   r1 = mul r12 8 64 
-  r1 = add r1 r2 64 
+  r1 = add r2 r1 64 
   r4 = load 8 r1 0 
   r2 = mul r4 1 64 
   r1 = mul r15 4 64 
-  r3 = add r1 r2 64 
-  r1 = mul r4 1 64 
-  r2 = add r1 4 64 
+  r3 = add r2 r1 64 
+  r2 = mul r4 1 64 
+  r1 = mul 1 4 64 
+  r1 = add r2 r1 64 
+  r2 = mul r1 1 64 
   r1 = mul r14 4 64 
   r9 = add r2 r1 64 
   r2 = icmp eq r3 r9 64 
@@ -416,8 +438,9 @@ start main 0:
   r1 = load 4 r8 0 
   r1 = icmp slt r2 r1 32 
   r3 = select r1 r7 r8 
-  r1 = mul r7 1 64 
-  r2 = add r1 4 64 
+  r2 = mul r7 1 64 
+  r1 = mul 1 4 64 
+  r2 = add r2 r1 64 
   r1 = add r6 18446744073709551615 64 
   r4 = icmp eq r1 0 64 
   r5 = mul r3 1 64 
@@ -428,7 +451,6 @@ start main 0:
   br r4 .while.body.i.i17.prol.loopexit .while.body.i.i17.prol 
 .while.body.i.i17.prol.loopexit:
   r2 = icmp ult r10 3 64 
-  r4 = mul r3 1 64 
   r16 = mul r1 1 64 
   r1 = mul r5 1 64 
   r5 = mul r1 1 64 
@@ -440,34 +462,37 @@ start main 0:
   br r2 .min_at_row.exit22 .while.body.i.i17 
 .while.body.i.i17:
   r2 = load 4 r5 0 
-  r1 = load 4 r4 0 
+  r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
-  r4 = select r1 r5 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 4 64 
+  r4 = select r1 r5 r3 
+  r2 = mul r5 1 64 
+  r1 = mul 1 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
   r4 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 8 64 
+  r2 = mul r5 1 64 
+  r1 = mul 2 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
   r4 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r3 = add r1 12 64 
+  r2 = mul r5 1 64 
+  r1 = mul 3 4 64 
+  r3 = add r2 r1 64 
   r2 = load 4 r3 0 
   r1 = load 4 r4 0 
   r1 = icmp slt r2 r1 32 
-  r2 = select r1 r3 r4 
-  r1 = mul r5 1 64 
-  r1 = add r1 16 64 
-  r3 = icmp eq r1 r9 64 
-  r4 = mul r2 1 64 
+  r3 = select r1 r3 r4 
+  r2 = mul r5 1 64 
+  r1 = mul 4 4 64 
+  r1 = add r2 r1 64 
+  r2 = icmp eq r1 r9 64 
   r5 = mul r1 1 64 
-  r1 = mul r2 1 64 
-  br r3 .min_at_row.exit22 .while.body.i.i17 
+  r1 = mul r3 1 64 
+  br r2 .min_at_row.exit22 .while.body.i.i17 
 .min_at_row.exit22:
   r2 = load 4 r1 0 
   r1 = icmp slt r13 r2 32 

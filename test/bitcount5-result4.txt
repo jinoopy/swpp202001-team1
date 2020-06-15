@@ -1,1 +1,1 @@
-Syntax error at asmb/bitcount5.s:0: function not ended
+0
