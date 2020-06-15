@@ -31,7 +31,7 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
             Instruction &I = *it;
             if(I.getOpcode() != Instruction::GetElementPtr) continue;
 
-            IRBuilder<> Builder(&I);
+            // IRBuilder<> Builder(&I);
             GetElementPtrInst *GI = dyn_cast<GetElementPtrInst>(&I);
 
             Value* ptrOp = GI->getPointerOperand();
@@ -39,23 +39,26 @@ PreservedAnalyses GEPUnpackPass::run(Module &M, ModuleAnalysisManager &MAM) {
             curr = curr->getPointerElementType();
 
             Instruction *pti = CastInst::CreateBitOrPointerCast(ptrOp, IntegerType::getInt64Ty(Context));
-			Builder.Insert(pti);
+			pti->insertBefore(&I);
             
 			vector<Instruction *> v;
 			v.push_back(pti);
             for(auto opIt = GI->idx_begin(); opIt!=GI->idx_end(); ++opIt) {
                 Value *op = *opIt;
-                unsigned int size = getAccessSize(curr);
+                unsigned size = getAccessSize(curr);
                 Instruction *mul = BinaryOperator::CreateMul(op, ConstantInt::get(IntegerType::getInt64Ty(Context), size, true));
-				Builder.Insert(mul);
-                Instruction *sum = BinaryOperator::CreateAdd(v.back(), mul);
-				Builder.Insert(sum);
-				v.push_back(sum);
+				// Builder.Insert(mul);
+				mul->insertBefore(&I);
+                Instruction *add = BinaryOperator::CreateAdd(v.back(), mul);
+				v.push_back(add);
+				// Builder.Insert(add);
+				add->insertBefore(&I);
                 if(curr->isArrayTy()) curr = curr->getArrayElementType();
             }
 
             Instruction *itp = CastInst::CreateBitOrPointerCast(v.back(), I.getType());
-			Builder.Insert(itp);
+			// Builder.Insert(itp);
+			itp->insertBefore(&I);
             I.replaceAllUsesWith(itp);
 			s.insert(&I);
         }

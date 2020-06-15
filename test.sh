@@ -14,6 +14,7 @@ function test() {
 		~/swpp202001-interpreter/sf-interpreter asmb/$TESTNAME.s \
 		< ~/swpp202001-test/$TESTNAME/test/input$i.txt > test/$TESTNAME-result$i.txt
 		cmp ~/swpp202001-test/$TESTNAME/test/output$i.txt test/$TESTNAME-result$i.txt
+		cat sf-interpreter.log
 	done
 	echo "-----end test $TESTNAME-----"
 }
@@ -35,7 +36,7 @@ if [[ "$1" == "run" || "$1" == "all" ]]; then
 	#test "bitcount3"
 	#test "bitcount4"
 	#test "bitcount5"
-	#test "bubble_sort"
+	test "bubble_sort"
 	#test "collatz"
 	#test "gcd"
 	#test "matmul1"
@@ -44,8 +45,8 @@ if [[ "$1" == "run" || "$1" == "all" ]]; then
 	#test "matmul4"
 	#test "prime"
 	#test "rmq1d_naive"
-	test "rmq1d_sparsetable"
-	test "rmq2d_naive"
+	#test "rmq1d_sparsetable"
+	#test "rmq2d_naive"
 	#test "rmq2d_sparsetable"
 	echo "----- end -----"
 fi

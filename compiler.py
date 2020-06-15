@@ -133,7 +133,7 @@ def opt(config):
     outputIR = inputIR[:-3]+"_out.ll "
     runPass(config, inputIR, outputIR, passes, debug=True)
 
-def runPass(config, inputIR, outputIR, passes, debug=False):
+def runPass(config, inputIR, outputIR, passes, debug=True):
     if(platform.system() == "Darwin"):
         LIBTYPE = ".dylib"
     else:
@@ -153,7 +153,7 @@ def runPass(config, inputIR, outputIR, passes, debug=False):
                 print()
         inputIR = outputIR
 
-def backend(config, inputIR, outputS, debug=False):
+def backend(config, inputIR, outputS, debug=True):
     outputIR = inputIR[:-8]+"_backend.ll "
     passes = config["run"]["backend"]
     runPass(config, inputIR, outputIR, passes, debug)
