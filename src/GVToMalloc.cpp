@@ -23,7 +23,6 @@ namespace optim
         
         for (auto gv = GVs.begin(); gv != GVs.end(); gv++)
         {
-				gv->dump();
             auto type = gv->getValueType();
             if(type->getTypeID() != 11) continue;
             Constant *value = nullptr;
