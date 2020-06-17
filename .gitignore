@@ -4,5 +4,5 @@ lib
 test
 sf-interpreter.log
 sf-interpreter-cost.log
-backend
+/backend
 .test.s
