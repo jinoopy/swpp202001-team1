@@ -90,7 +90,6 @@
         "function-optim": [
             "mergefunc",
             "tailcallelim",
-            "inline",
             "globaldce",
             "ipsccp",
             "deadargelim"
@@ -133,6 +132,7 @@
     "run": {
         "opt": [
             "global-optim",
+            "function-optim",
             "inst-optim",
             "memory-optim",
             "inst-optim",
