@@ -84,7 +84,6 @@
         "global-optim": [
             "gv2malloc",
             "globaldce",
-            "ipsccp",
             "mem2reg",
             "gvn",
             "globaldce"
@@ -94,6 +93,7 @@
             "tailcallelim",
             "inline",
             "globaldce",
+            "ipsccp",
             "deadargelim"
         ],
         "memory-optim": [
@@ -105,7 +105,6 @@
             "reassociate",
             "constprop",
             "sccp",
-            "power-reduc",
             "instcombine",
             "power-reduc",
             "sink",
@@ -124,7 +123,7 @@
             "reassociate",
             "loop-simplify",
             "indvars",
-            "loop-unroll",
+            "loop-unroll-and-jam",
             "vectorize"
         ],
         "cleanup": [
@@ -151,7 +150,6 @@
             "constexpr",
             "gep-unpack",
             "power-reduc",
-            "constexpr",
             "addrcast",
             "regspill",
             "dse"

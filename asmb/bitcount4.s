@@ -7,7 +7,7 @@ start countSetBits 1:
   r1 = mul r3 4 64 
   r1 = add r2 r1 64 
   r4 = load 4 r1 0 
-  r1 = sdiv arg1 256 32 
+  r1 = udiv arg1 256 32 
   r3 = urem r1 256 32 
   r2 = add 20480 0 64 
   r1 = mul 0 1024 64 
@@ -16,7 +16,7 @@ start countSetBits 1:
   r1 = add r2 r1 64 
   r1 = load 4 r1 0 
   r4 = add r1 r4 32 
-  r1 = sdiv arg1 65536 32 
+  r1 = udiv arg1 65536 32 
   r3 = urem r1 256 32 
   r2 = add 20480 0 64 
   r1 = mul 0 1024 64 
@@ -51,17 +51,17 @@ start main 0:
   r5 = mul 0 1 64 
   br .for.body 
 .for.cond.cleanup:
-  r1 = call read 
-  r5 = mul r1 1 32 
-  r3 = urem r1 256 64 
+  r6 = call read 
+  r5 = mul r6 1 32 
+  r3 = urem r6 256 64 
   r2 = add 20480 0 64 
   r1 = mul 0 1024 64 
   r2 = add r2 r1 64 
   r1 = mul r3 4 64 
   r1 = add r2 r1 64 
   r4 = load 4 r1 0 
-  r1 = sdiv r5 256 32 
-  r3 = urem r1 256 32 
+  r1 = udiv r6 256 64 
+  r3 = urem r1 256 64 
   r2 = add 20480 0 64 
   r1 = mul 0 1024 64 
   r2 = add r2 r1 64 
@@ -69,8 +69,8 @@ start main 0:
   r1 = add r2 r1 64 
   r1 = load 4 r1 0 
   r4 = add r1 r4 32 
-  r1 = sdiv r5 65536 32 
-  r3 = urem r1 256 32 
+  r1 = udiv r6 65536 64 
+  r3 = urem r1 256 64 
   r2 = add 20480 0 64 
   r1 = mul 0 1024 64 
   r2 = add r2 r1 64 
