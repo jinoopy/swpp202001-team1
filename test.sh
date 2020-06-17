@@ -49,12 +49,12 @@ if [[ "$1" == "run" || "$1" == "all" ]]; then
 	test "matmul2"
 	test "matmul3"					
 	test "matmul4"
-	# test "prime"					#infinite loop
+	test "prime"					#infinite loop
 	test "rmq1d_naive"
 	test "rmq1d_sparsetable"
 	test "rmq2d_naive"
-	test "rmq2d_sparsetable"		# lots of memory error
-									# malloc2gv problem
+	test "rmq2d_sparsetable"		# memory error & wrong answer
+									# but works if gv2malloc & inline both removed
 	echo "----- end -----"
 fi
 

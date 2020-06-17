@@ -780,21 +780,21 @@ start main 0:
   r6 = mul 0 1 32 
   br r9 .cleanup .for.cond1.i24.preheader.us 
 .for.cond1.i24.preheader.us:
-  r4 = mul r6 r12 32 
-  r3 = urem r11 4294967296 64 
-  r5 = mul 0 1 64 
+  r5 = mul r6 r12 32 
+  r4 = urem r11 4294967296 64 
+  r3 = mul 0 1 64 
   br .for.body3.i30.us 
 .for.body3.i30.us:
-  r1 = mul r5 1 32 
-  r1 = add r4 r1 32 
+  r1 = mul r3 1 32 
+  r1 = add r5 r1 32 
   r2 = mul r7 1 64 
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   call write r1 
-  r1 = add r5 1 64 
-  r2 = icmp eq r1 r3 64 
-  r5 = mul r1 1 64 
+  r1 = add r3 1 64 
+  r2 = icmp eq r1 r4 64 
+  r3 = mul r1 1 64 
   br r2 .for.end.i32.us .for.body3.i30.us 
 .for.end.i32.us:
   r1 = add r6 1 32 

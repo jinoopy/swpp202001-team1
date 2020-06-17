@@ -10,8 +10,8 @@ start gcd 2:
   r2 = mul r4 1 64 
   br r1 .return .if.end3 
 .if.end3:
-  r3 = icmp ugt r4 r5 64 
-  br r3 .if.then5 .if.else 
+  r1 = icmp ugt r4 r5 64 
+  br r1 .if.then5 .if.else 
 .if.then5:
   r1 = urem r4 r5 64 
   r2 = mul r1 1 64 
@@ -44,8 +44,8 @@ start main 0:
   r2 = mul r4 1 64 
   br r1 .gcd.exit .if.end3.i 
 .if.end3.i:
-  r3 = icmp ugt r4 r5 64 
-  br r3 .if.then5.i .if.else.i 
+  r1 = icmp ugt r4 r5 64 
+  br r1 .if.then5.i .if.else.i 
 .if.then5.i:
   r1 = urem r4 r5 64 
   r2 = mul r1 1 64 

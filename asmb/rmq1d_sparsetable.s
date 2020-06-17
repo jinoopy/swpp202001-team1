@@ -180,44 +180,44 @@ start main 0:
   r4 = mul r2 1 64 
   br r1 .for.body .for.cond.cleanup 
 .while.body:
-  r8 = add r1 4294967295 32 
-  r7 = call read 
-  r2 = mul r7 1 32 
+  r9 = add r1 4294967295 32 
+  r8 = call read 
+  r2 = mul r8 1 32 
   r1 = call read 
-  r6 = add r1 1 32 
-  r4 = sub r6 r2 32 
-  r9 = mul 31 1 32 
+  r7 = add r1 1 32 
+  r5 = sub r7 r2 32 
+  r4 = mul 31 1 32 
   r2 = mul 0 1 32 
   br .for.body.i 
 .for.body.i:
-  r1 = shl 1 r9 32 
-  r1 = and r1 r4 32 
+  r1 = shl 1 r4 32 
+  r1 = and r1 r5 32 
   r1 = icmp eq r1 0 32 
-  r5 = mul r2 1 32 
+  r6 = mul r2 1 32 
   br r1 .if.end.i .count_leading_zeros.exit 
 .if.end.i:
   r2 = add r2 1 32 
-  r1 = add r9 4294967295 32 
+  r1 = add r4 4294967295 32 
   r3 = icmp eq r2 32 32 
-  r9 = mul r1 1 32 
-  r5 = mul 32 1 32 
+  r4 = mul r1 1 32 
+  r6 = mul 32 1 32 
   br r3 .count_leading_zeros.exit .for.body.i 
 .count_leading_zeros.exit:
   r2 = load 8 20480 16 
-  r1 = sub 31 r5 32 
+  r1 = sub 31 r6 32 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
   r4 = load 8 r1 0 
-  r1 = mul r7 4294967296 64 
+  r1 = mul r8 4294967296 64 
   r1 = sdiv r1 4294967296 64 
   r2 = mul r4 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
   r3 = load 4 r1 0 
-  r1 = lshr 2147483648 r5 32 
-  r1 = sub r6 r1 32 
+  r1 = lshr 2147483648 r6 32 
+  r1 = sub r7 r1 32 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
   r2 = mul r4 1 64 
@@ -229,8 +229,8 @@ start main 0:
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
   call write r1 
-  r2 = icmp eq r8 0 32 
-  r1 = mul r8 1 32 
+  r2 = icmp eq r9 0 32 
+  r1 = mul r9 1 32 
   br r2 .while.end .while.body 
 .while.end:
   ret 0 

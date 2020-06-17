@@ -1,1 +1,10 @@
-Runtime error at asmb/rmq2d_sparsetable.s:616: accessing non-allocated memory
+10
+0
+0
+0
+20
+0
+0
+30
+0
+40

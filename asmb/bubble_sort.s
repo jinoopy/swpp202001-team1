@@ -27,18 +27,18 @@ start sort 2:
   r1 = icmp eq arg1 0 64 
   br r1 .for.end15 .for.cond2.preheader.lr.ph 
 .for.cond2.preheader.lr.ph:
-  r7 = add arg1 18446744073709551615 64 
-  r8 = mul 0 1 64 
+  r8 = add arg1 18446744073709551615 64 
+  r7 = mul 0 1 64 
   br .for.cond2.preheader 
 .for.cond2.preheader:
-  r1 = icmp ugt r7 r8 64 
+  r1 = icmp ugt r8 r7 64 
   r3 = mul arg1 1 64 
-  r6 = mul r7 1 64 
+  r6 = mul r8 1 64 
   br r1 .for.body5 .for.cond.cleanup4 
 .for.cond.cleanup4:
-  r1 = add r8 1 64 
+  r1 = add r7 1 64 
   r2 = icmp eq r1 arg1 64 
-  r8 = mul r1 1 64 
+  r7 = mul r1 1 64 
   br r2 .for.end15 .for.cond2.preheader 
 .for.body5:
   r2 = mul arg2 1 64 
@@ -58,7 +58,7 @@ start sort 2:
   br .if.end13 
 .if.end13:
   r1 = add r6 18446744073709551615 64 
-  r2 = icmp ugt r1 r8 64 
+  r2 = icmp ugt r1 r7 64 
   r3 = mul r6 1 64 
   r6 = mul r1 1 64 
   br r2 .for.body5 .for.cond.cleanup4 
@@ -96,8 +96,8 @@ start main 0:
   r4 = mul 0 1 64 
   br .for.body.i 
 .for.cond2.i.preheader.lr.ph:
-  r7 = add r9 18446744073709551615 64 
-  r8 = mul 0 1 64 
+  r8 = add r9 18446744073709551615 64 
+  r7 = mul 0 1 64 
   br .for.cond2.i.preheader 
 .for.body.i:
   r3 = call read 
@@ -110,14 +110,14 @@ start main 0:
   r4 = mul r1 1 64 
   br r2 .for.cond2.i.preheader.lr.ph .for.body.i 
 .for.cond2.i.preheader:
-  r1 = icmp ugt r7 r8 64 
+  r1 = icmp ugt r8 r7 64 
   r3 = mul r9 1 64 
-  r6 = mul r7 1 64 
+  r6 = mul r8 1 64 
   br r1 .for.body5.i .for.cond.cleanup4.i 
 .for.cond.cleanup4.i:
-  r1 = add r8 1 64 
+  r1 = add r7 1 64 
   r2 = icmp eq r1 r9 64 
-  r8 = mul r1 1 64 
+  r7 = mul r1 1 64 
   r3 = mul 0 1 64 
   br r2 .for.body.i20 .for.cond2.i.preheader 
 .for.body5.i:
@@ -138,7 +138,7 @@ start main 0:
   br .if.end13.i 
 .if.end13.i:
   r1 = add r6 18446744073709551615 64 
-  r2 = icmp ugt r1 r8 64 
+  r2 = icmp ugt r1 r7 64 
   r3 = mul r6 1 64 
   r6 = mul r1 1 64 
   br r2 .for.body5.i .for.cond.cleanup4.i 

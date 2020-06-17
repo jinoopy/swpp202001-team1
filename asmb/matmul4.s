@@ -176,27 +176,27 @@ start matmul 4:
   r1 = mul r8 1 32 
   r1 = add r10 r1 32 
   r1 = mul r1 arg1 32 
-  r6 = add r1 r11 32 
-  r5 = mul r8 4 64 
-  r7 = mul 0 1 64 
+  r7 = add r1 r11 32 
+  r6 = mul r8 4 64 
+  r5 = mul 0 1 64 
   br .for.body6.i58.us 
 .for.body6.i58.us:
-  r1 = mul r7 1 32 
-  r1 = add r6 r1 32 
+  r1 = mul r5 1 32 
+  r1 = add r7 r1 32 
   r2 = mul arg4 1 64 
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
   r4 = load 8 r1 0 
-  r3 = add r7 r5 64 
+  r3 = add r5 r6 64 
   r2 = add sp 256 64 
   r1 = mul 0 128 64 
   r2 = add r2 r1 64 
   r1 = mul r3 8 64 
   r1 = add r2 r1 64 
   store 8 r4 r1 0 
-  r1 = add r7 1 64 
+  r1 = add r5 1 64 
   r2 = icmp eq r1 4 64 
-  r7 = mul r1 1 64 
+  r5 = mul r1 1 64 
   br r2 .for.end.i60.us .for.body6.i58.us 
 .for.end.i60.us:
   r1 = add r8 1 64 
@@ -205,23 +205,23 @@ start matmul 4:
   r9 = mul 0 1 64 
   br r2 .for.body.i25.us .for.body.i42.us 
 .for.body.i25.us:
-  r5 = mul r9 4 64 
-  r8 = mul 0 1 64 
+  r8 = mul r9 4 64 
+  r7 = mul 0 1 64 
   br .for.body6.i30.us 
 .for.body6.i30.us:
-  r7 = mul 0 1 64 
   r6 = mul 0 1 64 
+  r5 = mul 0 1 64 
   br .for.body11.i.us 
 .for.body11.i.us:
-  r3 = add r7 r5 64 
+  r3 = add r6 r8 64 
   r2 = add sp 128 64 
   r1 = mul 0 128 64 
   r2 = add r2 r1 64 
   r1 = mul r3 8 64 
   r1 = add r2 r1 64 
   r4 = load 8 r1 0 
-  r1 = mul r7 4 64 
-  r3 = add r1 r8 64 
+  r1 = mul r6 4 64 
+  r3 = add r1 r7 64 
   r2 = add sp 256 64 
   r1 = mul 0 128 64 
   r2 = add r2 r1 64 
@@ -229,23 +229,23 @@ start matmul 4:
   r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   r1 = mul r1 r4 64 
-  r4 = add r1 r6 64 
-  r1 = add r7 1 64 
+  r4 = add r1 r5 64 
+  r1 = add r6 1 64 
   r2 = icmp eq r1 4 64 
-  r6 = mul r4 1 64 
-  r7 = mul r1 1 64 
+  r5 = mul r4 1 64 
+  r6 = mul r1 1 64 
   br r2 .for.end.i37.us .for.body11.i.us 
 .for.end.i37.us:
-  r3 = add r8 r5 64 
+  r3 = add r7 r8 64 
   r2 = add sp 0 64 
   r1 = mul 0 128 64 
   r2 = add r2 r1 64 
   r1 = mul r3 8 64 
   r1 = add r2 r1 64 
   store 8 r4 r1 0 
-  r1 = add r8 1 64 
+  r1 = add r7 1 64 
   r2 = icmp eq r1 4 64 
-  r8 = mul r1 1 64 
+  r7 = mul r1 1 64 
   br r2 .for.end30.i.us .for.body6.i30.us 
 .for.end30.i.us:
   r1 = add r9 1 64 
@@ -254,32 +254,32 @@ start matmul 4:
   r7 = mul 0 1 64 
   br r2 .for.body.i5.us .for.body.i25.us 
 .for.body.i5.us:
-  r5 = mul r7 4 64 
+  r6 = mul r7 4 64 
   r1 = mul r7 1 32 
   r1 = add r12 r1 32 
   r1 = mul r1 arg1 32 
-  r4 = add r1 r11 32 
-  r6 = mul 0 1 64 
+  r5 = add r1 r11 32 
+  r4 = mul 0 1 64 
   br .for.body6.i19.us 
 .for.body6.i19.us:
-  r3 = add r6 r5 64 
+  r3 = add r4 r6 64 
   r2 = add sp 0 64 
   r1 = mul 0 128 64 
   r2 = add r2 r1 64 
   r1 = mul r3 8 64 
   r1 = add r2 r1 64 
   r3 = load 8 r1 0 
-  r1 = mul r6 1 32 
-  r1 = add r4 r1 32 
+  r1 = mul r4 1 32 
+  r1 = add r5 r1 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
   r2 = add r2 r1 64 
   r1 = load 8 r2 0 
   r1 = add r1 r3 64 
   store 8 r1 r2 0 
-  r1 = add r6 1 64 
+  r1 = add r4 1 64 
   r2 = icmp eq r1 4 64 
-  r6 = mul r1 1 64 
+  r4 = mul r1 1 64 
   br r2 .for.end.i20.us .for.body6.i19.us 
 .for.end.i20.us:
   r1 = add r7 1 64 
@@ -438,21 +438,21 @@ start main 0:
   r6 = mul 0 1 32 
   br r9 .cleanup .for.cond1.i24.preheader.us 
 .for.cond1.i24.preheader.us:
-  r4 = mul r6 r11 32 
-  r3 = urem r12 4294967296 64 
-  r5 = mul 0 1 64 
+  r5 = mul r6 r11 32 
+  r4 = urem r12 4294967296 64 
+  r3 = mul 0 1 64 
   br .for.body3.i30.us 
 .for.body3.i30.us:
-  r1 = mul r5 1 32 
-  r1 = add r4 r1 32 
+  r1 = mul r3 1 32 
+  r1 = add r5 r1 32 
   r2 = mul r7 1 64 
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
   r1 = load 8 r1 0 
   call write r1 
-  r1 = add r5 1 64 
-  r2 = icmp eq r1 r3 64 
-  r5 = mul r1 1 64 
+  r1 = add r3 1 64 
+  r2 = icmp eq r1 r4 64 
+  r3 = mul r1 1 64 
   br r2 .for.end.i32.us .for.body3.i30.us 
 .for.end.i32.us:
   r1 = add r6 1 32 

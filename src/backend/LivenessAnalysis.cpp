@@ -121,26 +121,21 @@ vector<vector<bool>> RegisterGraph::LiveInterval(Module &M)
                 result.push_back(live[&I]);
             }
 
-            //Additionally, oprand for terminators and phi nodes should be marked
             Instruction* term = BB.getTerminator();
-            
-            Value* condition;
-            if(isa<BranchInst>(term) && dyn_cast<BranchInst>(term)->isConditional()) condition = dyn_cast<BranchInst>(term)->getCondition();
-            else if(isa<SwitchInst>(term)) condition = dyn_cast<SwitchInst>(term)->getCondition();
-            if(condition && findValue(condition) != -1){ //if branches,
-                vector<bool> PhiTerm(N);
-                //the branching condition should be live.
-                PhiTerm[findValue(condition)] = true;
-                for(BasicBlock* succ : successors(&BB)) {
-                    for(PHINode& phi : succ->phis()) {
-                        Value* incomeV = phi.getIncomingValueForBlock(&BB);
-                        if(incomeV && findValue(&phi) != -1) {
-                            PhiTerm[findValue(&phi)] = true;
-                        }
+            //Vector for storing liveness after terminator, before successor
+            vector<bool> PhiTerm = live[term];
+            for(BasicBlock* succ : successors(&BB)) {
+                for(PHINode& phi : succ->phis()) {
+                    assert(findValue(&phi) != -1 && "phi term should be live.");
+                    PhiTerm[findValue(&phi)] = true;
+                    //if incoming value is not used after phi, mark it as dead
+                    Value* incomeV = phi.getIncomingValueForBlock(&BB);
+                    if(findValue(incomeV) != -1 && !live[&phi][findValue(incomeV)]) {
+                        PhiTerm[findValue(incomeV)] = false;
                     }
                 }
-                result.push_back(PhiTerm);
             }
+            result.push_back(PhiTerm);
         }
     }
 
