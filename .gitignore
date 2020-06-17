@@ -1,0 +1,8 @@
+.vscode
+asmb
+lib
+test
+sf-interpreter.log
+sf-interpreter-cost.log
+backend
+.test.s
