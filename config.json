@@ -122,7 +122,6 @@
             "vectorize"
         ],
         "cleanup": [
-            "simplifycfg",
             "gvn",
             "dce",
             "sccp",

@@ -9,7 +9,14 @@ end malloc_upto_8
 start min 2:
 .entry:
   r1 = icmp slt arg1 arg2 32 
-  r1 = select r1 arg1 arg2 
+  br r1 .cond.true .cond.false 
+.cond.true:
+  r1 = mul arg1 1 32 
+  br .cond.end 
+.cond.false:
+  r1 = mul arg2 1 32 
+  br .cond.end 
+.cond.end:
   ret r1 
 end min
 
@@ -20,12 +27,16 @@ start count_leading_zeros 1:
   br .for.cond 
 .for.cond:
   r1 = icmp sgt r3 4294967295 32 
-  br r1 .for.body .cleanup 
+  br r1 .for.body .for.cond.cleanup 
+.for.cond.cleanup:
+  br .cleanup 
 .for.body:
   r1 = shl 1 r3 32 
   r1 = and r1 arg1 32 
   r1 = icmp eq r1 0 32 
-  br r1 .if.end .cleanup 
+  br r1 .if.end .if.then 
+.if.then:
+  br .cleanup 
 .if.end:
   r2 = add r2 1 32 
   r1 = add r3 4294967295 32 
@@ -126,87 +137,105 @@ start preprocess 0:
   r2 = load 8 r1 0 
   r1 = call A 0 0 
   store 8 r2 r1 0 
-  r3 = mul 0 1 32 
+  r4 = mul 0 1 32 
   br .for.cond 
 .for.cond:
-  r1 = load 4 20480 40 
-  r2 = icmp sgt r3 r1 32 
-  r4 = mul 0 1 32 
-  r12 = mul 0 1 32 
-  br r2 .for.cond27 .for.cond8 
+  r2 = load 4 20480 40 
+  r1 = icmp sgt r4 r2 32 
+  br r1 .for.end26 .for.body 
+.for.body:
+  r3 = mul 0 1 32 
+  br .for.cond8 
 .for.cond8:
   r1 = load 4 20480 32 
-  r1 = icmp sgt r4 r1 32 
+  r1 = icmp sgt r3 r1 32 
   br r1 .for.end .for.body11 
 .for.body11:
-  r2 = icmp eq r3 0 32 
   r1 = icmp eq r4 0 32 
-  r1 = mul r2 r1 1 
-  br r1 .for.inc .if.end 
+  br r1 .land.lhs.true .if.end 
+.land.lhs.true:
+  r1 = icmp eq r3 0 32 
+  br r1 .if.then .if.end 
+.if.then:
+  br .for.inc 
 .if.end:
-  r1 = call height r3 
+  r1 = call height r4 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
   r2 = mul r1 4 64 
-  r1 = call width r4 
+  r1 = call width r3 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
   r1 = mul r2 r1 64 
   r2 = call malloc_upto_8 r1 
-  r1 = call A r3 r4 
+  r1 = call A r4 r3 
   store 8 r2 r1 0 
   br .for.inc 
 .for.inc:
-  r1 = add r4 1 32 
-  r4 = mul r1 1 32 
-  br .for.cond8 
-.for.end:
   r1 = add r3 1 32 
   r3 = mul r1 1 32 
+  br .for.cond8 
+.for.end:
+  r1 = add r4 1 32 
+  r4 = mul r1 1 32 
   br .for.cond 
-.for.cond27:
-  r1 = icmp sgt r12 r1 32 
+.for.end26:
+  r1 = mul r2 1 32 
   r11 = mul 0 1 32 
-  br r1 .for.end112 .for.cond31 
+  br .for.cond27 
+.for.cond27:
+  r1 = icmp sgt r11 r1 32 
+  br r1 .for.end112 .for.body30 
+.for.body30:
+  r10 = mul 0 1 32 
+  br .for.cond31 
 .for.cond31:
   r1 = load 4 20480 32 
-  r1 = icmp sgt r11 r1 32 
+  r1 = icmp sgt r10 r1 32 
   br r1 .for.end109 .for.body34 
 .for.body34:
-  r1 = icmp eq r12 0 32 
-  r9 = icmp eq r11 0 32 
-  r1 = mul r1 r9 1 
-  br r1 .for.inc107 .if.end41 
+  r1 = icmp eq r11 0 32 
+  br r1 .land.lhs.true37 .if.end41 
+.land.lhs.true37:
+  r1 = icmp eq r10 0 32 
+  br r1 .if.then40 .if.end41 
+.if.then40:
+  br .for.inc107 
 .if.end41:
-  r1 = call A r12 r11 
-  r10 = load 8 r1 0 
-  r7 = mul 0 1 32 
+  r1 = call A r11 r10 
+  r9 = load 8 r1 0 
+  r8 = mul 0 1 32 
   br .for.cond43 
 .for.cond43:
-  r1 = call height r12 
-  r1 = icmp slt r7 r1 32 
-  r6 = mul 0 1 32 
-  br r1 .for.cond48 .for.inc107 
+  r1 = call height r11 
+  r1 = icmp slt r8 r1 32 
+  br r1 .for.body47 .for.cond.cleanup 
+.for.cond.cleanup:
+  br .for.inc107 
+.for.body47:
+  r7 = mul 0 1 32 
+  br .for.cond48 
 .for.cond48:
-  r1 = call width r11 
-  r1 = icmp slt r6 r1 32 
+  r1 = call width r10 
+  r1 = icmp slt r7 r1 32 
   br r1 .for.body53 .for.cond.cleanup52 
 .for.cond.cleanup52:
-  r1 = add r7 1 32 
-  r7 = mul r1 1 32 
+  r1 = add r8 1 32 
+  r8 = mul r1 1 32 
   br .for.cond43 
 .for.body53:
-  br r9 .if.else .if.then56 
+  r1 = icmp eq r10 0 32 
+  br r1 .if.else .if.then56 
 .if.then56:
-  r5 = add r11 4294967295 32 
-  r1 = call A r12 r5 
-  r8 = load 8 r1 0 
+  r5 = add r10 4294967295 32 
+  r1 = call A r11 r5 
+  r6 = load 8 r1 0 
   r1 = call width r5 
-  r1 = mul r1 r7 32 
-  r4 = add r1 r6 32 
+  r1 = mul r1 r8 32 
+  r4 = add r1 r7 32 
   r1 = mul r4 4294967296 64 
   r1 = sdiv r1 4294967296 64 
-  r2 = mul r8 1 64 
+  r2 = mul r6 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
   r3 = load 4 r1 0 
@@ -214,69 +243,69 @@ start preprocess 0:
   r1 = add r4 r1 32 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
-  r2 = mul r8 1 64 
+  r2 = mul r6 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
   r1 = load 4 r1 0 
   r3 = call min r3 r1 
-  r1 = call width r11 
-  r1 = mul r1 r7 32 
-  r1 = add r1 r6 32 
+  r1 = call width r10 
+  r1 = mul r1 r8 32 
+  r1 = add r1 r7 32 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
-  r2 = mul r10 1 64 
+  r2 = mul r9 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
   store 4 r3 r1 0 
   br .if.end100 
 .if.else:
-  r4 = add r12 4294967295 32 
-  r1 = call A r4 0 
-  r5 = load 8 r1 0 
-  r1 = call height r4 
+  r3 = add r11 4294967295 32 
+  r1 = call A r3 0 
+  r4 = load 8 r1 0 
+  r1 = call height r3 
   r1 = call width 0 
-  r1 = mul r1 r7 32 
-  r1 = add r1 r6 32 
+  r1 = mul r1 r8 32 
+  r1 = add r1 r7 32 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
-  r2 = mul r5 1 64 
+  r2 = mul r4 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
-  r3 = load 4 r1 0 
-  r1 = shl 1 r4 32 
-  r2 = add r7 r1 32 
+  r5 = load 4 r1 0 
+  r1 = shl 1 r3 32 
+  r2 = add r8 r1 32 
   r1 = call width 0 
   r1 = mul r1 r2 32 
-  r1 = add r1 r6 32 
+  r1 = add r1 r7 32 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
-  r2 = mul r5 1 64 
+  r2 = mul r4 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
   r1 = load 4 r1 0 
-  r3 = call min r3 r1 
+  r3 = call min r5 r1 
   r1 = call width 0 
-  r1 = mul r1 r7 32 
-  r1 = add r1 r6 32 
+  r1 = mul r1 r8 32 
+  r1 = add r1 r7 32 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
-  r2 = mul r10 1 64 
+  r2 = mul r9 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
   store 4 r3 r1 0 
   br .if.end100 
 .if.end100:
-  r1 = add r6 1 32 
-  r6 = mul r1 1 32 
+  r1 = add r7 1 32 
+  r7 = mul r1 1 32 
   br .for.cond48 
 .for.inc107:
-  r1 = add r11 1 32 
-  r11 = mul r1 1 32 
+  r1 = add r10 1 32 
+  r10 = mul r1 1 32 
   br .for.cond31 
 .for.end109:
-  r1 = add r12 1 32 
+  r1 = add r11 1 32 
   r2 = load 4 20480 40 
-  r12 = mul r1 1 32 
+  r11 = mul r1 1 32 
   r1 = mul r2 1 32 
   br .for.cond27 
 .for.end112:
@@ -311,16 +340,18 @@ start main 0:
 .for.cond:
   r1 = load 4 20480 16 
   r1 = icmp slt r4 r1 32 
-  r3 = mul 0 1 32 
-  br r1 .for.cond8 .for.cond.cleanup 
+  br r1 .for.body .for.cond.cleanup 
 .for.cond.cleanup:
   call preprocess 
   r1 = call read 
   r2 = mul r1 1 32 
   br .while.cond 
+.for.body:
+  r2 = mul 0 1 32 
+  br .for.cond8 
 .for.cond8:
   r1 = load 4 20480 8 
-  r1 = icmp slt r3 r1 32 
+  r1 = icmp slt r2 r1 32 
   br r1 .for.body12 .for.cond.cleanup11 
 .for.cond.cleanup11:
   r1 = add r4 1 32 
@@ -328,11 +359,11 @@ start main 0:
   br .for.cond 
 .for.body12:
   r1 = call read 
-  r2 = mul r1 1 32 
-  r1 = call input r4 r3 
-  store 4 r2 r1 0 
-  r1 = add r3 1 32 
   r3 = mul r1 1 32 
+  r1 = call input r4 r2 
+  store 4 r3 r1 0 
+  r1 = add r2 1 32 
+  r2 = mul r1 1 32 
   br .for.cond8 
 .while.cond:
   r1 = icmp eq r2 0 32 
