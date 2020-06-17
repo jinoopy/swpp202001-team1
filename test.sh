@@ -37,22 +37,22 @@ if [[ "$1" == "run" || "$1" == "all" ]]; then
 		exit 0
 	fi
 	test "binary_tree"				#wrong answer
-	# test "bitcount1"
-	# test "bitcount2"
-	# test "bitcount3"
-	# test "bitcount4"
-	# test "bitcount5"
-	# test "bubble_sort" 		
-	# test "collatz"
-	# test "gcd"
-	# test "matmul1"
-	# test "matmul2"
-	test "matmul3"					#wrong answer
-	# test "matmul4"
-	test "prime"					#infinite loop
-	# test "rmq1d_naive"
-	# test "rmq1d_sparsetable"
-	# test "rmq2d_naive"
+	test "bitcount1"
+	test "bitcount2"
+	test "bitcount3"
+	test "bitcount4"
+	test "bitcount5"
+	test "bubble_sort" 		
+	test "collatz"
+	test "gcd"
+	test "matmul1"
+	test "matmul2"
+	test "matmul3"					
+	test "matmul4"
+	# test "prime"					#infinite loop
+	test "rmq1d_naive"
+	test "rmq1d_sparsetable"
+	test "rmq2d_naive"
 	test "rmq2d_sparsetable"		#lots of memory error
 									#if remove 'instcombine', pass 3/5 testcases
 	echo "----- end -----"
