@@ -143,7 +143,6 @@
             "memory-optim",
             "inst-optim",
             "loop-optim-1",
-            "inst-optim",
             "loop-optim-2",
             "inst-optim",
             "cleanup"
@@ -151,8 +150,6 @@
         "backend": [
             "constexpr",
             "gep-unpack",
-            "power-reduc",
-            "instcombine",
             "power-reduc",
             "constexpr",
             "addrcast",
