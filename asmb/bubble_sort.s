@@ -10,8 +10,8 @@ start get_inputs 1:
   r4 = mul 0 1 64 
   br .for.cond 
 .for.cond:
-  r1 = icmp eq r4 arg1 64 
-  br r1 .for.cond.cleanup .for.body 
+  r1 = icmp ult r4 arg1 64 
+  br r1 .for.body .for.cond.cleanup 
 .for.cond.cleanup:
   r1 = mul r5 1 64 
   br .return 
@@ -38,8 +38,8 @@ start sort 2:
   r6 = mul 0 1 64 
   br .for.cond 
 .for.cond:
-  r1 = icmp eq r6 arg1 64 
-  br r1 .for.cond.cleanup .for.body 
+  r1 = icmp ult r6 arg1 64 
+  br r1 .for.body .for.cond.cleanup 
 .for.cond.cleanup:
   br .for.end15 
 .for.body:
@@ -86,8 +86,8 @@ start put_inputs 2:
   r2 = mul 0 1 64 
   br .for.cond 
 .for.cond:
-  r1 = icmp eq r2 arg1 64 
-  br r1 .for.cond.cleanup .for.body 
+  r1 = icmp ult r2 arg1 64 
+  br r1 .for.body .for.cond.cleanup 
 .for.cond.cleanup:
   br .for.end 
 .for.body:

@@ -1,11 +1,14 @@
 start collatz 2:
 .entry:
-  r1 = mul arg2 1 64 
+  r3 = mul arg2 1 32 
+  br .tailrecurse 
+.tailrecurse:
+  r1 = mul r3 1 64 
   call write r1 
-  r1 = icmp ult arg2 2 32 
+  r1 = icmp ult r3 2 32 
   br r1 .if.then .if.end 
 .if.then:
-  r1 = mul arg2 1 32 
+  r1 = mul r3 1 32 
   br .return 
 .if.end:
   r2 = load 2 arg1 0 
@@ -17,19 +20,19 @@ start collatz 2:
 .if.end6:
   r1 = add r2 1 16 
   store 2 r1 arg1 0 
-  r1 = urem arg2 2 32 
+  r1 = urem r3 2 32 
   r1 = icmp eq r1 0 32 
   br r1 .cond.true .cond.false 
 .cond.true:
-  r1 = udiv arg2 2 32 
+  r1 = udiv r3 2 32 
   br .cond.end 
 .cond.false:
-  r1 = mul arg2 3 32 
+  r1 = mul r3 3 32 
   r1 = add r1 1 32 
   br .cond.end 
 .cond.end:
-  r1 = call collatz arg1 r1 
-  br .return 
+  r3 = mul r1 1 32 
+  br .tailrecurse 
 .return:
   ret r1 
 end collatz

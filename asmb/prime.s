@@ -12,7 +12,6 @@ start check_with_primes 1:
   r1 = icmp ugt r1 arg1 64 
   br r1 .if.then .if.end 
 .if.then:
-  r1 = mul r3 1 64 
   r2 = mul 3 1 32 
   br .cleanup 
 .if.end:
@@ -20,7 +19,6 @@ start check_with_primes 1:
   r1 = icmp eq r1 0 64 
   br r1 .if.then3 .if.end4 
 .if.then3:
-  r1 = mul r3 1 64 
   r2 = mul 1 1 32 
   br .cleanup 
 .if.end4:
@@ -28,18 +26,16 @@ start check_with_primes 1:
   r1 = mul 1 8 64 
   r1 = add r2 r1 64 
   r1 = load 8 r1 0 
+  r3 = mul r1 1 64 
   r2 = mul 0 1 32 
   br .cleanup 
 .cleanup:
-switch r2 0 .cleanup.cont 3 .while.end .cleanup5.loopexit
+  r1 = mul 0 1 64 
+switch r2 0 .cleanup.cont 3 .while.end .cleanup5
 .cleanup.cont:
-  r3 = mul r1 1 64 
   br .while.cond 
 .while.end:
   r1 = mul 1 1 64 
-  br .cleanup5 
-.cleanup5.loopexit:
-  r1 = mul 0 1 64 
   br .cleanup5 
 .cleanup5:
   ret r1 
@@ -60,41 +56,39 @@ start add_primes 1:
   r1 = icmp eq r1 0 64 
   br r1 .if.end5 .if.then 
 .if.then:
-  r4 = malloc 16 
-  r1 = mul r4 1 64 
-  r5 = load 8 20480 8 
-  store 8 r5 r1 0 
-  r2 = mul r4 1 64 
+  r5 = malloc 16 
+  r1 = mul r5 1 64 
+  r4 = load 8 20480 8 
+  store 8 r4 r1 0 
+  r2 = mul r5 1 64 
   r1 = mul 8 1 64 
   r1 = add r2 r1 64 
   store 8 0 r1 0 
-  r3 = mul r4 1 64 
+  r3 = mul r5 1 64 
   r2 = load 8 20480 16 
   r1 = mul 1 8 64 
   r1 = add r2 r1 64 
   store 8 r3 r1 0 
   r1 = add 20480 16 64 
-  store 8 r4 r1 0 
-  r1 = urem arg1 r5 64 
+  store 8 r5 r1 0 
+  r1 = urem arg1 r4 64 
   r1 = icmp eq r1 0 64 
   br r1 .if.then4 .if.end 
 .if.then4:
-  r1 = mul 1 1 1 
+  r2 = mul 1 1 1 
   br .cleanup 
 .if.end:
-  r1 = mul 0 1 1 
+  r2 = mul 0 1 1 
   br .cleanup 
 .cleanup:
-switch r1 0 .cleanup.cont 1 .return.loopexit .unreachable
+  r1 = mul 0 1 64 
+switch r2 0 .cleanup.cont 1 .return .unreachable
 .cleanup.cont:
   br .if.end5 
 .if.end5:
   br .while.cond 
 .while.end:
   r1 = mul 1 1 64 
-  br .return 
-.return.loopexit:
-  r1 = mul 0 1 64 
   br .return 
 .return:
   ret r1 

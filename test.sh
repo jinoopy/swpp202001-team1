@@ -49,7 +49,7 @@ if [[ "$1" == "run" || "$1" == "all" ]]; then
 	test "matmul2"
 	test "matmul3"					
 	test "matmul4"
-	test "prime"					#infinite loop
+	test "prime"					
 	test "rmq1d_naive"
 	test "rmq1d_sparsetable"
 	test "rmq2d_naive"

@@ -48,11 +48,11 @@ start main 0:
   r1 = mul 0 4 64 
   r1 = add r2 r1 64 
   store 4 0 r1 0 
-  r5 = mul 0 1 64 
+  r5 = mul 0 1 32 
   br .for.cond 
 .for.cond:
-  r1 = icmp eq r5 256 64 
-  br r1 .for.cond.cleanup .for.body 
+  r1 = icmp ult r5 256 32 
+  br r1 .for.body .for.cond.cleanup 
 .for.cond.cleanup:
   r1 = call read 
   r1 = call countSetBits r1 
@@ -61,25 +61,24 @@ start main 0:
   call write r1 
   ret 0 
 .for.body:
-  r1 = mul r5 1 32 
-  r4 = urem r1 2 32 
-  r1 = udiv r5 2 64 
-  r3 = urem r1 2147483648 64 
+  r3 = urem r5 2 32 
+  r4 = udiv r5 2 32 
+  r2 = add 20480 0 64 
+  r1 = mul 0 1024 64 
+  r2 = add r2 r1 64 
+  r1 = mul r4 4 64 
+  r1 = add r2 r1 64 
+  r1 = load 4 r1 0 
+  r4 = add r1 r3 32 
+  r3 = mul r5 1 64 
   r2 = add 20480 0 64 
   r1 = mul 0 1024 64 
   r2 = add r2 r1 64 
   r1 = mul r3 4 64 
   r1 = add r2 r1 64 
-  r1 = load 4 r1 0 
-  r3 = add r1 r4 32 
-  r2 = add 20480 0 64 
-  r1 = mul 0 1024 64 
-  r2 = add r2 r1 64 
-  r1 = mul r5 4 64 
-  r1 = add r2 r1 64 
-  store 4 r3 r1 0 
-  r1 = add r5 1 64 
-  r5 = mul r1 1 64 
+  store 4 r4 r1 0 
+  r1 = add r5 1 32 
+  r5 = mul r1 1 32 
   br .for.cond 
 end main
 

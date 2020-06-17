@@ -122,6 +122,7 @@
             "vectorize"
         ],
         "cleanup": [
+            "simplifycfg",
             "gvn",
             "dce",
             "sccp",
@@ -135,9 +136,6 @@
             "function-optim",
             "inst-optim",
             "memory-optim",
-            "inst-optim",
-            "loop-optim-1",
-            "loop-optim-2",
             "inst-optim",
             "cleanup"
         ],

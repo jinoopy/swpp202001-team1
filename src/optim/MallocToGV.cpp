@@ -17,23 +17,23 @@ PreservedAnalyses MallocToGVPass::run(Module &M, ModuleAnalysisManager &MAM)
     for (Instruction &I : FMain->getEntryBlock())
     {
         CallInst *cI = dyn_cast<CallInst>(&I);
-        if (cI != nullptr && cI->getCalledFunction()->getName() == "malloc")
+        if (cI && cI->getName().contains("gv") && cI->getCalledFunction()->getName() == "malloc")
         {
             //final pointer passed to other functions
             Instruction* malloc = cI;
             //Bitcast instruction which transforms the type of malloc.
             //if no bitcast instruction performed, value of malloc() is used directly
             Instruction *bcI = getMallocType(cI);
-            if(bcI != nullptr) {
+            if(bcI) {
                 malloc = bcI;
             }
             PointerType *T = dyn_cast<PointerType>(malloc->getType());
-            assert(T != nullptr && "return of malloc should be a pointer");
+            assert(T && "return of malloc should be a pointer");
 
             //Save instruction which stores the initial value.
             StoreInst *stI = getMallocInitVal(malloc);
-            Constant *initVal = stI != nullptr ? dyn_cast<Constant>(stI->getValueOperand()) : Constant::getNullValue(T->getElementType());
-            if(stI != nullptr) stI->eraseFromParent();
+            Constant *initVal = stI ? dyn_cast<Constant>(stI->getValueOperand()) : Constant::getNullValue(T->getElementType());
+            if(stI) stI->eraseFromParent();
 
             //create corresponding GV
             GlobalVariable *GV = new GlobalVariable(
