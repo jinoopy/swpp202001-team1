@@ -47,7 +47,7 @@ protected:
 
 TEST_F(GVToMallocTest, Test1) {     // This test case has two global variables and two functions (main, foo).
     parseAssembly("test-ir/input1.ll");
-    GVToMalloc pass;
+    GVToMallocPass pass;
     pass.run(*M , MAM);
 
     M->print(outs(), nullptr);
@@ -57,7 +57,7 @@ TEST_F(GVToMallocTest, Test1) {     // This test case has two global variables a
 
 TEST_F(GVToMallocTest, Test2) {     // This test case has one global variable and two functions (main, foo).
     parseAssembly("test-ir/input2.ll");
-    GVToMalloc pass;
+    GVToMallocPass pass;
     pass.run(*M , MAM);
 
     M->print(outs(), nullptr);
@@ -67,7 +67,17 @@ TEST_F(GVToMallocTest, Test2) {     // This test case has one global variable an
 
 TEST_F(GVToMallocTest, Test3) {     // This test case has one global variable and one function (main).
     parseAssembly("test-ir/input3.ll");
-    GVToMalloc pass;
+    GVToMallocPass pass;
+    pass.run(*M , MAM);
+
+    M->print(outs(), nullptr);
+    
+    EXPECT_EQ(0, 0);
+}
+
+TEST_F(GVToMallocTest, Test4) {     // This test case has one global variable and one function (main).
+    parseAssembly("../../swpp202001-test/rmq2d_sparsetable/src/rmq2d_sparsetable.ll");
+    GVToMallocPass pass;
     pass.run(*M , MAM);
 
     M->print(outs(), nullptr);

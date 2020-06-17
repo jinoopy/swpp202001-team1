@@ -5,7 +5,7 @@ using namespace std;
 
 namespace optim
 {
-    PreservedAnalyses GVToMalloc::run(Module &M, ModuleAnalysisManager &MAM)
+    PreservedAnalyses GVToMallocPass::run(Module &M, ModuleAnalysisManager &MAM)
     {
         auto &Context = M.getContext();
 
@@ -13,33 +13,35 @@ namespace optim
         int m_index = 0;
         vector<Value *> malloc;
 
-        auto *MallocFTy = FunctionType::get(Type::getInt8PtrTy(Context), {Type::getInt64Ty(Context)}, false); // make malloc function
-        Function *MallocF = Function::Create(MallocFTy, Function::ExternalLinkage,
+        Function *MallocF = M.getFunction("malloc");
+        if(MallocF == nullptr)
+        {
+            auto *MallocFTy = FunctionType::get(Type::getInt8PtrTy(Context), {Type::getInt64Ty(Context)}, false); // make malloc function
+            MallocF = Function::Create(MallocFTy, Function::ExternalLinkage,
                                              "malloc", M);
-        MallocF->addFnAttr(Attribute::OptimizeNone);
-        MallocF->addFnAttr(Attribute::NoInline);
-
+        }
+        
         for (auto gv = GVs.begin(); gv != GVs.end(); gv++)
         {
+				gv->dump();
             auto type = gv->getValueType();
             if(type->getTypeID() != 11) continue;
-            auto *value = gv->getInitializer();
+            Constant *value = nullptr;
+            if(gv->hasInitializer()) value = gv->getInitializer();
             malloc.push_back(MakeNewMalloc(M, Context, MallocF, type, value, m_index));
             m_index++;
         }
         // replace call instruction with new arguments.
+
+        if(m_index==0) return PreservedAnalyses::all();
 
         vector<Function *> old_functions;
         vector<Function *> new_functions;
         map<Function *, Function *> fMap; // By using fMap, we can call the new function(arguments changed function).
         for (auto &f : M.functions())
         {
-            //if(f.getLinkage() == Function::ExternalLinkage)
-            //if(f.getFnAttribute(Attribute::OptimizeNone) != nullptr){
-            if (DO_NOT_CONSIDER.find(f.getName()) == DO_NOT_CONSIDER.end())
-            {
-                old_functions.push_back(&f);
-            }
+            if(f.isDeclaration()) continue;
+            old_functions.push_back(&f);
         }
 
         for (auto &f : old_functions)
@@ -55,17 +57,31 @@ namespace optim
             }
         }
 
-        int i = 0;
-        for (auto &f : old_functions)
+		int i = 0;
+		while(old_functions.size() > 1) {
+			vector<Function *> FV;
+        	for (auto &f : old_functions) {
+				if (f->getName() != "main" && f->use_empty()) {
+					f->eraseFromParent();
+					FV.push_back(f);
+				}
+			}
+			for(auto &it : FV) {
+				for(auto vecIt = old_functions.begin(); vecIt != old_functions.end(); vecIt++) {
+					if(*vecIt == it) {
+						old_functions.erase(vecIt);
+						break;
+					}
+				}
+			}
+		}
+
+        for (auto gv = GVs.begin(); gv != GVs.end(); gv++) // every gv,
         {
-            if (f->getName() != "main")
-                f->eraseFromParent();
-        }
-        for (auto gv = GVs.begin(); gv != GVs.end(); gv++, i++) // every gv,
-        {
-            if(gv->getValueType()->getTypeID() != 11) continue;
+            if(gv->getValueType()->getTypeID() != 11 || gv->use_empty()) continue;
             for (Function &F : M)
             {
+                if(F.isDeclaration()) continue;
                 auto isWithinFn = [&](Use &u) {
                     return dyn_cast<Instruction>(u.getUser())->getFunction() == &F;
                 };
@@ -88,14 +104,15 @@ namespace optim
                 }
                 gv->replaceUsesWithIf(replaceV, isWithinFn);
             }
+            i++;
         }
 
         return PreservedAnalyses::all();
     }
 
-    Value *GVToMalloc::MakeNewMalloc(Module &M, LLVMContext &Context, Function *MallocF, Type *type, llvm::Constant *value, int m_index)
+    Value *GVToMallocPass::MakeNewMalloc(Module &M, LLVMContext &Context, Function *MallocF, Type *type, llvm::Constant *value, int m_index)
     {
-        auto size = type->getScalarSizeInBits();
+        auto size = (type->getScalarSizeInBits())/8;
 
         auto main = M.getFunction("main"); // get main function for inserting malloc instruction.
         BasicBlock &Entry = main->getEntryBlock();
@@ -106,17 +123,19 @@ namespace optim
 
         Value *bitCast = builder.CreateBitCast(malloc, type->getPointerTo(), "gv" + std::to_string(m_index)); // %gv1 = bitcast i8* %ma1 to type*
 
-        auto constInt_value = dyn_cast<ConstantInt>(value); // getting The real value in C++ integer type not llvm value type.
-        int64_t init_value = constInt_value->getSExtValue();
-        if (init_value != 0)
-        {
-            auto *store = builder.CreateStore(value, bitCast); // initialize the variable as the original value if it was initialized with some value.
+        if(value) {
+            auto constInt_value = dyn_cast<ConstantInt>(value); // getting The real value in C++ integer type not llvm value type.
+            int64_t init_value = constInt_value->getSExtValue();
+            if (init_value != 0)
+            {
+                auto *store = builder.CreateStore(value, bitCast); // initialize the variable as the original value if it was initialized with some value.
+            }
         }
         return bitCast;
     }
 
     // get all the malloc variables And add them as new arguments in function.
-    Function &GVToMalloc::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
+    Function &GVToMallocPass::AddArgumentsToFunctionDef(Module &M, LLVMContext &Context, Function &f, vector<Value *> malloc)
     {
         if (f.getName() == "main")
         {
@@ -137,7 +156,7 @@ namespace optim
 
             FunctionType *NFTy = FunctionType::get(FTy->getReturnType(), Params, false);
             Function *NewFunc = Function::Create(NFTy, f.getLinkage(), f.getAddressSpace(), f.getName(), f.getParent()); // RecreateFunction(&f, NFTy);
-            auto VMap = ValueToValueMapTy();
+            ValueToValueMapTy VMap;
             Function::arg_iterator DestI = NewFunc->arg_begin();
             for (const Argument &I : f.args()) // set the name of original arguments to original name.
             {
@@ -154,7 +173,7 @@ namespace optim
         }
     }
 
-    void GVToMalloc::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
+    void GVToMallocPass::AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc)
     {
         for (auto &BB : f)
         {
@@ -163,7 +182,7 @@ namespace optim
                 CallInst *cI = dyn_cast<CallInst>(&*I);
                 if (cI != nullptr)
                 {
-                    if (DO_NOT_CONSIDER.find(cI->getCalledFunction()->getName()) != DO_NOT_CONSIDER.end())
+                    if (cI->getCalledFunction()->isDeclaration() || fMap.find(cI->getCalledFunction()) == fMap.end())
                     {
                         ++I;
                         continue;

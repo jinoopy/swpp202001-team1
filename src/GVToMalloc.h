@@ -7,6 +7,7 @@
 #include "llvm/IR/PassManager.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/ValueMap.h"
 #include "llvm/Transforms/Utils/Cloning.h"
 
 #include "llvm/Analysis/PostDominators.h"
@@ -24,7 +25,7 @@ using namespace llvm;
 using namespace std;
 
 namespace optim {
-class GVToMalloc : public PassInfoMixin<GVToMalloc>{
+class GVToMallocPass : public PassInfoMixin<GVToMallocPass>{
 public:
 //   This run function is the main function of this class.
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
@@ -44,9 +45,6 @@ public:
 //   In case of main function, we will use the malloc variables as the arguments of call instructions.
 //   And case of other functions, we will use the function arguments as the arguments of call instructions. 
   void AddArgumentsToCallInst(map<Function *, Function *> fMap, Function &f, vector<Value *> malloc);
-
-private:
-  const set<StringRef> DO_NOT_CONSIDER = {"malloc", "free", "input", "output"};
 };
 
 extern "C" ::llvm::PassPluginLibraryInfo
@@ -57,8 +55,8 @@ llvmGetPassPluginInfo() {
       PB.registerPipelineParsingCallback(
         [](StringRef Name, ModulePassManager &MPM,
            ArrayRef<PassBuilder::PipelineElement>) {
-          if (Name == "gv-malloc") {
-            MPM.addPass(GVToMalloc());
+          if (Name == "gv2malloc") {
+            MPM.addPass(GVToMallocPass());
             return true;
           }
           return false;
