@@ -1,7 +1,15 @@
 start countSetBitsRec 1:
 .entry:
   r1 = icmp eq arg1 0 32 
-  br r1 .cleanup .if.end 
+  br r1 .if.then .if.end 
+.if.then:
+  r2 = add 20480 0 64 
+  r1 = mul 0 64 64 
+  r2 = add r2 r1 64 
+  r1 = mul 0 4 64 
+  r1 = add r2 r1 64 
+  r1 = load 4 r1 0 
+  br .cleanup 
 .if.end:
   r3 = urem arg1 16 32 
   r2 = add 20480 0 64 
@@ -13,14 +21,8 @@ start countSetBitsRec 1:
   r1 = udiv arg1 16 32 
   r1 = call countSetBitsRec r1 
   r1 = add r1 r2 32 
-  ret r1 
+  br .cleanup 
 .cleanup:
-  r2 = add 20480 0 64 
-  r1 = mul 0 64 64 
-  r2 = add r2 r1 64 
-  r1 = mul 0 4 64 
-  r1 = add r2 r1 64 
-  r1 = load 4 r1 0 
   ret r1 
 end countSetBitsRec
 
@@ -60,9 +62,9 @@ start main 0:
   store 4 1 r1 0 
   r2 = add 20480 0 64 
   r1 = mul 0 64 64 
-  r2 = add r2 r1 64 
-  r1 = mul 5 4 64 
   r1 = add r2 r1 64 
+  r2 = mul 5 4 64 
+  r1 = add r1 r2 64 
   store 4 2 r1 0 
   r2 = add 20480 0 64 
   r1 = mul 0 64 64 

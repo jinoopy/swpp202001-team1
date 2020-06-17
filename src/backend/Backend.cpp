@@ -155,14 +155,14 @@ void Backend::SSAElimination(Module &M, SymbolMap &symbolMap, RegisterGraph& RG)
 		for(BasicBlock &BB : F) {
 			// To represent graph, following vector(adjacent list) is used.
 			vector<vector<Symbol *>> adjList(16);
-			BranchInst *brInst = dyn_cast<BranchInst>(BB.getTerminator());
+			Instruction *I = BB.getTerminator();
 			// If terminator is return statement, then pass it.
-			if(brInst == nullptr) {
+			if(isa<ReturnInst>(I)) {
 				continue;
 			}
 			// For every successor, find phi nodes from BB and construct graph.
-			for(unsigned i = 0; i < brInst->getNumSuccessors(); i++) {
-				addEdges(BB, *(brInst->getSuccessor(i)), symbolMap, adjList);
+			for(unsigned i = 0; i < I->getNumSuccessors(); i++) {
+				addEdges(BB, *(I->getSuccessor(i)), symbolMap, adjList);
 			}
 
 			// To store the number of incoming edge.
@@ -398,8 +398,8 @@ Value *Backend::findLeastReg(Symbol *reg, BasicBlock &BB, SymbolMap &symbolMap) 
 			}
 		}
 	}
-	Instruction *brInst = dyn_cast<BranchInst>(BB.getTerminator());
-	if(brInst == nullptr) {
+	Instruction *brInst = BB.getTerminator();
+	if(isa<ReturnInst>(brInst)) {
 		return nullptr;
 	}
 	for(unsigned i = 0; i < brInst->getNumSuccessors(); i++) {

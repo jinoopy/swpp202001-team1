@@ -2,10 +2,12 @@ start matmul 4:
 .entry:
   ; Init stack pointer
   sp = sub sp 344 64 
-  r1 = icmp eq arg1 0 32 
   r15 = mul 0 1 32 
-  br r1 .for.end425 .for.cond1.preheader 
-.for.cond1.preheader:
+  br .for.cond 
+.for.cond:
+  r1 = icmp ult r15 arg1 32 
+  br r1 .for.body .for.end425 
+.for.body:
   r1 = mul r15 arg1 32 
   store 8 r1 sp 0 
   r1 = or r15 1 32 
@@ -18,8 +20,11 @@ start matmul 4:
   r1 = mul r1 arg1 32 
   store 8 r1 sp 24 
   r14 = mul 0 1 32 
-  br .for.cond4.preheader 
-.for.cond4.preheader:
+  br .for.cond1 
+.for.cond1:
+  r1 = icmp ult r14 arg1 32 
+  br r1 .for.body3 .for.end422 
+.for.body3:
   r1 = load 8 sp 0 
   r3 = add r14 r1 32 
   r1 = mul r3 1 64 
@@ -117,7 +122,10 @@ start matmul 4:
   r1 = load 8 sp 88 
   store 8 r1 sp 88 
   r5 = mul 0 1 32 
-  br .for.body6 
+  br .for.cond4 
+.for.cond4:
+  r1 = icmp ult r5 arg1 32 
+  br r1 .for.body6 .for.end 
 .for.body6:
   r1 = load 8 sp 0 
   r3 = add r5 r1 32 
@@ -630,19 +638,16 @@ start matmul 4:
   r1 = load 8 sp 88 
   store 8 r2 r1 0 
   r1 = add r5 4 32 
-  r2 = icmp ult r1 arg1 32 
   r5 = mul r1 1 32 
-  br r2 .for.body6 .for.end 
+  br .for.cond4 
 .for.end:
   r1 = add r14 4 32 
-  r2 = icmp ult r1 arg1 32 
   r14 = mul r1 1 32 
-  br r2 .for.cond4.preheader .for.end422 
+  br .for.cond1 
 .for.end422:
   r1 = add r15 4 32 
-  r2 = icmp ult r1 arg1 32 
   r15 = mul r1 1 32 
-  br r2 .for.cond1.preheader .for.end425 
+  br .for.cond 
 .for.end425:
   sp = add sp 344 64 
   ret 0 
@@ -650,15 +655,20 @@ end matmul
 
 start read_mat 2:
 .entry:
-  r1 = icmp eq arg1 0 32 
-  r6 = mul 0 1 32 
-  br r1 .for.end6 .for.cond1.preheader.us 
-.for.cond1.preheader.us:
-  r5 = mul r6 arg1 32 
-  r7 = mul arg1 1 64 
+  r7 = mul 0 1 32 
+  br .for.cond 
+.for.cond:
+  r1 = icmp eq r7 arg1 32 
+  br r1 .for.end6 .for.body 
+.for.body:
+  r5 = mul r7 arg1 32 
+  r6 = mul arg1 1 64 
   r4 = mul 0 1 64 
-  br .for.body3.us 
-.for.body3.us:
+  br .for.cond1 
+.for.cond1:
+  r1 = icmp eq r4 r6 64 
+  br r1 .for.end .for.body3 
+.for.body3:
   r3 = call read 
   r1 = mul r4 1 32 
   r1 = add r5 r1 32 
@@ -667,29 +677,32 @@ start read_mat 2:
   r1 = add r2 r1 64 
   store 8 r3 r1 0 
   r1 = add r4 1 64 
-  r2 = icmp eq r1 r7 64 
   r4 = mul r1 1 64 
-  br r2 .for.end.us .for.body3.us 
-.for.end.us:
-  r1 = add r6 1 32 
-  r2 = icmp eq r1 arg1 32 
-  r6 = mul r1 1 32 
-  br r2 .for.end6 .for.cond1.preheader.us 
+  br .for.cond1 
+.for.end:
+  r1 = add r7 1 32 
+  r7 = mul r1 1 32 
+  br .for.cond 
 .for.end6:
   ret 0 
 end read_mat
 
 start print_mat 2:
 .entry:
-  r1 = icmp eq arg1 0 32 
-  r5 = mul 0 1 32 
-  br r1 .for.end6 .for.cond1.preheader.us 
-.for.cond1.preheader.us:
-  r4 = mul r5 arg1 32 
-  r6 = mul arg1 1 64 
+  r6 = mul 0 1 32 
+  br .for.cond 
+.for.cond:
+  r1 = icmp eq r6 arg1 32 
+  br r1 .for.end6 .for.body 
+.for.body:
+  r4 = mul r6 arg1 32 
+  r5 = mul arg1 1 64 
   r3 = mul 0 1 64 
-  br .for.body3.us 
-.for.body3.us:
+  br .for.cond1 
+.for.cond1:
+  r1 = icmp eq r3 r5 64 
+  br r1 .for.end .for.body3 
+.for.body3:
   r1 = mul r3 1 32 
   r1 = add r4 r1 32 
   r2 = mul arg2 1 64 
@@ -698,109 +711,37 @@ start print_mat 2:
   r1 = load 8 r1 0 
   call write r1 
   r1 = add r3 1 64 
-  r2 = icmp eq r1 r6 64 
   r3 = mul r1 1 64 
-  br r2 .for.end.us .for.body3.us 
-.for.end.us:
-  r1 = add r5 1 32 
-  r2 = icmp eq r1 arg1 32 
-  r5 = mul r1 1 32 
-  br r2 .for.end6 .for.cond1.preheader.us 
+  br .for.cond1 
+.for.end:
+  r1 = add r6 1 32 
+  r6 = mul r1 1 32 
+  br .for.cond 
 .for.end6:
   ret 0 
 end print_mat
 
 start main 0:
 .entry:
-  r11 = call read 
-  r12 = mul r11 1 32 
-  r1 = urem r12 4 32 
+  r2 = call read 
+  r5 = mul r2 1 32 
+  r1 = urem r5 4 32 
   r1 = icmp eq r1 0 32 
-  br r1 .if.end .cleanup 
+  br r1 .if.end .if.then 
+.if.then:
+  br .cleanup 
 .if.end:
-  r1 = mul r11 8 64 
-  r1 = mul r1 r11 64 
+  r1 = mul r2 8 64 
+  r1 = mul r1 r2 64 
   r2 = and r1 34359738360 64 
-  r13 = malloc r2 
-  r8 = malloc r2 
-  r10 = malloc r2 
-  r9 = icmp eq r12 0 32 
-  r7 = mul 0 1 32 
-  br r9 .for.cond.i3.preheader .for.cond1.i.preheader.us 
-.for.cond1.i.preheader.us:
-  r6 = mul r7 r12 32 
-  r5 = urem r11 4294967296 64 
-  r4 = mul 0 1 64 
-  br .for.body3.i.us 
-.for.body3.i.us:
-  r3 = call read 
-  r1 = mul r4 1 32 
-  r1 = add r6 r1 32 
-  r2 = mul r13 1 64 
-  r1 = mul r1 8 64 
-  r1 = add r2 r1 64 
-  store 8 r3 r1 0 
-  r1 = add r4 1 64 
-  r2 = icmp eq r1 r5 64 
-  r4 = mul r1 1 64 
-  br r2 .for.end.i.us .for.body3.i.us 
-.for.end.i.us:
-  r1 = add r7 1 32 
-  r2 = icmp eq r1 r12 32 
-  r7 = mul r1 1 32 
-  br r2 .for.cond.i3.preheader .for.cond1.i.preheader.us 
-.for.cond.i3.preheader:
-  r7 = mul 0 1 32 
-  br r9 .read_mat.exit17 .for.cond1.i7.preheader.us 
-.for.cond1.i7.preheader.us:
-  r6 = mul r7 r12 32 
-  r5 = urem r11 4294967296 64 
-  r4 = mul 0 1 64 
-  br .for.body3.i14.us 
-.for.body3.i14.us:
-  r3 = call read 
-  r1 = mul r4 1 32 
-  r1 = add r6 r1 32 
-  r2 = mul r8 1 64 
-  r1 = mul r1 8 64 
-  r1 = add r2 r1 64 
-  store 8 r3 r1 0 
-  r1 = add r4 1 64 
-  r2 = icmp eq r1 r5 64 
-  r4 = mul r1 1 64 
-  br r2 .for.end.i16.us .for.body3.i14.us 
-.for.end.i16.us:
-  r1 = add r7 1 32 
-  r2 = icmp eq r1 r12 32 
-  r7 = mul r1 1 32 
-  br r2 .read_mat.exit17 .for.cond1.i7.preheader.us 
-.read_mat.exit17:
-  r7 = mul r10 1 64 
-  call matmul r12 r7 r13 r8 
-  r6 = mul 0 1 32 
-  br r9 .cleanup .for.cond1.i24.preheader.us 
-.for.cond1.i24.preheader.us:
-  r5 = mul r6 r12 32 
-  r4 = urem r11 4294967296 64 
-  r3 = mul 0 1 64 
-  br .for.body3.i30.us 
-.for.body3.i30.us:
-  r1 = mul r3 1 32 
-  r1 = add r5 r1 32 
-  r2 = mul r7 1 64 
-  r1 = mul r1 8 64 
-  r1 = add r2 r1 64 
-  r1 = load 8 r1 0 
-  call write r1 
-  r1 = add r3 1 64 
-  r2 = icmp eq r1 r4 64 
-  r3 = mul r1 1 64 
-  br r2 .for.end.i32.us .for.body3.i30.us 
-.for.end.i32.us:
-  r1 = add r6 1 32 
-  r2 = icmp eq r1 r12 32 
-  r6 = mul r1 1 32 
-  br r2 .cleanup .for.cond1.i24.preheader.us 
+  r4 = malloc r2 
+  r3 = malloc r2 
+  r1 = malloc r2 
+  call read_mat r5 r4 
+  call read_mat r5 r3 
+  call matmul r5 r1 r4 r3 
+  call print_mat r5 r1 
+  br .cleanup 
 .cleanup:
   ret 0 
 end main

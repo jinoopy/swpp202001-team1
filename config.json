@@ -107,16 +107,13 @@
             "instcombine",
             "power-reduc",
             "sink",
-            "simplifycfg",
             "dce"
         ],
         "loop-optim-1": [
             "reassociate",
             "loop-simplify",
             "lcssa",
-            "licm",
-            "loop-rotate",
-            "loop-unswitch"
+            "licm"
         ],
         "loop-optim-2": [
             "reassociate",
@@ -136,7 +133,6 @@
     "run": {
         "opt": [
             "global-optim",
-            "function-optim",
             "inst-optim",
             "memory-optim",
             "inst-optim",
