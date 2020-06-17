@@ -256,7 +256,7 @@ void AssemblyEmitter::visitBranchInst(BranchInst& I) {
     }
 }
 void AssemblyEmitter::visitSwitchInst(SwitchInst& I) {
-    string asmb("switch " + name(I.getCondition()));
+    string asmb("  switch " + name(I.getCondition()));
     for(auto& c : I.cases()) {
         if(c.getCaseIndex() == I.case_default()->getCaseIndex()) continue;
         asmb.append(" " + name(c.getCaseValue()) + " ." + name(c.getCaseSuccessor()));

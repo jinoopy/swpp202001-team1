@@ -269,7 +269,8 @@ start remove 2:
   r2 = mul 1 1 64 
   br .cleanup 
 .cleanup:
-switch r3 0 .while.cond.backedge 2 .while.cond.backedge .cleanup24
+  r1 = mul r2 1 64 
+  switch r3 0 .while.cond.backedge 2 .while.cond.backedge .cleanup24
 .while.cond.backedge:
   r1 = load 8 r4 0 
   r5 = mul r2 1 64 

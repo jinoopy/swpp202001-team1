@@ -28,8 +28,9 @@ start check_with_primes 1:
   r4 = mul 0 1 32 
   br .cleanup 
 .cleanup:
+  r5 = mul r1 1 64 
   r1 = mul 1 1 64 
-switch r4 0 .while.cond 3 .cleanup5 .cleanup5.loopexit
+  switch r4 0 .while.cond 3 .cleanup5 .cleanup5.loopexit
 .cleanup5.loopexit:
   r1 = mul 0 1 64 
   br .cleanup5 
@@ -76,7 +77,8 @@ start add_primes 1:
   r3 = mul 0 1 32 
   br .cleanup.i 
 .cleanup.i:
-switch r3 0 .while.cond.i 3 .while.end.i .if.end5
+  r5 = mul r1 1 64 
+  switch r3 0 .while.cond.i 3 .while.end.i .if.end5
 .while.end.i:
   r4 = malloc 16 
   r1 = mul r4 1 64 
@@ -135,8 +137,9 @@ start is_prime 1:
   r4 = mul 0 1 32 
   br .cleanup.i 
 .cleanup.i:
+  r5 = mul r1 1 64 
   r3 = mul 0 1 64 
-switch r4 0 .while.cond.i 3 .while.end.i .return
+  switch r4 0 .while.cond.i 3 .while.end.i .return
 .while.end.i:
   r2 = load 8 20480 8 
   r1 = mul r2 r2 64 
@@ -174,7 +177,8 @@ switch r4 0 .while.cond.i 3 .while.end.i .return
   r3 = mul 0 1 32 
   br .cleanup.i.i 
 .cleanup.i.i:
-switch r3 0 .while.cond.i.i 3 .while.end.i.i .if.end5.i
+  r5 = mul r1 1 64 
+  switch r3 0 .while.cond.i.i 3 .while.end.i.i .if.end5.i
 .while.end.i.i:
   r4 = malloc 16 
   r1 = mul r4 1 64 
