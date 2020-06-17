@@ -263,6 +263,11 @@ except:
 #run the desired mode
 if mode == "-build":
     print("llvm/bin directory : " + binDir)
+    try:
+        if not(os.path.isdir('lib')):
+            os.makedirs(os.path.join('lib'))
+    except OSError as e:
+        raise
     build(config)
 elif mode == "-run":
     if inputIR == "":
