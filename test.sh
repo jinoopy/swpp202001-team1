@@ -53,8 +53,8 @@ if [[ "$1" == "run" || "$1" == "all" ]]; then
 	test "rmq1d_naive"
 	test "rmq1d_sparsetable"
 	test "rmq2d_naive"
-	test "rmq2d_sparsetable"		#lots of memory error
-									#if remove 'instcombine', pass 3/5 testcases
+	test "rmq2d_sparsetable"		# lots of memory error
+									# malloc2gv problem
 	echo "----- end -----"
 fi
 

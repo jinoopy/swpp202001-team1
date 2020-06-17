@@ -1,1 +1,1 @@
-Runtime error at asmb/rmq2d_sparsetable.s:437: allocation size should not be 0
+Runtime error at asmb/rmq2d_sparsetable.s:616: accessing non-allocated memory

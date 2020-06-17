@@ -1,1 +1,1 @@
-Runtime error at asmb/rmq2d_sparsetable.s:437: out-of-memory
+Runtime error at asmb/rmq2d_sparsetable.s:240: out-of-memory

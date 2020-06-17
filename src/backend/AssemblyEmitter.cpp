@@ -67,7 +67,8 @@ void AssemblyEmitter::visitBasicBlock(BasicBlock& BB) {
             *fout << "  ; Init global variables\n";
             for(auto& gv : BB.getModule()->globals()) {
                 //temporarily stores the GV pointer.
-                *fout << emitInst({"r1 = malloc", to_string(getAccessSize(gv.getValueType()))});
+                unsigned size = (getAccessSize(gv.getValueType()) + 7) / 8 * 8;
+                *fout << emitInst({"r1 = malloc", to_string(size)});
                 if(gv.hasInitializer() && !gv.getInitializer()->isZeroValue()) {
                     *fout << emitInst({"store", to_string(getAccessSize(gv.getValueType())), name(gv.getInitializer()), "r1 0"});
                 }

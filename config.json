@@ -82,7 +82,6 @@
     ],
     "preset-passes": {
         "global-optim": [
-            "gv2malloc",
             "globaldce",
             "mem2reg",
             "gvn",

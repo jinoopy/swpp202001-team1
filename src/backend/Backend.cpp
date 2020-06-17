@@ -526,7 +526,7 @@ SymbolMap::SymbolMap(Module* M, TargetMachine& TM, RegisterGraph& RG) : M(M), TM
     unsigned size = getAccessSize(dyn_cast<GlobalVariable>(&gv)->getValueType());
     Memory* gvaddr = new Memory(TM.gvp(), acc);
     symbolTable[&gv] = gvaddr;
-    acc += size;
+    acc += (size+7) / 8 * 8;
   }
 }
 
