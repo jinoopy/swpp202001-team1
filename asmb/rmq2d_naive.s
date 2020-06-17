@@ -32,14 +32,16 @@ start min_element 2:
   r2 = load 4 r4 0 
   r1 = load 4 r3 0 
   r1 = icmp slt r2 r1 32 
+  r2 = mul r3 1 64 
   br r1 .if.then .if.end 
 .if.then:
-  r3 = mul r4 1 64 
+  r2 = mul r4 1 64 
   br .if.end 
 .if.end:
-  r2 = mul r4 1 64 
-  r1 = mul 1 4 64 
-  r1 = add r2 r1 64 
+  r1 = mul r4 1 64 
+  r3 = mul 1 4 64 
+  r1 = add r1 r3 64 
+  r3 = mul r2 1 64 
   r4 = mul r1 1 64 
   br .while.cond 
 .while.end:
@@ -48,10 +50,11 @@ end min_element
 
 start min_at_row 3:
 .entry:
-  r2 = load 8 20480 0 
-  r1 = mul arg1 4294967296 64 
-  r1 = sdiv r1 4294967296 64 
-  r1 = mul r1 8 64 
+  r1 = load 8 20480 0 
+  r3 = mul arg1 4294967296 64 
+  r3 = sdiv r3 4294967296 64 
+  r2 = mul r1 1 64 
+  r1 = mul r3 8 64 
   r1 = add r2 r1 64 
   r4 = load 8 r1 0 
   r1 = mul arg2 4294967296 64 
@@ -104,10 +107,10 @@ start main 0:
   r1 = mul r5 8 64 
   r1 = add r2 r1 64 
   store 8 r3 r1 0 
-  r3 = mul 0 1 32 
+  r4 = mul 0 1 32 
   br .for.cond9 
 .for.cond9:
-  r1 = icmp slt r3 r7 32 
+  r1 = icmp slt r4 r7 32 
   br r1 .for.body13 .for.cond.cleanup12 
 .for.cond.cleanup12:
   r1 = add r6 1 32 
@@ -115,48 +118,50 @@ start main 0:
   br .for.cond 
 .for.body13:
   r1 = call read 
-  r4 = mul r1 1 32 
+  r3 = mul r1 1 32 
   r2 = load 8 20480 0 
   r1 = mul r5 8 64 
   r1 = add r2 r1 64 
   r2 = load 8 r1 0 
-  r1 = mul r3 1 64 
+  r1 = mul r4 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
-  store 4 r4 r1 0 
-  r1 = add r3 1 32 
-  r3 = mul r1 1 32 
+  store 4 r3 r1 0 
+  r1 = add r4 1 32 
+  r4 = mul r1 1 32 
   br .for.cond9 
 .while.cond:
   r1 = icmp eq r2 0 32 
   br r1 .while.end .while.body 
 .while.body:
-  r6 = add r2 4294967295 32 
+  r7 = add r2 4294967295 32 
   r1 = call read 
   r2 = mul r1 1 32 
   r1 = call read 
-  r7 = mul r1 1 32 
+  r6 = mul r1 1 32 
   r1 = call read 
   r5 = mul r1 1 32 
   r1 = call read 
   r4 = mul r1 1 32 
   r1 = call min_at_row r2 r5 r4 
   r3 = mul r1 1 32 
+  r1 = mul r2 1 32 
   br .for.cond35 
 .for.cond35:
-  r1 = icmp slt r2 r7 32 
-  br r1 .for.body39 .for.cond.cleanup38 
+  r2 = icmp slt r1 r6 32 
+  br r2 .for.body39 .for.cond.cleanup38 
 .for.cond.cleanup38:
   r1 = mul r3 4294967296 64 
   r1 = sdiv r1 4294967296 64 
   call write r1 
-  r2 = mul r6 1 32 
+  r2 = mul r7 1 32 
   br .while.cond 
 .for.body39:
-  r2 = add r2 1 32 
+  r2 = add r1 1 32 
   r1 = call min_at_row r2 r5 r4 
   r1 = call min r3 r1 
   r3 = mul r1 1 32 
+  r1 = mul r2 1 32 
   br .for.cond35 
 .while.end:
   ret 0 

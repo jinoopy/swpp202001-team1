@@ -227,23 +227,23 @@ start preprocess 0:
   r1 = icmp eq r10 0 32 
   br r1 .if.else .if.then56 
 .if.then56:
-  r5 = add r10 4294967295 32 
-  r1 = call A r11 r5 
-  r6 = load 8 r1 0 
-  r1 = call width r5 
+  r6 = add r10 4294967295 32 
+  r1 = call A r11 r6 
+  r5 = load 8 r1 0 
+  r1 = call width r6 
   r1 = mul r1 r8 32 
   r4 = add r1 r7 32 
   r1 = mul r4 4294967296 64 
   r1 = sdiv r1 4294967296 64 
-  r2 = mul r6 1 64 
+  r2 = mul r5 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
   r3 = load 4 r1 0 
-  r1 = shl 1 r5 32 
+  r1 = shl 1 r6 32 
   r1 = add r4 r1 32 
   r1 = mul r1 4294967296 64 
   r1 = sdiv r1 4294967296 64 
-  r2 = mul r6 1 64 
+  r2 = mul r5 1 64 
   r1 = mul r1 4 64 
   r1 = add r2 r1 64 
   r1 = load 4 r1 0 
@@ -303,10 +303,9 @@ start preprocess 0:
   r10 = mul r1 1 32 
   br .for.cond31 
 .for.end109:
-  r1 = add r11 1 32 
-  r2 = load 4 20480 40 
-  r11 = mul r1 1 32 
-  r1 = mul r2 1 32 
+  r2 = add r11 1 32 
+  r1 = load 4 20480 40 
+  r11 = mul r2 1 32 
   br .for.cond27 
 .for.end112:
   ret 0 
@@ -359,9 +358,8 @@ start main 0:
   br .for.cond 
 .for.body12:
   r1 = call read 
-  r3 = mul r1 1 32 
-  r1 = call input r4 r2 
-  store 4 r3 r1 0 
+  r3 = call input r4 r2 
+  store 4 r1 r3 0 
   r1 = add r2 1 32 
   r2 = mul r1 1 32 
   br .for.cond8 
@@ -385,9 +383,9 @@ start main 0:
   r1 = add r1 r3 32 
   r7 = call floorlog2 r1 
   r6 = call P r8 r7 r10 r4 
-  r2 = add r2 1 32 
-  r1 = shl 4294967295 r8 32 
-  r5 = add r2 r1 32 
+  r1 = add r2 1 32 
+  r2 = shl 4294967295 r8 32 
+  r5 = add r1 r2 32 
   r4 = call P r8 r7 r5 r4 
   r2 = add r3 1 32 
   r1 = shl 4294967295 r7 32 

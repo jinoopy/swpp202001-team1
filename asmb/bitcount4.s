@@ -61,15 +61,15 @@ start main 0:
   call write r1 
   ret 0 
 .for.body:
-  r3 = urem r5 2 32 
-  r4 = udiv r5 2 32 
+  r4 = urem r5 2 32 
+  r3 = udiv r5 2 32 
   r2 = add 20480 0 64 
   r1 = mul 0 1024 64 
-  r2 = add r2 r1 64 
-  r1 = mul r4 4 64 
   r1 = add r2 r1 64 
+  r2 = mul r3 4 64 
+  r1 = add r1 r2 64 
   r1 = load 4 r1 0 
-  r4 = add r1 r3 32 
+  r4 = add r1 r4 32 
   r3 = mul r5 1 64 
   r2 = add 20480 0 64 
   r1 = mul 0 1024 64 

@@ -20,17 +20,14 @@ start gcd 2:
   br r1 .if.then5 .if.else 
 .if.then5:
   r1 = urem r3 r2 64 
-  r4 = mul r1 1 64 
-  r1 = mul r2 1 64 
-  r2 = mul r4 1 64 
   br .if.end7 
 .if.else:
   r1 = urem r2 r3 64 
-  r2 = mul r3 1 64 
+  r2 = mul r1 1 64 
+  r1 = mul r3 1 64 
   br .if.end7 
 .if.end7:
-  r3 = mul r2 1 64 
-  r2 = mul r1 1 64 
+  r3 = mul r1 1 64 
   br .tailrecurse 
 .return:
   ret r1 

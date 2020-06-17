@@ -60,9 +60,9 @@ start main 0:
   store 4 1 r1 0 
   r2 = add 20480 0 64 
   r1 = mul 0 64 64 
-  r2 = add r2 r1 64 
-  r1 = mul 5 4 64 
   r1 = add r2 r1 64 
+  r2 = mul 5 4 64 
+  r1 = add r1 r2 64 
   store 4 2 r1 0 
   r2 = add 20480 0 64 
   r1 = mul 0 64 64 

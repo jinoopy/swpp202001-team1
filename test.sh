@@ -25,6 +25,18 @@ function test() {
 	echo "-----end test $TESTNAME-----"
 }
 
+if [ ! -d ./asmb ]; then
+	mkdir asmb
+fi
+
+if [ ! -d ./test ]; then
+	mkdir test
+fi
+
+if [ ! -d ./lib ]; then
+	mkdir lib
+fi
+
 if [[ "$1" == "build" || "$1" == "all" ]]; then
 	echo "----- build -----"
 	python3 compiler.py -build -bin ~/llvmscript/llvm-10.0-release/bin

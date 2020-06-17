@@ -23,14 +23,14 @@ start matmul 4:
   r2 = mul arg3 1 64 
   r1 = mul r1 8 64 
   r1 = add r2 r1 64 
-  r3 = load 8 r1 0 
+  r2 = load 8 r1 0 
   r1 = mul r5 arg1 32 
   r1 = add r1 r6 32 
-  r2 = mul arg4 1 64 
+  r3 = mul arg4 1 64 
   r1 = mul r1 8 64 
-  r1 = add r2 r1 64 
+  r1 = add r3 r1 64 
   r1 = load 8 r1 0 
-  r3 = mul r1 r3 64 
+  r3 = mul r1 r2 64 
   r1 = add r6 r4 32 
   r2 = mul arg2 1 64 
   r1 = mul r1 8 64 
@@ -120,17 +120,17 @@ end print_mat
 start main 0:
 .entry:
   r2 = call read 
-  r4 = mul r2 1 32 
+  r5 = mul r2 1 32 
   r1 = mul r2 8 64 
   r1 = mul r1 r2 64 
-  r3 = and r1 34359738360 64 
-  r5 = malloc r3 
-  r2 = malloc r3 
-  r1 = malloc r3 
-  call read_mat r4 r5 
-  call read_mat r4 r2 
-  call matmul r4 r1 r5 r2 
-  call print_mat r4 r1 
+  r4 = and r1 34359738360 64 
+  r3 = malloc r4 
+  r2 = malloc r4 
+  r1 = malloc r4 
+  call read_mat r5 r3 
+  call read_mat r5 r2 
+  call matmul r5 r1 r3 r2 
+  call print_mat r5 r1 
   ret 0 
 end main
 

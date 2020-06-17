@@ -656,13 +656,13 @@ start main 0:
 .if.end:
   r1 = mul r2 8 64 
   r1 = mul r1 r2 64 
-  r4 = and r1 34359738360 64 
-  r3 = malloc r4 
-  r2 = malloc r4 
-  r1 = malloc r4 
+  r2 = and r1 34359738360 64 
+  r4 = malloc r2 
+  r3 = malloc r2 
+  r1 = malloc r2 
+  call read_mat r5 r4 
   call read_mat r5 r3 
-  call read_mat r5 r2 
-  call matmul r5 r1 r3 r2 
+  call matmul r5 r1 r4 r3 
   call print_mat r5 r1 
   br .cleanup 
 .cleanup:
