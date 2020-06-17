@@ -104,10 +104,10 @@
         "inst-optim": [
             "reassociate",
             "constprop",
+            "sccp",
             "power-reduc",
             "instcombine",
             "power-reduc",
-            "sccp",
             "sink",
             "simplifycfg",
             "dce"
@@ -124,7 +124,7 @@
             "reassociate",
             "loop-simplify",
             "indvars",
-            "loop-unroll-and-jam",
+            "loop-unroll",
             "vectorize"
         ],
         "cleanup": [
@@ -143,6 +143,7 @@
             "memory-optim",
             "inst-optim",
             "loop-optim-1",
+            "inst-optim",
             "loop-optim-2",
             "inst-optim",
             "cleanup"
@@ -151,6 +152,9 @@
             "constexpr",
             "gep-unpack",
             "power-reduc",
+            "instcombine",
+            "power-reduc",
+            "constexpr",
             "addrcast",
             "regspill",
             "dse"

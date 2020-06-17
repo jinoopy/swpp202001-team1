@@ -95,7 +95,7 @@ private:
   //----------------------------------------------
   // %.. = uses %target.getUser() ..
   //           => uses %temp1 ..
-  void insertLoad(Use& target, AllocaInst* loadFrom, Instruction* insertBefore);
+  Value* insertLoad(Use& target, AllocaInst* loadFrom, Instruction* insertBefore, set<Value*>& skip);
 
   //Inserts the store instruction and corresponding type conversions
   // %storeVal = ..
@@ -103,7 +103,7 @@ private:
   // %temp = (proper type conversion to i64) %storeVal
   // store %temp, %storeAt
   // %insertBefore
-  Value* insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore);
+  Value* insertStore(Value* storeVal, AllocaInst* storeAt, Instruction* insertBefore, set<Value*>& skip);
 
 };
 

@@ -10,9 +10,8 @@ start main 0:
   r1 = add 20480 0 64 
   store 8 r3 r1 0 
   store 8 2 r2 0 
-  r2 = mul r3 1 64 
-  r1 = mul 8 1 64 
-  r1 = add r2 r1 64 
+  r1 = mul r3 1 64 
+  r1 = add r1 8 64 
   store 8 0 r1 0 
   r1 = add 20480 8 64 
   store 8 r3 r1 0 
@@ -57,9 +56,8 @@ start check_with_primes.1 2:
   r4 = mul 1 1 32 
   br r2 .cleanup .if.end4 
 .if.end4:
-  r2 = mul r5 1 64 
-  r1 = mul 1 8 64 
-  r1 = add r2 r1 64 
+  r1 = mul r5 1 64 
+  r1 = add r1 8 64 
   r1 = load 8 r1 0 
   r4 = mul 0 1 32 
   br .cleanup 
@@ -81,8 +79,8 @@ start add_primes.2 2:
   r3 = mul 1 1 64 
   br r1 .while.body .return 
 .while.body:
-  r5 = add r2 1 64 
-  store 8 r5 arg2 0 
+  r4 = add r2 1 64 
+  store 8 r4 arg2 0 
   r1 = load 8 20480 0 
   r6 = mul r1 1 64 
   br .while.cond.i 
@@ -92,40 +90,38 @@ start add_primes.2 2:
 .while.body.i:
   r2 = load 8 r6 0 
   r1 = mul r2 r2 64 
-  r3 = icmp ugt r1 r5 64 
+  r3 = icmp ugt r1 r4 64 
   r1 = mul r6 1 64 
-  r4 = mul 3 1 32 
+  r5 = mul 3 1 32 
   br r3 .cleanup.i .if.end.i 
 .if.end.i:
-  r1 = urem r5 r2 64 
+  r1 = urem r4 r2 64 
   r2 = icmp eq r1 0 64 
   r1 = mul r6 1 64 
-  r4 = mul 1 1 32 
+  r5 = mul 1 1 32 
   br r2 .cleanup.i .if.end4.i 
 .if.end4.i:
-  r2 = mul r6 1 64 
-  r1 = mul 1 8 64 
-  r1 = add r2 r1 64 
+  r1 = mul r6 1 64 
+  r1 = add r1 8 64 
   r1 = load 8 r1 0 
-  r4 = mul 0 1 32 
+  r5 = mul 0 1 32 
   br .cleanup.i 
 .cleanup.i:
-switch r4 0 .while.cond.i 3 .while.end.i .if.end5
+switch r5 0 .while.cond.i 3 .while.end.i .if.end5
 .while.end.i:
-  r4 = malloc 16 
-  r1 = mul r4 1 64 
-  store 8 r5 r1 0 
-  r2 = mul r4 1 64 
-  r1 = mul 8 1 64 
-  r1 = add r2 r1 64 
-  store 8 0 r1 0 
-  r3 = mul r4 1 64 
-  r2 = load 8 20480 8 
-  r1 = mul 1 8 64 
-  r1 = add r2 r1 64 
-  store 8 r3 r1 0 
-  r1 = add 20480 8 64 
+  r3 = malloc 16 
+  r1 = mul r3 1 64 
   store 8 r4 r1 0 
+  r1 = mul r3 1 64 
+  r1 = add r1 8 64 
+  store 8 0 r1 0 
+  r2 = mul r3 1 64 
+  r1 = add 20480 8 64 
+  r1 = load 8 r1 0 
+  r1 = add r1 8 64 
+  store 8 r2 r1 0 
+  r1 = add 20480 8 64 
+  store 8 r3 r1 0 
   r2 = load 8 arg2 0 
   r1 = urem arg1 r2 64 
   r1 = icmp eq r1 0 64 
@@ -162,9 +158,8 @@ start is_prime.3 2:
   r4 = mul 1 1 32 
   br r2 .cleanup.i .if.end4.i 
 .if.end4.i:
-  r2 = mul r5 1 64 
-  r1 = mul 1 8 64 
-  r1 = add r2 r1 64 
+  r1 = mul r5 1 64 
+  r1 = add r1 8 64 
   r1 = load 8 r1 0 
   r4 = mul 0 1 32 
   br .cleanup.i 
@@ -179,8 +174,8 @@ switch r4 0 .while.cond.i 3 .while.end.i .return
   r3 = mul 1 1 64 
   br r4 .while.body.i4 .return 
 .while.body.i4:
-  r6 = add r1 1 64 
-  store 8 r6 arg2 0 
+  r4 = add r1 1 64 
+  store 8 r4 arg2 0 
   r1 = load 8 20480 0 
   r5 = mul r1 1 64 
   br .while.cond.i.i 
@@ -190,40 +185,38 @@ switch r4 0 .while.cond.i 3 .while.end.i .return
 .while.body.i.i:
   r3 = load 8 r5 0 
   r1 = mul r3 r3 64 
-  r2 = icmp ugt r1 r6 64 
+  r2 = icmp ugt r1 r4 64 
   r1 = mul r5 1 64 
   r3 = mul 3 1 32 
   br r2 .cleanup.i.i .if.end.i.i 
 .if.end.i.i:
-  r1 = urem r6 r3 64 
+  r1 = urem r4 r3 64 
   r2 = icmp eq r1 0 64 
   r1 = mul r5 1 64 
   r3 = mul 1 1 32 
   br r2 .cleanup.i.i .if.end4.i.i 
 .if.end4.i.i:
-  r2 = mul r5 1 64 
-  r1 = mul 1 8 64 
-  r1 = add r2 r1 64 
+  r1 = mul r5 1 64 
+  r1 = add r1 8 64 
   r1 = load 8 r1 0 
   r3 = mul 0 1 32 
   br .cleanup.i.i 
 .cleanup.i.i:
 switch r3 0 .while.cond.i.i 3 .while.end.i.i .if.end5.i
 .while.end.i.i:
-  r4 = malloc 16 
-  r1 = mul r4 1 64 
-  store 8 r6 r1 0 
-  r2 = mul r4 1 64 
-  r1 = mul 8 1 64 
-  r1 = add r2 r1 64 
-  store 8 0 r1 0 
-  r3 = mul r4 1 64 
-  r2 = load 8 20480 8 
-  r1 = mul 1 8 64 
-  r1 = add r2 r1 64 
-  store 8 r3 r1 0 
-  r1 = add 20480 8 64 
+  r3 = malloc 16 
+  r1 = mul r3 1 64 
   store 8 r4 r1 0 
+  r1 = mul r3 1 64 
+  r1 = add r1 8 64 
+  store 8 0 r1 0 
+  r2 = mul r3 1 64 
+  r1 = add 20480 8 64 
+  r1 = load 8 r1 0 
+  r1 = add r1 8 64 
+  store 8 r2 r1 0 
+  r1 = add 20480 8 64 
+  store 8 r3 r1 0 
   r2 = load 8 arg2 0 
   r1 = urem arg1 r2 64 
   r1 = icmp eq r1 0 64 
