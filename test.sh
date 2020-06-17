@@ -53,8 +53,7 @@ if [[ "$1" == "run" || "$1" == "all" ]]; then
 	test "rmq1d_naive"
 	test "rmq1d_sparsetable"
 	test "rmq2d_naive"
-	test "rmq2d_sparsetable"		# memory error & wrong answer
-									# but works if gv2malloc & inline both removed
+	test "rmq2d_sparsetable"		#wrong answer
 	echo "----- end -----"
 fi
 
