@@ -1,5 +1,17 @@
 # TEAM 1 Compiler
 
+## Results
+
+- 1st Prize out of all teams in 2020-01
+
+- Best speedup in 15 tasks out of 23
+
+- Highly efficient assembly by Graph coloring-based Register Allocation
+
+- Check out by counting LOAD and STORE ops! They are reduced to the limit 
+
+- Relatively bad performance on loop optimization.
+
 ## How to use
 
 ### Dev mode
